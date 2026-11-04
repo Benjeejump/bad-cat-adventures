@@ -1,0 +1,36 @@
+"""Targeted gadgets and the 20-kitten timed attack, including a forgiving timeout."""
+from playwright.sync_api import sync_playwright
+
+def check(value,message):
+ assert value,message
+ print('PASS',message,flush=True)
+with sync_playwright() as p:
+ b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
+ ctx=b.new_context(viewport={'width':1280,'height':800},reduced_motion='reduce')
+ ctx.route('https://tile.openstreetmap.org/**',lambda r:r.abort());ctx.route('https://nominatim.openstreetmap.org/**',lambda r:r.abort())
+ page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto('http://127.0.0.1:8000/',wait_until='domcontentloaded');page.locator('#launch-silent').click();page.wait_for_timeout(500)
+ page.locator('[data-gadget="bubble"]').click()
+ check(page.evaluate('badCatDiagnostics().targeting.armed')=='bubble','Choosing a gadget arms it without immediately firing')
+ page.locator('#actor-metro').click()
+ check('M floats away' in page.locator('#story').inner_text(),'The chosen action affects Metro')
+ check(page.locator('.target-pop').count()>0,'Targeted action has a visible impact animation')
+ page.locator('#cancel-target').click();page.locator('#actor-badcat').click()
+ check(page.evaluate('badCatDiagnostics().targeting.selected')=='badcat','Can select BC before choosing an action')
+ page.locator('[data-gadget="sonar"]').click()
+ check('BC is revealed' in page.locator('#story').inner_text(),'Selecting an action then affects the selected BC')
+ page.locator('#kitten-launch').click();page.locator('#encounter-actions button').first.click()
+ check(page.locator('.kitten-target').count()==20,'Exactly 20 kittens arrive')
+ check(page.evaluate('badCatDiagnostics().targeting.raid.seconds')<=45,'Visible 45-second countdown starts')
+ page.locator('[data-gadget="puppy"]').click()
+ for i in range(1,21):page.locator(f'[data-kitten="{i}"]').click()
+ check('All 20 kittens' in page.locator('#encounter-title').inner_text(),'Clearing all 20 within the timer wins the round')
+ page.locator('#encounter-actions button').first.click()
+ check(page.evaluate('badCatDiagnostics().targeting.raid.remaining')==20,'Retry resets all 20 targets')
+ page.screenshot(path='/tmp/bad-cat-kitten-attack.png')
+ page.evaluate('badCatTargeting.tick(46)')
+ check('puppies scoop up' in page.locator('#encounter-title').inner_text(),'Timeout produces a puppy rescue, not game over')
+ page.locator('#encounter-actions button').last.click()
+ page.locator('#kitten-launch').click();page.locator('#encounter-actions button').first.click();page.set_viewport_size({'width':1024,'height':600})
+ check(page.locator('#kitten-field').bounding_box()['width']>400,'Kitten playfield remains usable at tablet landscape size')
+ page.locator('#raid-close').click();page.locator('#encounter-actions button').last.click()
+ check(not errors,f'No targeting JavaScript errors: {errors}');b.close()

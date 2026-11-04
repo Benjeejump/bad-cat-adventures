@@ -1,9 +1,18 @@
-const CACHE = "bad-cat-shell-v2";
+const CACHE = "bad-cat-shell-v3";
 const SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
+  "./adventure.js",
+  "./targeting.js",
+  "./assets/kitten.svg",
+  "./site-config.js",
+  "./map-mode.css",
+  "./assets/odyssey.svg",
+  "./assets/bad-cat.svg",
+  "./assets/metro.svg",
+  "./assets/amy.svg",
   "./manifest.webmanifest",
   "./assets/icon.svg",
   "./assets/icon-192.png",

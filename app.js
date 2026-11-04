@@ -149,81 +149,35 @@
     tileLoaded = false,
     tileErrors = 0,
     mapTimer;
-  const buildingDefs = [
-    {
-      name: "Puppy Headquarters",
-      emoji: "🏡",
-      offset: [0.0015, -0.0015],
-      event: "puppy",
-    },
-    {
-      name: "Metro's fictional lair",
-      emoji: "🏰",
-      offset: [0.0043, 0.002],
-      event: "lair",
-    },
-    {
-      name: "Cartoon houses",
-      emoji: "🏘️",
-      offset: [0.0022, 0.0045],
-      event: "houses",
-    },
-    {
-      name: "Squid Car Wash",
-      emoji: "🧽",
-      offset: [-0.0003, 0.0032],
-      event: "squid",
-    },
-  ];
-  function buildingEvent(kind) {
-    if (kind === "squid") {
-      encounter("squid");
-      return;
-    }
-    if (kind === "puppy") {
-      gadget("puppy");
-      story(
-        "Puppy Headquarters opens its doors. Giant Puppy offers to carry the whole car. Politely.",
-      );
-    }
-    if (kind === "lair") {
-      story(
-        "Metro's lair has a secret button labelled ‘DO NOT PRESS’. It dispenses tiny hats. Suspicious!",
-      );
-      burst("🎩", 10);
-      sound("sonar");
-    }
-    if (kind === "houses") {
-      encounter("vacuum");
-    }
-  }
+  const buildingDefs = []; // Fictional buildings stay in HQ, not over the real road map.
   function initFallback() {
     for (const [key, emoji, label] of [
-      ["car", "🚙", "Your crew"],
+      ["car", "", "White Honda Odyssey"],
       ["badcat", "🐈‍⬛", "Bad Cat"],
       ["metro", "🐱", "Metro"],
     ]) {
       const node = document.createElement("div");
       node.className = `actor ${key === "car" ? "car-actor" : "enemy-actor"}`;
       node.id = `actor-${key}`;
-      node.textContent = emoji;
+      node.innerHTML =
+        key === "car"
+          ? ""
+          : `<img src="assets/${key === "badcat" ? "bad-cat" : "metro"}.svg" alt="${key === "badcat" ? "BC, Bad Cat" : "M, Metro"}">`;
       node.setAttribute("aria-label", label);
+      if (key !== "car") {
+        node.setAttribute("role", "button");
+        node.tabIndex = 0;
+        const act = () => window.badCatTargeting.target(key, node);
+        node.addEventListener("click", act);
+        node.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            act();
+          }
+        });
+      }
       $("#fallback-actors").append(node);
     }
-    buildingDefs.forEach((b, i) => {
-      const node = document.createElement("button");
-      node.className = "actor building-actor";
-      node.textContent = b.emoji;
-      node.title = `${b.name} · fictional`;
-      node.setAttribute(
-        "aria-label",
-        `${b.name}, fictional adventure building`,
-      );
-      node.style.left = `${[23, 70, 78, 31][i]}%`;
-      node.style.top = `${[30, 23, 69, 78][i]}%`;
-      node.addEventListener("click", () => buildingEvent(b.event));
-      $("#fallback-actors").append(node);
-    });
   }
   function mapNotice(text) {
     $("#map-notice").textContent = text;
@@ -255,8 +209,8 @@
     map = L.map("map", {
       zoomControl: false,
       attributionControl: true,
-    }).setView(state.car, 15);
-    L.control.zoom({ position: "topright" }).addTo(map);
+    }).setView(state.car, 18);
+    L.control.zoom({ position: "bottomleft" }).addTo(map);
     const tiles = (tileLayer = L.tileLayer(
       "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
       {
@@ -294,28 +248,65 @@
       keyboard: true,
     }).addTo(map);
     markers.badcat = L.marker(state.badcat, {
-      icon: icon("🐈‍⬛", "enemy-icon"),
+      icon: icon(
+        '<img src="assets/bad-cat.svg" alt="BC, Bad Cat">',
+        "enemy-icon badcat-marker",
+      ),
       title: "Bad Cat · fictional character",
     }).addTo(map);
     markers.metro = L.marker(state.metro, {
-      icon: icon("🐱", "enemy-icon"),
+      icon: icon(
+        '<img src="assets/metro.svg" alt="M, Metro">',
+        "enemy-icon metro-marker",
+      ),
       title: "Metro · fictional character",
     }).addTo(map);
-    buildings = buildingDefs.map((b) =>
-      L.marker([state.car[0] + b.offset[0], state.car[1] + b.offset[1]], {
-        icon: icon(b.emoji, "building-icon"),
-        title: `${b.name} · fictional overlay`,
-      })
-        .addTo(map)
-        .on("click", () => buildingEvent(b.event)),
+    markers.badcat.on("click", () =>
+      window.badCatTargeting.target("badcat", markers.badcat.getElement()),
     );
-    L.polyline(route, {
-      color: "#718d75",
-      weight: 3,
-      opacity: 0.4,
-      dashArray: "6 9",
-      interactive: false,
-    }).addTo(map);
+    markers.metro.on("click", () =>
+      window.badCatTargeting.target("metro", markers.metro.getElement()),
+    );
+    const siteMarkers = new Map();
+    let resolvingSites = false,
+      lastSiteAttempt = 0;
+    const placeSites = async () => {
+      if (resolvingSites || Date.now() - lastSiteAttempt < 15000) return;
+      resolvingSites = true;
+      lastSiteAttempt = Date.now();
+      try {
+        // Sequential requests respect the public geocoder's one-request-per-second limit.
+        for (const site of window.BAD_CAT_SITES) {
+          if (siteMarkers.has(site.id)) continue;
+          const coordinates = await window.resolveBadCatSite(site);
+          if (coordinates) {
+            const marker = L.marker(coordinates, {
+              icon: icon(site.id === "carwash" ? "🦑" : "🐾", "carwash-pin"),
+              title: `${site.name} · ${site.address}`,
+            })
+              .addTo(map)
+              .bindTooltip(`${site.name} · ${site.address}`)
+              .on("click", () =>
+                site.id === "carwash"
+                  ? window.badCatAdventure.carwash()
+                  : encounter("puppybase"),
+              );
+            siteMarkers.set(site.id, marker);
+          }
+          await new Promise((resolve) => setTimeout(resolve, 1100));
+        }
+      } finally {
+        resolvingSites = false;
+        $("#place-status").textContent =
+          siteMarkers.size === 2
+            ? "GO Car Wash + Puppy Base: fixed Lakeline pins ready."
+            : "Place lookup needs a connection. The car wash button always works.";
+        $("#retry-places").hidden = siteMarkers.size === 2;
+      }
+    };
+    placeSites();
+    window.addEventListener("online", placeSites);
+    $("#retry-places").addEventListener("click", placeSites);
     map.on("dragstart", () => {
       state.follow = false;
       updateFollow();
@@ -378,9 +369,15 @@
       `${(state.distance / 1000).toFixed(2)} km explored`;
   }
   function tick(dt) {
-    if (state.mode === "test" && !state.paused) {
+    window.badCatTargeting.tick(dt);
+    window.badCatAdventure.tick(dt);
+    if (
+      state.mode === "test" &&
+      !state.paused &&
+      !window.badCatAdventure.isOpen()
+    ) {
       const prev = state.car;
-      state.elapsed += dt * state.speed;
+      state.elapsed += dt * state.speed * window.badCatAdventure.motionScale();
       state.car = routePoint(state.elapsed / 200);
       state.distance += metres(prev, state.car);
     }
@@ -390,10 +387,10 @@
       if (state.mode === "test") {
         // Vary signed route offsets so cats approach, overtake and retreat.
         state.badcat = routePoint(
-          t + Math.sin(state.elapsed / 13) * 0.025 - (retreat ? 0.06 : 0.012),
+          t + Math.sin(state.elapsed / 13) * 0.06 - (retreat ? 0.1 : 0.05),
         );
         state.metro = routePoint(
-          t + Math.cos(state.elapsed / 17) * 0.032 - (retreat ? 0.075 : 0.021),
+          t + Math.cos(state.elapsed / 17) * 0.06 - (retreat ? 0.14 : 0.12),
         );
       } else {
         const r = retreat ? 0.004 : 0.0012;
@@ -412,6 +409,24 @@
       "shielded",
       Date.now() < state.shieldUntil,
     );
+    for (const key of ["badcat", "metro"]) {
+      const effect = state.targetEffects?.[key];
+      if (effect && Date.now() < effect.until) {
+        const side = key === "badcat" ? -1 : 1;
+        state[key] = [
+          state.car[0] + (effect.kind === "sonar" ? 0.0005 : -0.0008),
+          state.car[1] + side * 0.0014,
+        ];
+      }
+    }
+    const tunnel = window.badCatAdventure.tunnelState();
+    document
+      .querySelectorAll(".enemy-icon,.actor.enemy-actor")
+      .forEach((node) => node.classList.toggle("in-tunnel", !!tunnel?.hidden));
+    if (tunnel?.exiting) {
+      state.badcat = [state.car[0] + 0.00055, state.car[1] - 0.0006];
+      state.metro = [state.car[0] + 0.00075, state.car[1] + 0.0006];
+    }
     updateActors();
   }
   function setTestDrive() {
@@ -419,6 +434,7 @@
     state.mode = "test";
     state.gpsStarting = false;
     state.lastGPS = null;
+    state.lastGPSZoomed = false;
     state.paused = false;
     state.car = routePoint(state.elapsed / 200);
     $("#source-badge").textContent = "TEST DRIVE";
@@ -433,13 +449,7 @@
     $("#gps").textContent = "⌖ Use my GPS";
     state.follow = true;
     updateFollow();
-    if (map) map.setView(state.car, 15);
-    buildings.forEach((m, i) =>
-      m.setLatLng([
-        route[0][0] + buildingDefs[i].offset[0],
-        route[0][1] + buildingDefs[i].offset[1],
-      ]),
-    );
+    if (map) map.setView(state.car, 18);
     toast("Test Drive ready. Let the adventure roll!");
   }
   function startGPS() {
@@ -457,6 +467,7 @@
       )
     )
       return;
+    const firstGPS = state.mode !== "gps";
     state.gpsStarting = true;
     $("#gps").textContent = "⌖ Finding you…";
     browserLocation.start(
@@ -482,13 +493,14 @@
         $("#test-drive").classList.remove("selected");
         $("#pause").disabled = true;
         $("#speed").disabled = true;
-        if (map && state.follow) map.setView(state.car, 15, { animate: false });
-        buildings.forEach((marker, i) =>
-          marker.setLatLng([
-            state.car[0] + buildingDefs[i].offset[0],
-            state.car[1] + buildingDefs[i].offset[1],
-          ]),
-        );
+        if (map && state.follow)
+          map.setView(
+            state.car,
+            firstGPS && !state.lastGPSZoomed ? 18 : map.getZoom(),
+            { animate: false },
+          );
+        state.lastGPSZoomed = true;
+        window.badCatAdventure.onFix(state.car, fix.coords.accuracy);
         updateActors();
       },
       (error) => {
@@ -577,6 +589,7 @@
       encounter();
       return;
     }
+    window.badCatAdventure.onGadget(kind);
     progress.gadgets++;
     save();
     sound(kind);
@@ -642,17 +655,15 @@
         base +
         '<ellipse cx="120" cy="117" rx="77" ry="7" fill="#bed2c3"/><path d="M52 55h130q40 28 0 57H52q-35-28 0-57Z" fill="#d8ae64" stroke="#284952" stroke-width="4"/><path d="M109 55V28h25v12h-11v15" fill="#76aaa5" stroke="#284952" stroke-width="4"/><path d="m37 72-20-15v48l21-13m167-21 19-16v49l-18-12" fill="#6da59e" stroke="#284952" stroke-width="4"/><g fill="#c8e5e1" stroke="#284952" stroke-width="4"><circle cx="80" cy="83" r="16"/><circle cx="127" cy="83" r="16"/><circle cx="174" cy="83" r="16"/></g><g fill="#c6e4df"><circle cx="209" cy="35" r="8"/><circle cx="226" cy="18" r="5"/></g></svg>'
       );
-    return (
-      base +
-      '<ellipse cx="120" cy="118" rx="87" ry="8" fill="#c9d9c7"/><path d="M27 77 48 66 65 36Q105 27 143 38l31 29 30 7q16 6 12 27H24Z" fill="#74a8a2" stroke="#284952" stroke-width="4"/><path d="m68 42-15 26 45-1V39m8 0v28h57l-25-25Z" fill="#cbe3dc" stroke="#284952" stroke-width="3"/><path d="m25 83 19 1v13H25m172-15 17 5v11h-17" fill="#f3d89b" stroke="#284952" stroke-width="2"/><path d="M105 72v24m-48-18h12m51-1h12" stroke="#284952" stroke-width="3"/><g fill="#29434c" stroke="#284952" stroke-width="3"><circle cx="63" cy="104" r="18"/><circle cx="176" cy="104" r="18"/></g><g fill="#dce7d7"><circle cx="63" cy="104" r="8"/><circle cx="176" cy="104" r="8"/></g><path d="M74 27h56l10 8H66Z" fill="#d6aa6b" stroke="#284952" stroke-width="3"/></svg>'
-    );
+    return '<img src="assets/odyssey.svg" alt="White Honda Odyssey" class="odyssey-art">';
   }
+
   function setVehicle(type, announce = true) {
     progress.vehicle = type;
     save();
     $("#vehicle-art").innerHTML = vehicleSVG(type);
     $("#vehicle-name").textContent = {
-      car: "Adventure Cruiser",
+      car: "White Honda Odyssey",
       plane: "Cloud Hopper",
       submarine: "Bubble Voyager",
     }[type];
@@ -661,12 +672,16 @@
       b.setAttribute("aria-pressed", b.dataset.vehicle === type);
     });
     const emoji = { car: "🚙", plane: "✈️", submarine: "🤿" }[type];
-    $("#actor-car").textContent = emoji;
+    const markerArt =
+      type === "car"
+        ? '<img src="assets/odyssey.svg" alt="White Honda Odyssey">'
+        : emoji;
+    $("#actor-car").innerHTML = markerArt;
     if (markers.car)
       markers.car.setIcon(
         L.divIcon({
           className: "leaflet-actor",
-          html: `<div>${emoji}</div>`,
+          html: `<div>${markerArt}</div>`,
           iconSize: [44, 44],
           iconAnchor: [22, 22],
         }),
@@ -681,7 +696,7 @@
         pick(
           {
             car: [
-              "Wheels down. The Adventure Cruiser is ready for whatever Dylan dreams up.",
+              "Wheels down. The white Honda Odyssey is ready for whatever Dylan dreams up.",
             ],
             plane: [
               "Wings out! Bad Cat waves from a tiny cloud. Metro forgot to pack a parachute sandwich.",
@@ -727,54 +742,7 @@
   }
   const dialog = $("#encounter-dialog");
   function encounter(kind) {
-    const which = kind || (state.encounter++ % 2 === 0 ? "squid" : "vacuum");
-    $("#encounter-art").textContent = which === "squid" ? "🦑🫧" : "🌪️🏘️";
-    $("#encounter-title").textContent =
-      which === "squid" ? "Squid at the car wash!" : "Mega House Vacuum!";
-    $("#encounter-text").textContent =
-      which === "squid"
-        ? "Eight arms, one enormous soap sponge. The squid has tangled the car wash. How will your crew help?"
-        : "“More powerful than a kitten tornado!” Metro cheers. The vacuum is lifting cartoon houses. Let’s bring them gently home.";
-    $("#encounter-actions").replaceChildren();
-    const choices =
-      which === "squid"
-        ? [
-            [
-              "Bubble tickles",
-              "bubble",
-              "The squid giggles, untangles every hose and gives the car a sparkling wash.",
-            ],
-            [
-              "Ask Bad Cat to help",
-              "puppy",
-              "Bad Cat and Giant Puppy teach the squid a bubble dance. Now it runs the car wash!",
-            ],
-          ]
-        : [
-            [
-              "Forcefield the houses",
-              "shield",
-              "The houses settle inside cosy forcefield bubbles. Everyone floats gently home.",
-            ],
-            [
-              "Reverse the vacuum",
-              "laser",
-              "Dylan presses the big reverse button. Houses float down, and the vacuum blows a rainbow!",
-            ],
-          ];
-    choices.forEach(([name, power, result]) => {
-      const button = document.createElement("button");
-      button.textContent = name;
-      button.addEventListener("click", () => {
-        dialog.close();
-        gadget(power);
-        story(result);
-        toast(result);
-      });
-      $("#encounter-actions").append(button);
-    });
-    dialog.showModal();
-    sound("sonar");
+    window.badCatAdventure.encounter(kind);
   }
   function renderInventions() {
     $("#inventions").replaceChildren();
@@ -804,6 +772,8 @@
   }
   function setView(view) {
     state.view = view;
+    document.body.classList.toggle("map-mode", view === "drive");
+    if (view !== "drive") window.badCatTargeting.cancel();
     $("#drive-view").classList.toggle("hidden", view !== "drive");
     $("#hq-view").classList.toggle("hidden", view !== "hq");
     $$("[data-view]").forEach((b) => {
@@ -829,7 +799,11 @@
     b.addEventListener("click", () => setView(b.dataset.view)),
   );
   $$("[data-gadget]").forEach((b) =>
-    b.addEventListener("click", () => gadget(b.dataset.gadget)),
+    b.addEventListener("click", () =>
+      b.dataset.gadget === "encounter"
+        ? encounter()
+        : window.badCatTargeting.arm(b.dataset.gadget),
+    ),
   );
   $$("[data-vehicle]").forEach((b) =>
     b.addEventListener("click", () => setVehicle(b.dataset.vehicle)),
@@ -905,10 +879,9 @@
   });
   $("#mission").addEventListener("click", newMission);
   $("#surprise-drive").addEventListener("click", () => {
-    newMission();
-    toast("New mission received. Your story, your rules!");
+    encounter();
   });
-  $("#close-encounter").addEventListener("click", () => dialog.close());
+
   $("#invention-form").addEventListener("submit", (event) => {
     event.preventDefault();
     const name = $("#invention-name").value.trim();
@@ -957,16 +930,18 @@
     if (
       event.repeat ||
       /INPUT|SELECT|TEXTAREA/.test(event.target.tagName) ||
-      dialog.open ||
+      window.badCatAdventure.isOpen() ||
       state.view !== "drive"
     )
       return;
     const index = Number(event.key) - 1;
     if (index >= 0 && index < 6) {
       event.preventDefault();
-      gadget(
-        ["shield", "laser", "sonar", "bubble", "puppy", "encounter"][index],
-      );
+      if (index === 5) encounter();
+      else
+        window.badCatTargeting.arm(
+          ["shield", "laser", "sonar", "bubble", "puppy"][index],
+        );
     }
   });
   window.addEventListener("online", updateConnection);
@@ -980,6 +955,35 @@
   });
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && audio) audio.suspend().catch(() => {});
+  });
+  window.badCatTargeting.init({
+    view: () => state.view,
+    sound,
+    story,
+    result: (won, count) => window.badCatAdventure.raidResult(won, count),
+    apply: (kind, target) => {
+      gadget(kind);
+      state.targetEffects ||= {};
+      state.targetEffects[target] = { kind, until: Date.now() + 9000 };
+    },
+  });
+  window.badCatAdventure.init({
+    gadget,
+    vehicle: setVehicle,
+    sound,
+    story,
+    metres,
+    startSound: () => {
+      if (!soundEnabled) $("#sound").click();
+    },
+    view: () => state.view,
+    paused: () => state.paused,
+    shielded: () => Date.now() < state.shieldUntil,
+    setView,
+    win: () => {
+      progress.squidWins++;
+      save();
+    },
   });
   initFallback();
   setVehicle(progress.vehicle, false);
@@ -1027,5 +1031,8 @@
     audioState: audio?.state || "not-started",
     inventions: progress.inventions.length,
     cacheSupported: "serviceWorker" in navigator,
+    zoom: map?.getZoom() || null,
+    adventure: window.badCatAdventure.diagnostics(),
+    targeting: window.badCatTargeting.diagnostics(),
   });
 })();

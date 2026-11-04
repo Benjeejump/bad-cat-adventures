@@ -21,7 +21,7 @@ jobs:
       - name: Stage only public game files
         run: |
           mkdir public
-          cp index.html styles.css app.js sw.js manifest.webmanifest public/
+          cp index.html styles.css app.js targeting.js adventure.js site-config.js map-mode.css sw.js manifest.webmanifest public/
           cp -r assets public/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

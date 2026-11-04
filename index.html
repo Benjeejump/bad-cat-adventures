@@ -11,22 +11,44 @@
       name="description"
       content="Dylan's imagination-powered adventure console. Cats, gadgets and very good puppies."
     />
+
+    <script>
+      // Reload existing installations once the new shell takes over, so old cached
+      // game scripts cannot strand the new launch screen. Fresh installs do not reload.
+      if ("serviceWorker" in navigator) {
+        const hadController = !!navigator.serviceWorker.controller;
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (hadController && !refreshing) {
+            refreshing = true;
+            location.reload();
+          }
+        });
+        navigator.serviceWorker
+          .register("./sw.js", { updateViaCache: "none" })
+          .then((registration) => registration.update())
+          .catch(() => {});
+      }
+    </script>
     <title>Bad Cat Adventures · Dylan's command centre</title>
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="map-mode.css" />
   </head>
-  <body>
+  <body class="map-mode launching">
     <header class="topbar">
       <a class="brand" href="#" aria-label="Bad Cat Adventures home"
-        ><span class="brand-cat">🐈‍⬛</span
+        ><span class="brand-cat"
+          ><img src="assets/bad-cat.svg" alt="BC"
+        /></span>
         ><span
-          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.1</b></span></span
+          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.2</b></span></span
         ></a
       >
       <nav aria-label="Game sections">
         <button class="nav-tab active" data-view="drive" aria-pressed="true">
-          ◉ <span>Adventure console</span></button
+          ◉ <span>Adventure map</span></button
         ><button class="nav-tab" data-view="hq" aria-pressed="false">
           ⌂ <span>Mission HQ</span><i>PREPARING OFFLINE</i>
         </button>
@@ -57,6 +79,61 @@
         </button>
       </div>
     </header>
+
+    <div
+      id="game-launch"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="launch-title"
+    >
+      <div class="launch-sky">
+        <div class="launch-moon"></div>
+        <div class="launch-stars">✦<span>✧</span>✦<span>✧</span>✦</div>
+        <div class="launch-hills"></div>
+        <div class="launch-trees">
+          <i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="launch-road"></div>
+        <div class="launch-car">
+          <img
+            src="assets/odyssey.svg"
+            alt="The family’s white Honda Odyssey"
+          /><span>DYLAN’S CREW</span>
+        </div>
+        <div class="launch-cat launch-bc">
+          <img src="assets/bad-cat.svg" alt="BC, Bad Cat" /><span
+            >“I have a plan…”</span
+          >
+        </div>
+        <div class="launch-cat launch-metro">
+          <img src="assets/metro.svg" alt="M, Metro" /><span
+            >“Use the pipes!”</span
+          >
+        </div>
+        <div class="launch-pipe"></div>
+        <div class="launch-dust">✦ ✦ ✦</div>
+      </div>
+      <div class="launch-content">
+        <p class="launch-tag">A WORLD FROM DYLAN’S IMAGINATION</p>
+        <h1 id="launch-title">
+          <span>BAD CAT</span><strong>ADVENTURES</strong>
+        </h1>
+        <p class="launch-line">
+          One family car. Two troublesome cats.<br />Absolutely anything could
+          happen.
+        </p>
+        <div class="launch-buttons">
+          <button id="launch-play">LET’S RIDE, DYLAN! <span>▶</span></button
+          ><button id="launch-silent">Play quietly ♪ OFF</button>
+        </div>
+        <p class="launch-hint">GPS optional. Imagination essential.</p>
+      </div>
+      <span class="launch-version">v0.2 · THE LAKELINE ADVENTURES</span
+      ><button id="launch-skip" aria-label="Skip opening and play quietly">
+        Skip intro →
+      </button>
+    </div>
+
     <main>
       <div class="page-heading">
         <div>
@@ -70,171 +147,97 @@
           </div>
         </div>
       </div>
-      <section id="drive-view" aria-label="Adventure console">
-        <div class="console-grid">
-          <section class="map-panel panel">
-            <div class="panel-top">
-              <div class="panel-title">
-                <span class="live-dot"></span> ADVENTURE RADAR
-                <span id="source-badge" class="badge">TEST DRIVE</span>
-              </div>
-              <button id="follow" class="small-button" aria-pressed="true">
-                ⌖ Following car
-              </button>
-            </div>
-            <div class="map-stage" id="map-stage">
-              <div
-                id="map"
-                aria-label="Road map with fictional adventure characters"
-              ></div>
-              <div id="fallback-map">
-                <svg
-                  viewBox="0 0 900 560"
-                  preserveAspectRatio="xMidYMid slice"
-                  aria-hidden="true"
-                >
-                  <defs>
-                    <pattern
-                      id="grid"
-                      width="45"
-                      height="45"
-                      patternUnits="userSpaceOnUse"
-                    >
-                      <path
-                        d="M45 0H0V45"
-                        fill="none"
-                        stroke="#b5d6c8"
-                        stroke-width="1"
-                      />
-                    </pattern>
-                  </defs>
-                  <rect width="900" height="560" fill="#dbe9d8" />
-                  <path
-                    d="M590-30Q430 100 570 240T640 590"
-                    fill="none"
-                    stroke="#a5cfd7"
-                    stroke-width="62"
-                  />
-                  <path
-                    d="M0 80Q180 190 330 120T900 150M-30 450Q260 200 410 360T950 410M170-20L280 600M750-20L650 600"
-                    fill="none"
-                    stroke="#f9faf1"
-                    stroke-width="20"
-                  />
-                  <path
-                    d="M0 80Q180 190 330 120T900 150M-30 450Q260 200 410 360T950 410M170-20L280 600M750-20L650 600"
-                    fill="none"
-                    stroke="#c2cdb6"
-                    stroke-width="1"
-                  />
-                  <rect
-                    width="900"
-                    height="560"
-                    fill="url(#grid)"
-                    opacity=".35"
-                  />
-                  <g fill="#bdd6ac">
-                    <ellipse cx="130" cy="270" rx="100" ry="65" />
-                    <ellipse cx="770" cy="300" rx="80" ry="70" />
-                  </g></svg
-                ><span class="fallback-label"
-                  >IMAGINATION MAP · FICTIONAL TERRAIN</span
-                >
-                <div id="fallback-actors"></div>
-              </div>
-              <div class="radar-ring" aria-hidden="true"></div>
-              <div class="map-location">
-                <span>⌖</span>
-                <div id="location-label">
-                  Test Drive · Cambridge, UK<small id="accuracy"
-                    >No location permission needed</small
+      <section id="drive-view" aria-label="Full screen adventure map">
+        <section class="map-panel">
+          <div class="map-stage" id="map-stage">
+            <div
+              id="map"
+              aria-label="Road map with fictional adventure characters"
+            ></div>
+            <div id="fallback-map">
+              <svg
+                viewBox="0 0 900 560"
+                preserveAspectRatio="xMidYMid slice"
+                aria-hidden="true"
+              >
+                <defs>
+                  <pattern
+                    id="grid"
+                    width="45"
+                    height="45"
+                    patternUnits="userSpaceOnUse"
                   >
-                </div>
-              </div>
-              <div id="map-notice" class="map-notice" role="status">
-                Connecting to the road map… Offline adventures are always
-                available.
-              </div>
-              <div class="map-key">
-                <span>🚙 Your crew</span><span>🐈‍⬛ Bad Cat</span
-                ><span>🐱 Metro</span><span>✦ Fictional overlays</span>
-              </div>
-              <div id="effect-layer" aria-hidden="true"></div>
-              <div id="shield-overlay" aria-hidden="true"></div>
+                    <path
+                      d="M45 0H0V45"
+                      fill="none"
+                      stroke="#b5d6c8"
+                      stroke-width="1"
+                    />
+                  </pattern>
+                </defs>
+                <rect width="900" height="560" fill="#dbe9d8" />
+                <path
+                  d="M590-30Q430 100 570 240T640 590"
+                  fill="none"
+                  stroke="#a5cfd7"
+                  stroke-width="62"
+                />
+                <path
+                  d="M0 80Q180 190 330 120T900 150M-30 450Q260 200 410 360T950 410M170-20L280 600M750-20L650 600"
+                  fill="none"
+                  stroke="#f9faf1"
+                  stroke-width="20"
+                />
+                <path
+                  d="M0 80Q180 190 330 120T900 150M-30 450Q260 200 410 360T950 410M170-20L280 600M750-20L650 600"
+                  fill="none"
+                  stroke="#c2cdb6"
+                  stroke-width="1"
+                />
+                <rect
+                  width="900"
+                  height="560"
+                  fill="url(#grid)"
+                  opacity=".35"
+                />
+                <g fill="#bdd6ac">
+                  <ellipse cx="130" cy="270" rx="100" ry="65" />
+                  <ellipse cx="770" cy="300" rx="80" ry="70" />
+                </g></svg
+              ><span class="fallback-label"
+                >IMAGINATION MAP · FICTIONAL TERRAIN</span
+              >
+              <div id="fallback-actors"></div>
             </div>
-            <div class="drive-controls">
-              <div class="mode-buttons">
-                <button id="test-drive" class="small-button selected">
-                  ▶ Test Drive</button
-                ><button id="gps" class="small-button">⌖ Use my GPS</button>
+            <div class="radar-ring" aria-hidden="true"></div>
+            <div class="map-location">
+              <span>⌖</span>
+              <div id="location-label">
+                Test Drive · Cambridge, UK<small id="accuracy"
+                  >No location permission needed</small
+                >
               </div>
-              <button id="pause" class="small-button" aria-pressed="false">
-                Ⅱ Pause</button
-              ><label class="speed-label"
-                >SPEED<select id="speed" aria-label="Test Drive speed">
-                  <option value="1">1× cruise</option>
-                  <option value="2">2× speedy</option>
-                  <option value="4">4× zoom!</option>
-                </select></label
-              ><span id="distance">0.00 km explored</span>
             </div>
-          </section>
-          <aside class="side-stack">
-            <section class="panel crew-panel">
-              <div class="section-label">
-                YOUR RIDE <span id="ride-status">ALL SYSTEMS GO</span>
-              </div>
-              <div class="vehicle-showcase" id="vehicle-art"></div>
-              <div class="ride-name">
-                <h2 id="vehicle-name">Adventure Cruiser</h2>
-                <span id="equipment-label">Bubble boost equipped</span>
-              </div>
-              <div class="transform-picker" aria-label="Vehicle transformation">
-                <button data-vehicle="car" class="selected" aria-pressed="true">
-                  🚙<span>Car</span></button
-                ><button data-vehicle="plane" aria-pressed="false">
-                  ✈️<span>Plane</span></button
-                ><button data-vehicle="submarine" aria-pressed="false">
-                  🤿<span>Submarine</span>
-                </button>
-              </div>
-            </section>
-            <section class="panel threat-panel">
-              <div class="section-label">
-                ON YOUR TAIL <span class="orange-dot">● LIVE</span>
-              </div>
-              <div class="enemy-row">
-                <span class="enemy-avatar badcat">🐈‍⬛</span>
-                <div>
-                  <b>Bad Cat</b
-                  ><small id="badcat-mood">Plotting something…</small>
-                </div>
-                <strong id="badcat-distance">— m</strong>
-              </div>
-              <div class="enemy-row">
-                <span class="enemy-avatar metro">🐱</span>
-                <div><b>Metro</b><small>Probably up to no good</small></div>
-                <strong id="metro-distance">— m</strong>
-              </div>
-              <div class="alert-strip" id="proximity">◎ Radar warming up…</div>
-            </section>
-            <section class="story-card">
-              <span class="story-spark">✦</span>
-              <p id="story" role="status" aria-live="polite">
-                Ready, Dylan? The cats have spotted us. Pick a gadget and make
-                your own adventure!
-              </p>
-              <button id="surprise-drive" class="text-button">
-                Surprise me ↗
-              </button>
-            </section>
-          </aside>
-        </div>
-        <section class="gadget-section">
-          <div class="gadget-heading">
-            <h2>Your gadget deck <span>BIG IDEAS. BIG BUTTONS.</span></h2>
-            <span id="gadget-count">∞ imagination power</span>
+            <div id="map-notice" class="map-notice" role="status">
+              Connecting to the road map… Offline adventures are always
+              available.
+            </div>
+            <div class="map-key">
+              <span>🚙 Your crew</span><span>🐈‍⬛ Bad Cat</span
+              ><span>🐱 Metro</span><span>✦ Fictional overlays</span>
+            </div>
+            <div id="effect-layer" aria-hidden="true"></div>
+            <div id="shield-overlay" aria-hidden="true"></div>
           </div>
+        </section>
+        <div class="map-hud">
+          <span id="source-badge" class="badge">TEST DRIVE</span
+          ><button id="follow" class="small-button" aria-pressed="true">
+            ⌖ Following car
+          </button>
+        </div>
+        <aside class="action-rail" aria-label="Adventure controls">
+          <span class="rail-label">DYLAN'S GADGETS</span>
           <div class="gadget-grid">
             <button class="gadget mint" data-gadget="shield">
               <span class="gadget-icon">◈</span><b>Forcefield</b
@@ -257,11 +260,84 @@
               ><small>The goodest backup</small><kbd>5</kbd>
             </button>
             <button class="gadget peach" data-gadget="encounter">
-              <span class="gadget-icon">🦑</span><b>Wild encounter</b
+              <span class="gadget-icon">✦</span><b>Surprise</b
               ><small>Expect the unexpected</small><kbd>6</kbd>
             </button>
           </div>
-        </section>
+          <div class="rail-transform">
+            <div class="transform-picker" aria-label="Vehicle transformation">
+              <button data-vehicle="car" class="selected" aria-pressed="true">
+                🚙<span>Car</span></button
+              ><button data-vehicle="plane" aria-pressed="false">
+                ✈️<span>Plane</span></button
+              ><button data-vehicle="submarine" aria-pressed="false">
+                🤿<span>Submarine</span>
+              </button>
+            </div>
+          </div>
+          <button
+            id="carwash-launch"
+            class="carwash-launch"
+            aria-label="Play the car wash squid game"
+          >
+            🦑<span>Car wash</span>
+          </button>
+          <button
+            id="kitten-launch"
+            class="carwash-launch"
+            aria-label="Play the 20-kitten attack"
+          >
+            🐾<span>Kitten attack</span>
+          </button>
+        </aside>
+        <details class="journey-settings">
+          <summary>⚙ Journey controls</summary>
+          <div class="drive-controls">
+            <div class="mode-buttons">
+              <button id="test-drive" class="small-button selected">
+                ▶ Test Drive</button
+              ><button id="gps" class="small-button">⌖ Use my GPS</button>
+            </div>
+            <button id="pause" class="small-button" aria-pressed="false">
+              Ⅱ Pause</button
+            ><label class="speed-label"
+              >SPEED<select id="speed" aria-label="Test Drive speed">
+                <option value="1">1× cruise</option>
+                <option value="2">2× speedy</option>
+                <option value="4">4× zoom!</option>
+              </select></label
+            ><span id="distance">0.00 km explored</span>
+          </div>
+          <div class="ride-settings">
+            <div id="vehicle-art"></div>
+            <div>
+              <b id="vehicle-name">White Honda Odyssey</b
+              ><small id="equipment-label">Bubble boost equipped</small>
+            </div>
+          </div>
+          <div class="quiet">
+            Fictional adventures · GPS position stays on your device
+          </div>
+          <p id="place-status" class="place-status" role="status">
+            Finding the two Lakeline places…
+          </p>
+          <button id="retry-places" class="small-button">
+            Retry place lookup
+          </button>
+        </details>
+        <div class="journey-story">
+          <p id="story" role="status" aria-live="polite">
+            Dylan, the Odyssey is ready. Keep an eye out for mischief!
+          </p>
+          <button id="surprise-drive" aria-label="Start a surprise happening">
+            ✦ Surprise
+          </button>
+        </div>
+        <div class="sr-only">
+          <span id="ride-status"></span><span id="badcat-mood"></span
+          ><span id="badcat-distance"></span><span id="metro-distance"></span
+          ><span id="proximity"></span><span id="gadget-count"></span>
+        </div>
       </section>
       <section
         id="hq-view"
@@ -376,21 +452,25 @@
       </footer>
     </main>
     <div id="toast" role="status" aria-live="polite"></div>
-    <dialog id="encounter-dialog">
+    <dialog id="encounter-dialog" aria-labelledby="encounter-title">
       <button
         id="close-encounter"
         class="dialog-close"
-        aria-label="Close encounter"
+        aria-label="Close adventure"
       >
         ×
       </button>
-      <div id="encounter-art"></div>
-      <p class="eyebrow">UNEXPECTED ADVENTURE</p>
-      <h2 id="encounter-title"></h2>
-      <p id="encounter-text"></p>
-      <div id="encounter-actions"></div>
-      <p class="quiet">You're the storyteller. Anything can happen.</p>
+      <div id="scene-stage"></div>
+      <div class="scene-caption">
+        <p class="eyebrow" id="scene-eyebrow">DYLAN DECIDES</p>
+        <h2 id="encounter-title"></h2>
+        <p id="encounter-text"></p>
+        <div id="encounter-actions"></div>
+      </div>
     </dialog>
+    <script src="site-config.js" defer></script>
+    <script src="adventure.js" defer></script>
+    <script src="targeting.js" defer></script>
     <script src="app.js" defer></script>
   </body>
 </html>
