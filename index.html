@@ -35,6 +35,7 @@
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="map-mode.css" />
+    <link rel="stylesheet" href="learning.css" />
   </head>
   <body class="map-mode launching">
     <header class="topbar">
@@ -43,7 +44,7 @@
           ><img src="assets/bad-cat.svg" alt="BC"
         /></span>
         <span
-          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.4</b></span></span
+          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.5</b></span></span
         ></a
       >
       <nav aria-label="Game sections">
@@ -130,7 +131,7 @@
           Starts with this tablet’s GPS. Allow location when asked.
         </p>
       </div>
-      <span class="launch-version">v0.4 · THE LAKELINE ADVENTURES</span
+      <span class="launch-version">v0.5 · THE LAKELINE ADVENTURES</span
       ><button id="launch-skip" aria-label="Skip opening and play quietly">
         Skip intro →
       </button>
@@ -308,6 +309,13 @@
             aria-label="Play the car wash squid game"
           >
             🦑<span>Car wash</span>
+          </button>
+          <button
+            id="spelling-launch"
+            class="carwash-launch"
+            aria-label="Play Bad Cat’s spelling bees"
+          >
+            🐝<span>Word trap</span>
           </button>
           <button
             id="kitten-launch"
@@ -497,6 +505,9 @@
     <script src="site-config.js" defer></script>
     <script src="campaign.js" defer></script>
     <script src="puppy-options.js" defer></script>
+    <script src="cinematics.js" defer></script>
+    <script src="word-bank.js" defer></script>
+    <script src="spelling.js" defer></script>
     <script src="adventure.js" defer></script>
     <script src="targeting.js" defer></script>
     <script src="game-map.js" defer></script>

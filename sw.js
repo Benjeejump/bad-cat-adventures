@@ -1,4 +1,4 @@
-const CACHE = "bad-cat-shell-v5";
+const CACHE = "bad-cat-shell-v6";
 const SHELL = [
   "./",
   "./index.html",
@@ -12,6 +12,11 @@ const SHELL = [
   "./assets/maplibre/maplibre-gl.css",
   "./assets/maplibre/leaflet-maplibre-gl.js",
   "./adventure.js",
+  "./cinematics.js",
+  "./word-bank.js",
+  "./spelling.js",
+  "./learning.css",
+  "./assets/spelling-bee.svg",
   "./targeting.js",
   "./campaign.js",
   "./puppy-options.js",

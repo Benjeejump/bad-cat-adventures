@@ -1022,6 +1022,7 @@
     story(message);
     toast(message);
   });
+  window.badCatSpelling.init({ sound, canSpeak: () => soundEnabled });
   window.badCatTargeting.init({
     view: () => state.view,
     sound,
@@ -1112,5 +1113,6 @@
     adventure: window.badCatAdventure.diagnostics(),
     targeting: window.badCatTargeting.diagnostics(),
     campaign: window.badCatCampaign.snapshot(),
+    spelling: window.badCatSpelling.diagnostics(),
   });
 })();

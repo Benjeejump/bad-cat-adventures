@@ -22,6 +22,12 @@
     arrivalReceivedAt = 0;
   const events = [
     {
+      id: "spelling",
+      title: "Bad Cat’s spelling bees!",
+      text: "Crack the word code to escape.",
+      choices: [],
+    },
+    {
       id: "kittens",
       title: "Twenty kittens just arrived!",
       text: "BC and Metro opened the kitten pipe! Choose a gadget, then tap each kitten to send it safely home. Can Dylan clear all 20 in 45 seconds?",
@@ -216,6 +222,8 @@
     },
   ];
   function art(which) {
+    const cinematic = window.badCatCinematics.art(which);
+    if (cinematic) return cinematic;
     const houses =
       '<g class="scene-houses"><g transform="translate(100 230)"><path d="m0 0 55-45 55 45v90H0Z" fill="#f3c276"/><path d="m-10 0 65-55 65 55" fill="none" stroke="#b25e5f" stroke-width="15"/><path d="M45 90V45h30v45" fill="#518da2"/></g><g transform="translate(690 240) scale(.8)"><path d="m0 0 55-45 55 45v90H0Z" fill="#b3d7be"/><path d="m-10 0 65-55 65 55" fill="none" stroke="#557b90" stroke-width="15"/></g></g>';
     return `<div class="story-world ${which}"><svg viewBox="0 0 900 430" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="900" height="430" fill="#c3e1e4"/><circle cx="730" cy="78" r="40" fill="#fff0ac"/><path d="M0 290Q150 230 300 290T600 280T900 270V430H0Z" fill="#9abea5"/><path d="M0 410Q450 290 900 410" fill="none" stroke="#e8dfc6" stroke-width="95"/>${houses}<g class="vacuum-machine"><path d="M390 175h105l18 140H370Z" fill="#cf8b76" stroke="#314d60" stroke-width="7"/><path d="M405 175v-40q0-65 73-55t30 87" fill="none" stroke="#536f84" stroke-width="23"/><circle cx="395" cy="320" r="20" fill="#314d60"/><circle cx="490" cy="320" r="20" fill="#314d60"/><circle cx="437" cy="225" r="23" fill="#fce8ad"/><path d="m427 224 10 9 15-21" fill="none" stroke="#314d60" stroke-width="5"/></g></svg><div class="scene-character">${which === "puppy" ? '<img src="assets/giant-puppy.svg" alt="Giant Puppy falling from the sky">' : `<img src="assets/${which === "amy" ? "amy" : ["vacuum", "trap"].includes(which) ? "metro" : "bad-cat"}.svg" alt="${which === "amy" ? "Amy’s imaginary cameo" : ["vacuum", "trap"].includes(which) ? "M, Metro" : "BC, Bad Cat"}">`}</div><img class="scene-car" src="assets/odyssey.svg" alt="White Honda Odyssey"><div class="scene-pipes"><i></i><i></i><span>BC + M · SECRET PIPE</span></div><div class="scene-puppies">🐶 🐕 🦮</div><div class="scene-magic">✦ 🫧 ✦ 🌈 ✦</div></div>`;
@@ -236,7 +244,11 @@
     }
   }
   function encounter(kind) {
-    if (dialog.open || launching) return;
+    if (dialog.open || launching || window.badCatSpelling.isOpen()) return;
+    if (kind === "spelling") {
+      window.badCatSpelling.open();
+      return;
+    }
     if (kind === "squid") {
       carwash();
       return;
@@ -248,6 +260,11 @@
       events.find((e) => e.id === kind) ||
       candidates[Math.floor(Math.random() * candidates.length)];
     lastEvent = active.id;
+    if (active.id === "spelling") {
+      sequence++;
+      window.badCatSpelling.open();
+      return;
+    }
     sequence++;
     if (["trap", "heist", "tunnel"].includes(active.id)) setHazard(active.id);
     $("#scene-stage").innerHTML = art(active.id);
@@ -267,7 +284,9 @@
     $("#scene-eyebrow").textContent = "UNEXPECTED HAPPENING · DYLAN DECIDES";
     $("#encounter-title").textContent = active.title;
     $("#encounter-text").textContent = active.text;
-    dialog.className = "story-dialog";
+    dialog.className = ["puppy", "tornado", "kittens"].includes(active?.id)
+      ? "story-dialog cinematic-dialog"
+      : "story-dialog";
     if (active.id === "puppy") {
       $("#encounter-title").textContent = "GIANT PUPPY IS FALLING!";
       $("#encounter-text").textContent =
@@ -286,7 +305,7 @@
             );
             world.insertAdjacentHTML(
               "beforeend",
-              `<div class="puppy-prop prop-${option.effect}" aria-hidden="true">${{ bubbles: "🫧 🫧 🫧", badcat: '<img src="assets/bad-cat.svg" alt="">', treats: "🍪 🦴 🍪", parachute: "🪂", hammock: "🧇", trampoline: "⭕", vacuum: "🌪️", blanket: "▰", cloud: "☁️", slide: "🌈" }[option.effect]}</div>`,
+              `<div class="puppy-prop prop-${option.effect}" aria-hidden="true">${window.badCatCinematics.prop(option.effect)}</div>`,
             );
             const delta = window.badCatCampaign.puppyOutcome(
               option.success,
@@ -368,7 +387,7 @@
   }
   const squidSVG = `<svg class="windscreen-squid" viewBox="0 0 700 500" aria-label="Friendly giant squid stuck to the windscreen"><g class="tentacles" fill="none" stroke="#bc6595" stroke-width="34" stroke-linecap="round"><path d="M240 270Q40 160 100 370T25 450"/><path d="M260 300Q80 330 180 450"/><path d="M300 305Q270 490 220 460"/><path d="M335 315Q350 480 310 480"/><path d="M370 315Q430 490 460 470"/><path d="M405 300Q600 400 530 465"/><path d="M440 275Q670 195 610 375T680 460"/><path d="M460 240Q570 100 660 250"/></g><g class="squid-body"><path d="M220 265Q195 175 350 45q155 130 130 220Q360 360 220 265Z" fill="#df91ba" stroke="#9c527e" stroke-width="5"/><path d="m230 220-80-35 75 83m245-48 80-35-75 83" fill="#bc6595"/><g fill="#fff"><ellipse cx="299" cy="231" rx="33" ry="41"/><ellipse cx="397" cy="231" rx="33" ry="41"/></g><g fill="#283e56"><ellipse cx="307" cy="238" rx="14" ry="21"/><ellipse cx="389" cy="238" rx="14" ry="21"/></g><path d="M324 282q25 24 49 0" fill="none" stroke="#8c426a" stroke-width="7" stroke-linecap="round"/><g fill="#f4c3d9"><circle cx="262" cy="272" r="13"/><circle cx="436" cy="272" r="13"/></g></g></svg>`;
   function carwash() {
-    if (dialog.open || launching) return;
+    if (dialog.open || launching || window.badCatSpelling.isOpen()) return;
     round = { wipers: 0, bubbles: 0, boosters: 0, won: false };
     active = null;
     dialog.className = "carwash-dialog";
@@ -593,7 +612,8 @@
   }
   function tick(dt) {
     if (!hooks) return;
-    if (window.badCatTargeting?.raidActive()) return;
+    if (window.badCatTargeting?.raidActive() || window.badCatSpelling.isOpen())
+      return;
     if (
       arrivalArmed &&
       arrivalSince !== null &&
@@ -691,6 +711,7 @@
         setTimeout(() => {
           $("#game-launch").hidden = true;
           $("#carwash-launch").focus();
+          window.badCatSpelling.resume();
         }, 450);
       };
       $("#launch-play").addEventListener("click", () => launch(true));
@@ -729,7 +750,10 @@
         : null,
     motionScale: () => (hazard ? 0.45 : 1),
     isOpen: () =>
-      dialog.open || launching || !!window.badCatTargeting?.raidActive(),
+      dialog.open ||
+      launching ||
+      !!window.badCatTargeting?.raidActive() ||
+      window.badCatSpelling.isOpen(),
     diagnostics: () => ({
       launching,
       round: round ? { ...round } : null,

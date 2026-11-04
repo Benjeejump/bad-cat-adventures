@@ -26,14 +26,19 @@ with sync_playwright() as p:
  page.evaluate('badCatAdventure.tick(20)')
  check(page.evaluate('badCatAdventure.diagnostics().hazard') in ['trap','heist','tunnel'],'Cats autonomously cause actual mischief')
  page.evaluate('badCatAdventure.tick(30)')
- check(page.locator('#encounter-dialog').evaluate('(el)=>el.open'),'A random big decision appears automatically')
- page.locator('#encounter-actions button').first.click()
- if page.evaluate('badCatTargeting.raidActive()'):
-  check(page.locator('.kitten-target').count()==20,'Automatic event decision starts the interactive kitten scene')
-  page.evaluate('badCatTargeting.tick(46)')
+ if page.evaluate('badCatSpelling.isOpen()'):
+  check(True,'A random spelling trap appears automatically')
+  info=page.evaluate('badCatSpelling.diagnostics()')
+  for letter in info['word'].upper():page.locator(f'.letter-bee[data-letter="{letter}"]:not([disabled])').first.evaluate('(n)=>n.click()')
+  page.locator('#check-word').click();page.locator('#spell-close').click()
  else:
-  check(page.locator('.story-world.resolved').count()==1,'Automatic event decision starts its animated result')
- page.locator('#encounter-actions button').last.click()
+  check(page.locator('#encounter-dialog').evaluate('(el)=>el.open'),'A random big decision appears automatically')
+  page.locator('#encounter-actions button').first.click()
+  if page.evaluate('badCatTargeting.raidActive()'):
+   check(page.locator('.kitten-target').count()==20,'Automatic event decision starts the interactive kitten scene')
+   page.evaluate('badCatTargeting.tick(46)')
+  else:check(page.locator('.story-world.resolved').count()==1,'Automatic event decision starts its animated result')
+  page.locator('#encounter-actions button').last.click()
  page.locator('#carwash-launch').click();page.locator('#wash-wipers').click()
  check(page.locator('.wiper').first.evaluate('(el)=>getComputedStyle(el).animationName')=='wiper-sweep','Wiper animation runs without reduced-motion emulation')
  for _ in range(3):page.locator('#wash-bubbles').click()

@@ -31,7 +31,7 @@
     snacks: {
       name: "Puppy snack crate",
       icon: "🍪",
-      text: "Three supplies for the puppy squad.",
+      text: "Three treats for the puppy squad.",
     },
     repair: {
       name: "Odyssey repair kit",
@@ -213,7 +213,7 @@
     else if (levels[key] < 3) levels[key]++;
     else {
       window.badCatCampaign.reward();
-      resultText = "Already fully upgraded—converted into one supply.";
+      resultText = "Already fully upgraded—converted into one puppy treat.";
     }
     captured++;
     armed = false;

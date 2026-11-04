@@ -26,7 +26,7 @@
               k === "condition"
                 ? 100
                 : k === "supplies"
-                  ? 9
+                  ? 99
                   : k === "heat"
                     ? 5
                     : 1000000,
@@ -63,7 +63,7 @@
         state[key] = clamp(
           state[key] + delta[key],
           0,
-          key === "condition" ? 100 : key === "supplies" ? 9 : 5,
+          key === "condition" ? 100 : key === "supplies" ? 99 : 5,
         );
     for (const [key, value] of Object.entries(delta.jams || {}))
       state.jams[key] = Math.max(state.jams[key] || 0, value);
@@ -72,16 +72,23 @@
   function render() {
     const summary = document.querySelector("#crew-readout");
     if (!summary) return;
+    document
+      .querySelector(".campaign-hud")
+      .classList.toggle("low-treats", state.supplies <= 2);
+    summary.title =
+      state.supplies <= 2
+        ? "We’re low on treats! Practice spelling to earn more."
+        : "Puppy treats buy puppy help.";
     summary.textContent = `🚙 ${state.condition}%   🍪 ${state.supplies}   🐈 ${state.heat}/5`;
     document.querySelector("#crew-detail").textContent =
-      `Car condition ${state.condition}%. Supplies ${state.supplies}. Cats’ advantage ${state.heat}/5. ${
+      `Car condition ${state.condition}%. Treats ${state.supplies}. Cats’ advantage ${state.heat}/5. ${
         Object.entries(state.jams)
           .filter(([, n]) => n > 0)
           .map(([k, n]) => `${labels[k]} jammed for ${n} more attempts.`)
           .join(" ") || "All gadgets working."
       }${storage ? "" : " Changes cannot be saved in this browser."}`;
     document.querySelector("#workshop-status").textContent =
-      `${state.condition}% condition · ${state.supplies} supplies · cats’ advantage ${state.heat}/5. Repairing clears gadget jams; resupplying reduces the cats’ advantage.`;
+      `${state.condition}% condition · ${state.supplies} treats · cats’ advantage ${state.heat}/5. Repairing clears gadget jams; resupplying reduces the cats’ advantage.`;
   }
   function use(power, { raid = false } = {}) {
     if (!powers.includes(power)) return true;
@@ -97,7 +104,7 @@
     if (power === "puppy" && !raid) {
       if (!state.supplies) {
         notice(
-          "No puppy snacks left! Resupply in Mission HQ, or use another gadget.",
+          "We’re low on treats! Spell a word or restock Puppy Base, or use another gadget.",
         );
         return false;
       }
@@ -164,7 +171,7 @@
         bad: true,
         delta: { supplies: -2, heat: 1 },
         message:
-          "Wrong imaginary house! Metro’s decoy biscuit tin steals two supplies while the puppies investigate. Amy was next door all along.",
+          "Wrong imaginary house! Metro’s decoy biscuit tin steals two treats while the puppies investigate. Amy was next door all along.",
         result: "mishap",
       },
     ],
@@ -182,7 +189,7 @@
     if (won) {
       state.wins++;
       change({ supplies: 2, heat: -1 });
-      return "Supplies +2. Cats’ advantage −1. Existing dents and jams still need repairs.";
+      return "Treats +2. Cats’ advantage −1. Existing dents and jams still need repairs.";
     }
     state.losses++;
     const escaped = 20 - cleared;
@@ -192,14 +199,14 @@
       heat: 2,
       jams: { shield: 2 },
     });
-    return `${escaped} kittens escaped and scratched the Odyssey! Supplies −2, cats’ advantage +2, forcefield jammed for two attempts. These setbacks carry into the next adventure.`;
+    return `${escaped} kittens escaped and scratched the Odyssey! Treats −2, cats’ advantage +2, forcefield jammed for two attempts. These setbacks carry into the next adventure.`;
   }
   function raidUse(power, index) {
     if (!use(power, { raid: true })) return false;
     if (power === "puppy" && index % 5 === 0) {
       if (!state.supplies) {
         notice(
-          "The puppies need snacks. Choose another gadget or resupply at HQ.",
+          "The puppies need treats. Spell a word, restock Puppy Base, or choose another gadget.",
         );
         return false;
       }
@@ -211,7 +218,7 @@
   function puppyOutcome(success, id) {
     if (success) {
       change({ condition: 5, supplies: 1, heat: -1 });
-      return "Car condition +5, supplies +1, cats’ advantage −1.";
+      return "Car condition +5, treats +1, cats’ advantage −1.";
     }
     change({
       condition: -15,
@@ -219,26 +226,26 @@
       heat: 1,
       jams: { [id === "blanket" ? "shield" : "laser"]: 2 },
     });
-    return "Car condition −15, supplies −2, cats’ advantage +1, one gadget jammed for two attempts.";
+    return "Car condition −15, treats −2, cats’ advantage +1, one gadget jammed for two attempts.";
   }
   function repair() {
     change({ condition: 25 });
     for (const k of powers) state.jams[k] = 0;
     save();
     notice(
-      "Workshop repairs +25 car condition and clears gadget jams. Supplies and cat advantage stay as they were.",
+      "Workshop repairs +25 car condition and clears gadget jams. Treats and cat advantage stay as they were.",
     );
   }
   function resupply() {
     change({ supplies: 3, heat: -1 });
-    notice("Puppy Base restocks three supplies. Cats’ advantage −1.");
+    notice("Puppy Base restocks three treats. Cats’ advantage −1.");
   }
   function init(onNotice) {
     notice = onNotice;
     const hud = document.createElement("details");
     hud.className = "campaign-hud";
     hud.innerHTML =
-      '<summary id="crew-readout" aria-label="Crew condition, supplies and cats advantage"></summary><p id="crew-detail" role="status"></p><span>Repairs and resupply: Mission HQ</span>';
+      '<summary id="crew-readout" aria-label="Crew condition, puppy treats and cats advantage"></summary><p id="crew-detail" role="status"></p><span>Repairs and resupply: Mission HQ</span>';
     document.body.append(hud);
     const card = document.createElement("section");
     card.className = "panel hq-card workshop-card";
@@ -265,13 +272,19 @@
       state.condition < 35 ? 0.65 : state.condition < 65 ? 0.85 : 1,
     pressure: () => state.heat,
     raidSeconds: () => Math.max(30, 45 - state.heat * 2),
+    awardTreats: (amount) => {
+      if (!Number.isFinite(amount)) return 0;
+      const before = state.supplies;
+      change({ supplies: Math.trunc(amount) });
+      return state.supplies - before;
+    },
     reward: () => change({ supplies: 1 }),
     choiceLabel: (id, index) => {
       const rule = risks[id]?.[index];
       return rule?.bad
         ? " · RISKY"
         : rule?.delta?.supplies < 0
-          ? " · USES SUPPLIES"
+          ? " · USES TREATS"
           : "";
     },
   };
