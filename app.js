@@ -377,7 +377,11 @@
       !window.badCatAdventure.isOpen()
     ) {
       const prev = state.car;
-      state.elapsed += dt * state.speed * window.badCatAdventure.motionScale();
+      state.elapsed +=
+        dt *
+        state.speed *
+        window.badCatAdventure.motionScale() *
+        window.badCatCampaign.motionScale();
       state.car = routePoint(state.elapsed / 200);
       state.distance += metres(prev, state.car);
     }
@@ -589,6 +593,9 @@
       encounter();
       return;
     }
+    if (!window.badCatCampaign.use(kind)) {
+      return false;
+    }
     window.badCatAdventure.onGadget(kind);
     progress.gadgets++;
     save();
@@ -641,6 +648,7 @@
       toast("Puppy squad deployed. Bad Cat is on your team!");
     }
     $("#gadget-count").textContent = `${progress.gadgets} big ideas unleashed`;
+    return true;
   }
   function vehicleSVG(type) {
     const base =
@@ -918,6 +926,7 @@
     $("#squid-progress").value = tickles;
     $("#squid-status").textContent = `${tickles} of 3 bubbly tickles`;
     if (tickles === 3) {
+      window.badCatCampaign.reward();
       progress.squidWins++;
       save();
       $("#squid-status").textContent =
@@ -956,15 +965,20 @@
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && audio) audio.suspend().catch(() => {});
   });
+  window.badCatCampaign.init((message) => {
+    story(message);
+    toast(message);
+  });
   window.badCatTargeting.init({
     view: () => state.view,
     sound,
     story,
     result: (won, count) => window.badCatAdventure.raidResult(won, count),
     apply: (kind, target) => {
-      gadget(kind);
+      if (gadget(kind) === false) return false;
       state.targetEffects ||= {};
       state.targetEffects[target] = { kind, until: Date.now() + 9000 };
+      return true;
     },
   });
   window.badCatAdventure.init({
@@ -980,7 +994,8 @@
     paused: () => state.paused,
     shielded: () => Date.now() < state.shieldUntil,
     setView,
-    win: () => {
+    win: (reward = true) => {
+      if (reward) window.badCatCampaign.reward();
       progress.squidWins++;
       save();
     },
@@ -1034,5 +1049,6 @@
     zoom: map?.getZoom() || null,
     adventure: window.badCatAdventure.diagnostics(),
     targeting: window.badCatTargeting.diagnostics(),
+    campaign: window.badCatCampaign.snapshot(),
   });
 })();

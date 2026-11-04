@@ -20,6 +20,9 @@
     armed = null,
     selected = null,
     raid = null;
+  let movers = [],
+    animationFrame = 0,
+    lastFrame = 0;
   function update() {
     const bar = $("#target-bar");
     bar.hidden = !armed && !selected;
@@ -64,7 +67,7 @@
       return;
     }
     const power = armed;
-    hooks.apply(power, character);
+    if (hooks.apply(power, character) === false) return;
     impact(node, power);
     const line = {
       shield: "boings away from your shield",
@@ -81,10 +84,15 @@
     if (raid) return;
     selected = null;
     armed = null;
-    raid = { remaining: 20, seconds: 45, cleared: 0 };
+    raid = {
+      remaining: 20,
+      seconds: window.badCatCampaign.raidSeconds(),
+      cleared: 0,
+    };
     document.body.classList.add("raid-active");
     $("#kitten-raid").hidden = false;
     $("#kitten-field").replaceChildren();
+    movers = [];
     for (let i = 0; i < 20; i++) {
       const b = document.createElement("button");
       b.className = "kitten-target";
@@ -92,7 +100,7 @@
       b.dataset.kitten = String(i + 1);
       b.style.setProperty("--arrive-delay", `${i * 0.06}s`);
       b.style.setProperty("--kitten-hue", `${(i % 5) * 16}deg`);
-      b.innerHTML = `<img src="assets/kitten.svg" alt=""><span>${i + 1}</span>`;
+      b.innerHTML = `<span class="kitten-emoji" aria-hidden="true">${["🐱", "😺", "😸", "😼", "🙀"][i % 5]}</span><small>${i + 1}</small>`;
       b.addEventListener("click", () => {
         if (!raid || b.disabled) return;
         if (!armed) {
@@ -100,6 +108,7 @@
             "Choose a gadget on the right, then tap a kitten!";
           return;
         }
+        if (!window.badCatCampaign.raidUse(armed, raid.cleared)) return;
         b.disabled = true;
         impact(b, armed);
         b.classList.add("kitten-cleared");
@@ -110,17 +119,68 @@
         if (!raid.remaining) finishRaid(true);
       });
       $("#kitten-field").append(b);
+      movers.push({
+        node: b,
+        x: ((i % 5) + 0.5) / 5,
+        y: (Math.floor(i / 5) + 0.5) / 4,
+        vx: (Math.random() < 0.5 ? -1 : 1) * (18 + Math.random() * 22),
+        vy: (Math.random() < 0.5 ? -1 : 1) * (14 + Math.random() * 20),
+      });
     }
+    startDrift();
     arm("bubble");
     $("#raid-count").textContent = "20 kittens left";
-    $("#raid-time").textContent = "45";
-    $("#raid-progress").value = 45;
+    $("#raid-time").textContent = String(raid.seconds);
+    $("#raid-progress").max = raid.seconds;
+    $("#raid-progress").value = raid.seconds;
     $("#raid-close").focus();
+  }
+  function startDrift() {
+    cancelAnimationFrame(animationFrame);
+    lastFrame = 0;
+    let oldWidth = 0,
+      oldHeight = 0;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const frame = (now) => {
+      if (!raid) return;
+      const field = $("#kitten-field"),
+        width = field.clientWidth,
+        height = field.clientHeight,
+        size = Math.max(46, Math.min(76, width / 5 - 6));
+      const dt = lastFrame ? Math.min(0.05, (now - lastFrame) / 1000) : 0;
+      lastFrame = now;
+      for (const m of movers) {
+        if (!oldWidth) {
+          m.x = m.x * Math.max(1, width - size);
+          m.y = m.y * Math.max(1, height - size);
+        } else if (width !== oldWidth || height !== oldHeight) {
+          m.x = (m.x / Math.max(1, oldWidth - size)) * (width - size);
+          m.y = (m.y / Math.max(1, oldHeight - size)) * (height - size);
+        }
+        if (!reduced && !document.hidden && !m.node.disabled) {
+          m.x += m.vx * dt;
+          m.y += m.vy * dt;
+        }
+        if (m.x < 0 || m.x > width - size) m.vx *= -1;
+        if (m.y < 0 || m.y > height - size) m.vy *= -1;
+        m.x = Math.max(0, Math.min(width - size, m.x));
+        m.y = Math.max(0, Math.min(height - size, m.y));
+        m.node.style.width = `${size}px`;
+        m.node.style.height = `${size}px`;
+        m.node.style.transform = `translate3d(${m.x}px,${m.y}px,0)`;
+      }
+      oldWidth = width;
+      oldHeight = height;
+      animationFrame = requestAnimationFrame(frame);
+    };
+    animationFrame = requestAnimationFrame(frame);
   }
   function finishRaid(won) {
     if (!raid) return;
     const cleared = raid.cleared;
     raid = null;
+    cancelAnimationFrame(animationFrame);
+    movers = [];
     $("#kitten-raid").hidden = true;
     document.body.classList.remove("raid-active");
     armed = null;
@@ -153,7 +213,7 @@
     panel.hidden = true;
     panel.setAttribute("aria-label", "Timed kitten attack");
     panel.innerHTML =
-      '<div class="raid-heading"><div><p>BC + M OPENED THE KITTEN PIPE!</p><h2>Kitten attack!</h2><span id="raid-count">20 kittens left</span></div><div class="raid-clock"><b id="raid-time">45</b><span>SECONDS</span></div><button id="raid-close" aria-label="End kitten round">×</button></div><progress id="raid-progress" max="45" value="45" aria-label="Kitten attack time remaining"></progress><p class="raid-help">Choose a gadget → tap the kittens to send them safely home!</p><div id="kitten-field"></div>';
+      '<div class="raid-heading"><div><p>BC + M OPENED THE KITTEN PIPE!</p><h2>Kitten attack!</h2><span id="raid-count">20 kittens left</span></div><div class="raid-clock"><b id="raid-time">45</b><span>SECONDS</span></div><button id="raid-close" aria-label="End kitten round">×</button></div><progress id="raid-progress" max="45" value="45" aria-label="Kitten attack time remaining"></progress><p class="raid-help">Pick a gadget → burst the drifting kitten bubbles! Escaped kittens cause lasting setbacks.</p><div id="kitten-field"></div>';
     document.body.append(panel);
     $("#raid-close").addEventListener("click", () => finishRaid(false));
     $("#kitten-launch").addEventListener("click", () =>

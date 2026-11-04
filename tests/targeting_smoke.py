@@ -28,7 +28,7 @@ with sync_playwright() as p:
  check(page.evaluate('badCatDiagnostics().targeting.raid.remaining')==20,'Retry resets all 20 targets')
  page.screenshot(path='/tmp/bad-cat-kitten-attack.png')
  page.evaluate('badCatTargeting.tick(46)')
- check('puppies scoop up' in page.locator('#encounter-title').inner_text(),'Timeout produces a puppy rescue, not game over')
+ check('kittens got away' in page.locator('#encounter-title').inner_text(),'Timeout produces lasting setbacks, without game over')
  page.locator('#encounter-actions button').last.click()
  page.locator('#kitten-launch').click();page.locator('#encounter-actions button').first.click();page.set_viewport_size({'width':1024,'height':600})
  check(page.locator('#kitten-field').bounding_box()['width']>400,'Kitten playfield remains usable at tablet landscape size')

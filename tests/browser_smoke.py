@@ -93,7 +93,7 @@ with sync_playwright() as p:
     page.evaluate('navigator.serviceWorker.ready')
     page.wait_for_function('navigator.serviceWorker.controller !== null')
     cached = page.evaluate('caches.keys()')
-    check('bad-cat-shell-v3' in cached, 'Offline shell cached')
+    check('bad-cat-shell-v4' in cached, 'Offline shell cached')
     context.set_offline(True)
     page.reload(wait_until='domcontentloaded')
     page.locator('#launch-silent').click()

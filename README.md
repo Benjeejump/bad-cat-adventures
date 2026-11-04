@@ -1,4 +1,4 @@
-# Bad Cat Adventures v0.2
+# Bad Cat Adventures v0.3
 
 Dylan’s imagination-powered, child-friendly adventure console. A static web game with no accounts, advertising, purchases, backend, API keys or paid services.
 
@@ -18,8 +18,11 @@ Open the local server in Chrome. No dependency installation or build step is req
 - **The family car:** an original white Honda Odyssey illustration is used in the map, opening and story scenes. It still transforms into a plane or submarine.
 - **BC and M:** original illustrated faces and letter badges identify Bad Cat and Metro. They do more than chase: Metro fires bubble traps, Bad Cat borrows the booster, and both can use pretend tunnels and pipes. Those actions temporarily slow Test Drive. Matching gadgets undo the effect; hazards also expire gently. Real GPS movement is never slowed or changed by game mechanics.
 - **Aim at characters:** choose a gadget, then tap BC, M or a kitten. You can also select BC/M first and then choose a gadget. The action has a visible impact and affects that character. Number keys 1–5 arm the corresponding gadget; 6 opens a surprise.
-- **Kitten attack:** 20 kittens arrive through the cats’ pipe. Choose a gadget and tap each kitten within 45 seconds to send them safely home. Clear all 20 to win; if time runs out, puppies rescue the remaining kittens and Dylan can retry. The small paw button also starts this round anytime.
-- **Dylan decides:** random large scenes offer two or three choices. Choices produce animated outcomes, including the vacuum sneezing out houses, puppy rescues, tunnel escapes and Amy’s imaginary secret homes. The first automatic decision arrives after about 45 seconds of foreground map play; later events are spaced out. Manual surprises are always available. There is no game-over screen.
+- **Kitten attack:** 20 kitten emojis drift around the screen inside circular forcefield bubbles. Aim a gadget and tap each moving bubble. The first round allows 45 seconds; the cats’ advantage reduces future rounds to as little as 35 seconds. Normal motion moves targets; reduced-motion mode keeps them stationary for accessibility. Escaped kittens damage the Odyssey, steal supplies, increase the cats’ advantage and jam the forcefield. Retry does not reset those setbacks. Puppy sorties consume one snack per five kittens; every five confetti shots increases cat pressure, so gadget choice matters.
+- **Giant Puppy:** an original giant puppy actually falls through the sky. Ten landing plans each have a good and bad animated outcome (bubbles, BC, treats, parachute, hammock, trampoline, sky fan, blanket, cloud or rainbow slide). Two distinct plans are drawn each time, and exactly one is randomly assigned success while the other is assigned failure. This is locked when the encounter opens, not rerolled after the click. The assignment is hidden from Dylan; the landing and persistent result are shown after his choice.
+- **Lasting consequences:** car condition, supplies, cats’ advantage and gadget jams are saved locally across encounters, retries and reloads. Damaged cars cruise more slowly in Test Drive; GPS positions remain accurate. Higher cat advantage means more frequent attacks and shorter kitten rounds. Jammed tools fizzle for a limited number of attempts, and puppy sorties need supplies. The HUD shows current status. Repair and resupply explicitly at the offline HQ workshop—there is still no game-over screen.
+
+- **Dylan decides:** random large scenes offer two or three choices. Choices produce animated outcomes, including the vacuum sneezing out houses, puppy catches and mishaps, tunnel escapes and Amy’s imaginary secret homes. The first automatic decision arrives after about 45 seconds of foreground map play; later events are spaced out. Manual surprises are always available. There is no game-over screen.
 - **Windscreen squid game:** use the small car-wash button anytime, even offline. Sweep the wipers (button or swipe), give the squid three bubble bursts, then boost it off the windscreen. The squid swims away and the game can be replayed. Boosters alone don’t win.
 - **Offline Mission HQ:** inventions, vehicle equipment, puppy play, the simple HQ squid challenge and surprise missions remain available. Inventions, upgrades and aggregate counters stay on this browser.
 
@@ -69,6 +72,8 @@ node --check sw.js
 node --check adventure.js
 node --check site-config.js
 node --check targeting.js
+node --check campaign.js
+node --check puppy-options.js
 ```
 
 Browser integration checks (optional development tools, not game dependencies):
@@ -82,6 +87,7 @@ python3 tests/adventure_smoke.py
 python3 tests/launch_smoke.py
 python3 tests/update_smoke.py
 python3 tests/targeting_smoke.py
+python3 tests/consequences_smoke.py
 ```
 
 `GAME_URL` overrides the browser suite’s base URL. The suite covers desktop load, car/cat movement, pause/speed, transformations, gadget effects, audio-context activation, both encounters, safe invention rendering and persistence, puppy play, squid completion, missions, service-worker caching, offline reload, responsive sizes and browser-emulated GPS denial/accuracy. It checks 1280×800 and 1024×600 landscape, 800×1280 portrait and 390×844 phone widths. `pages_smoke.py` checks project-subdirectory installation and offline HQ. `adventure_smoke.py` exercises active cat hazards, decisions, windscreen controls, fixed-pin fixtures and GPS proximity. `launch_smoke.py` checks real animation and audio activation. `update_smoke.py` installs the original v0.1 shell and verifies an upgrade preserves inventions and reaches the new launch screen. Geocoder fixtures validate application behaviour, not real address accuracy.
@@ -98,6 +104,6 @@ Current implementation-session results are in [TESTING.md](TESTING.md). Real til
 
 ## Project layout and licences
 
-`app.js` manages map/GPS and saved HQ progress; `adventure.js` manages decisions, launch and windscreen gameplay; `targeting.js` manages aiming and the timed kitten round; `site-config.js` handles the fixed places. `map-mode.css` styles the game cockpit and animations, while `styles.css` contains shared/HQ styling. `sw.js` handles the offline shell and `index.html` reloads old installed shells once after an update takes over. The Odyssey, BC, Metro and Amy cameo SVGs and app icon are original artwork; supporting characters also use system emoji, whose appearance varies by platform. Synthesised sound uses Web Audio. The app uses the system font stack.
+`app.js` manages map/GPS and saved HQ progress; `adventure.js` manages decisions, launch and windscreen gameplay; `targeting.js` manages aiming and the moving kitten round; `campaign.js` owns saved consequences and recovery; `puppy-options.js` draws paired puppy plans; `site-config.js` handles the fixed places. `map-mode.css` styles the game cockpit and animations, while `styles.css` contains shared/HQ styling. `sw.js` handles the offline shell and `index.html` reloads old installed shells once after an update takes over. The Odyssey, BC, Metro and Amy cameo SVGs and app icon are original artwork; supporting characters also use system emoji, whose appearance varies by platform. Synthesised sound uses Web Audio. The app uses the system font stack.
 
 Leaflet 1.9.4 is vendored in `assets/leaflet/` under its [BSD-2-Clause licence](assets/leaflet/LICENSE). It was obtained from the npm registry and checked against the published SHA-512 integrity digest. Road tiles are © OpenStreetMap contributors; see [OpenStreetMap copyright](https://www.openstreetmap.org/copyright) and [tile usage policy](https://operations.osmfoundation.org/policies/tiles/). No prefetch, bulk download or offline tile pack is implemented.

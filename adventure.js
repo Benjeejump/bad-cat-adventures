@@ -218,7 +218,7 @@
   function art(which) {
     const houses =
       '<g class="scene-houses"><g transform="translate(100 230)"><path d="m0 0 55-45 55 45v90H0Z" fill="#f3c276"/><path d="m-10 0 65-55 65 55" fill="none" stroke="#b25e5f" stroke-width="15"/><path d="M45 90V45h30v45" fill="#518da2"/></g><g transform="translate(690 240) scale(.8)"><path d="m0 0 55-45 55 45v90H0Z" fill="#b3d7be"/><path d="m-10 0 65-55 65 55" fill="none" stroke="#557b90" stroke-width="15"/></g></g>';
-    return `<div class="story-world ${which}"><svg viewBox="0 0 900 430" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="900" height="430" fill="#c3e1e4"/><circle cx="730" cy="78" r="40" fill="#fff0ac"/><path d="M0 290Q150 230 300 290T600 280T900 270V430H0Z" fill="#9abea5"/><path d="M0 410Q450 290 900 410" fill="none" stroke="#e8dfc6" stroke-width="95"/>${houses}<g class="vacuum-machine"><path d="M390 175h105l18 140H370Z" fill="#cf8b76" stroke="#314d60" stroke-width="7"/><path d="M405 175v-40q0-65 73-55t30 87" fill="none" stroke="#536f84" stroke-width="23"/><circle cx="395" cy="320" r="20" fill="#314d60"/><circle cx="490" cy="320" r="20" fill="#314d60"/><circle cx="437" cy="225" r="23" fill="#fce8ad"/><path d="m427 224 10 9 15-21" fill="none" stroke="#314d60" stroke-width="5"/></g></svg><div class="scene-character">${which === "puppy" ? "🐶" : `<img src="assets/${which === "amy" ? "amy" : ["vacuum", "trap"].includes(which) ? "metro" : "bad-cat"}.svg" alt="${which === "amy" ? "Amy’s imaginary cameo" : ["vacuum", "trap"].includes(which) ? "M, Metro" : "BC, Bad Cat"}">`}</div><img class="scene-car" src="assets/odyssey.svg" alt="White Honda Odyssey"><div class="scene-pipes"><i></i><i></i><span>BC + M · SECRET PIPE</span></div><div class="scene-puppies">🐶 🐕 🦮</div><div class="scene-magic">✦ 🫧 ✦ 🌈 ✦</div></div>`;
+    return `<div class="story-world ${which}"><svg viewBox="0 0 900 430" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="900" height="430" fill="#c3e1e4"/><circle cx="730" cy="78" r="40" fill="#fff0ac"/><path d="M0 290Q150 230 300 290T600 280T900 270V430H0Z" fill="#9abea5"/><path d="M0 410Q450 290 900 410" fill="none" stroke="#e8dfc6" stroke-width="95"/>${houses}<g class="vacuum-machine"><path d="M390 175h105l18 140H370Z" fill="#cf8b76" stroke="#314d60" stroke-width="7"/><path d="M405 175v-40q0-65 73-55t30 87" fill="none" stroke="#536f84" stroke-width="23"/><circle cx="395" cy="320" r="20" fill="#314d60"/><circle cx="490" cy="320" r="20" fill="#314d60"/><circle cx="437" cy="225" r="23" fill="#fce8ad"/><path d="m427 224 10 9 15-21" fill="none" stroke="#314d60" stroke-width="5"/></g></svg><div class="scene-character">${which === "puppy" ? '<img src="assets/giant-puppy.svg" alt="Giant Puppy falling from the sky">' : `<img src="assets/${which === "amy" ? "amy" : ["vacuum", "trap"].includes(which) ? "metro" : "bad-cat"}.svg" alt="${which === "amy" ? "Amy’s imaginary cameo" : ["vacuum", "trap"].includes(which) ? "M, Metro" : "BC, Bad Cat"}">`}</div><img class="scene-car" src="assets/odyssey.svg" alt="White Honda Odyssey"><div class="scene-pipes"><i></i><i></i><span>BC + M · SECRET PIPE</span></div><div class="scene-puppies">🐶 🐕 🦮</div><div class="scene-magic">✦ 🫧 ✦ 🌈 ✦</div></div>`;
   }
   function open() {
     if (!dialog.open) dialog.showModal();
@@ -268,7 +268,51 @@
     $("#encounter-title").textContent = active.title;
     $("#encounter-text").textContent = active.text;
     dialog.className = "story-dialog";
+    if (active.id === "puppy") {
+      $("#encounter-title").textContent = "GIANT PUPPY IS FALLING!";
+      $("#encounter-text").textContent =
+        "Dylan, choose a landing plan! One of these plans will work. The other will go wrong…";
+      const choices = window.badCatPuppyOptions.sample();
+      actions(
+        choices.map((option) => [
+          option.name,
+          () => {
+            const world = $(".story-world");
+            world.classList.add(
+              "resolved",
+              "puppy-decided",
+              `puppy-${option.effect}`,
+              option.success ? "puppy-success" : "puppy-failure",
+            );
+            world.insertAdjacentHTML(
+              "beforeend",
+              `<div class="puppy-prop prop-${option.effect}" aria-hidden="true">${{ bubbles: "🫧 🫧 🫧", badcat: '<img src="assets/bad-cat.svg" alt="">', treats: "🍪 🦴 🍪", parachute: "🪂", hammock: "🧇", trampoline: "⭕", vacuum: "🌪️", blanket: "▰", cloud: "☁️", slide: "🌈" }[option.effect]}</div>`,
+            );
+            const delta = window.badCatCampaign.puppyOutcome(
+              option.success,
+              option.id,
+            );
+            $("#scene-eyebrow").textContent = option.success
+              ? "PUPPY CAUGHT!"
+              : "THE LANDING PLAN BACKFIRED";
+            $("#encounter-title").textContent = option.success
+              ? "Safe landing, Giant Puppy!"
+              : "Oof! That didn’t work!";
+            $("#encounter-text").textContent =
+              (option.success ? option.good : option.bad) + " " + delta;
+            hooks.story(option.success ? option.good : option.bad);
+            hooks.sound(option.success ? "puppy" : "laser");
+            actions([["Back to the adventure →", close]]);
+          },
+        ]),
+      );
+      open();
+      hooks.sound("sonar");
+      return;
+    }
     if (active.id === "kittens") {
+      $("#encounter-text").textContent =
+        `Twenty kittens are drifting in forcefield bubbles! Choose a gadget, then tap each kitten. You have ${window.badCatCampaign.raidSeconds()} seconds. Escaped kittens damage the Odyssey and cost supplies.`;
       actions([
         [
           "Let’s clear those kittens!",
@@ -284,19 +328,36 @@
       return;
     }
     actions(
-      active.choices.map(([name, power, result, message]) => [
-        name,
+      active.choices.map(([name, power, result, message], index) => [
+        name + window.badCatCampaign.choiceLabel(active.id, index),
         () => {
           const world = $(".story-world");
-          world.classList.add("resolved", `result-${result}`);
-          if (["plane", "submarine"].includes(power)) {
-            hooks.vehicle(power);
-            clearHazard();
-          } else hooks.gadget(power);
-          $("#scene-eyebrow").textContent = "YOUR IDEA CHANGED THE STORY";
-          $("#encounter-title").textContent = "Nice thinking, Dylan!";
-          $("#encounter-text").textContent = message;
-          hooks.story(message);
+          const consequence = window.badCatCampaign.choice(active.id, index);
+          let worked = true;
+          if (!consequence.bad) {
+            if (["plane", "submarine"].includes(power)) {
+              hooks.vehicle(power);
+              clearHazard();
+            } else worked = hooks.gadget(power) !== false;
+          }
+          const failed = consequence.bad || !worked;
+          world.classList.add(
+            "resolved",
+            `result-${failed ? consequence.result || "mishap" : result}`,
+          );
+          $("#scene-eyebrow").textContent = failed
+            ? "THAT DIDN’T GO TO PLAN"
+            : "YOUR CHOICE HAS CONSEQUENCES";
+          $("#encounter-title").textContent = failed
+            ? "The cats got the upper paw!"
+            : "Dylan changed the story!";
+          const outcome =
+            consequence.message ||
+            (worked
+              ? message
+              : "The gadget fizzles. The crew must use another tool or repair in HQ. The cats keep their advantage.");
+          $("#encounter-text").textContent = outcome;
+          hooks.story(outcome);
           actions([["Back to our adventure →", close]]);
           hooks.sound("puppy");
         },
@@ -560,13 +621,15 @@
     } else {
       actionCountdown -= dt;
       if (actionCountdown <= 0) {
-        actionCountdown = 32 + Math.random() * 15;
+        actionCountdown =
+          32 + Math.random() * 15 - window.badCatCampaign.pressure() * 3;
         setHazard(["trap", "heist", "tunnel"][Math.floor(Math.random() * 3)]);
       }
     }
     nextEvent -= dt;
     if (nextEvent <= 0) {
-      nextEvent = 55 + Math.random() * 35;
+      nextEvent =
+        55 + Math.random() * 35 - window.badCatCampaign.pressure() * 4;
       encounter();
     }
   }
@@ -580,16 +643,20 @@
   function raidResult(won, cleared) {
     dialog.className = "story-dialog";
     $("#scene-stage").innerHTML = art("puppy");
-    $(".story-world").classList.add("resolved", "result-rescue");
+    $(".story-world").classList.add(
+      "resolved",
+      won ? "result-rescue" : "result-mishap",
+    );
     $("#scene-eyebrow").textContent = won
       ? "KITTEN MISSION COMPLETE"
-      : "PUPPY RESCUE TO THE RESCUE";
+      : "KITTENS ESCAPED · SETBACKS CARRY ON";
     $("#encounter-title").textContent = won
       ? "All 20 kittens are safely home!"
-      : "The puppies scoop up the last kittens!";
-    $("#encounter-text").textContent = won
-      ? "Dylan did it! BC is impressed. Metro is pretending he meant this to happen."
-      : `You sent ${cleared} kittens home. The puppy squad helps with the rest. Fancy another round?`;
+      : "The kittens got away with our supplies!";
+    const consequence = window.badCatCampaign.raidResult(won, cleared);
+    $("#encounter-text").textContent =
+      (won ? "Dylan cleared all 20! " : `You cleared ${cleared} of 20. `) +
+      consequence;
     actions([
       [
         "Play again",
@@ -602,7 +669,7 @@
     ]);
     open();
     hooks.sound("puppy");
-    if (won) hooks.win();
+    if (won) hooks.win(false);
   }
   window.badCatAdventure = {
     init(h) {
