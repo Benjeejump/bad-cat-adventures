@@ -685,6 +685,7 @@
           .querySelectorAll(".topbar,main")
           .forEach((node) => (node.inert = false));
         if (soundOn) hooks.startSound();
+        hooks.startJourney();
         $("#game-launch").classList.add("launch-finished");
         document.body.classList.remove("launching");
         setTimeout(() => {

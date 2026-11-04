@@ -18,7 +18,7 @@ with sync_playwright() as p:
  page.wait_for_timeout(500)
  check(page.evaluate('badCatDiagnostics().simulationElapsed')==0,'Journey waits for the launch button')
  page.screenshot(path='/tmp/bad-cat-opening.png')
- page.locator('#launch-play').click();page.wait_for_function('!badCatDiagnostics().adventure.launching')
+ page.locator('#launch-play').click();page.locator('#test-drive').evaluate('(el)=>el.click()');page.wait_for_function('!badCatDiagnostics().adventure.launching')
  check(page.evaluate('badCatDiagnostics().audioState')=='running','Let’s ride starts synthesised game sound after a gesture')
  page.wait_for_timeout(700)
  check(page.locator('#game-launch').is_hidden(),'Opening transitions into the map')

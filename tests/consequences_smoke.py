@@ -8,7 +8,7 @@ with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
  context=b.new_context(viewport={'width':1280,'height':800})
  context.route('https://tile.openstreetmap.org/**',lambda r:r.abort());context.route('https://nominatim.openstreetmap.org/**',lambda r:r.abort())
- page=context.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto('http://127.0.0.1:8000/',wait_until='domcontentloaded');page.locator('#launch-silent').click();page.wait_for_timeout(500)
+ page=context.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto('http://127.0.0.1:8000/',wait_until='domcontentloaded');page.locator('#launch-silent').click(); page.locator('#test-drive').evaluate('(el)=>el.click()');page.wait_for_timeout(500)
  # The pool has ten different dual-outcome options; each drawn pair has one success.
  seen=page.evaluate('''()=>{const ids=new Set();for(let i=0;i<250;i++){const pair=badCatPuppyOptions.sample();if(pair.length!==2||pair[0].id===pair[1].id||pair.filter(p=>p.success).length!==1)throw Error('Bad pair');pair.forEach(p=>ids.add(p.id));}return ids.size;}''')
  check(seen==10,'Ten different puppy choices; every pair contains exactly one hidden success and one failure')
@@ -43,7 +43,7 @@ with sync_playwright() as p:
  check(state_after['heat']>state_before['heat'],'Escaped kittens increase future cat pressure')
  check(state_after['jams']['shield']==2,'Failed round jams the forcefield for later attempts')
  check(page.locator('.result-mishap').count()==1,'Failure displays a setback animation, not a happy rescue')
- page.reload(wait_until='domcontentloaded');page.locator('#launch-silent').click()
+ page.reload(wait_until='domcontentloaded');page.locator('#launch-silent').click(); page.locator('#test-drive').evaluate('(el)=>el.click()')
  check(page.evaluate('badCatCampaign.snapshot()')==state_after,'Consequences survive a reload')
  check(page.evaluate('badCatCampaign.raidSeconds()')<45,'Cat advantage makes the next kitten attack harder')
  page.evaluate('badCatTargeting.startRaid()')

@@ -36,6 +36,7 @@
   }
   function arm(power) {
     if (!names[power]) return;
+    window.badCatLoot?.cancel();
     armed = power;
     if (selected) {
       target(selected, document.querySelector(`#actor-${selected}`));
@@ -116,6 +117,25 @@
         raid.remaining--;
         raid.cleared++;
         $("#raid-count").textContent = `${raid.remaining} kittens left`;
+        if (armed === "bubble" && window.badCatLoot.level("bubble") > 0) {
+          const origin = movers.find((m) => m.node === b),
+            radius = 90 + window.badCatLoot.level("bubble") * 25;
+          const nearby = movers
+            .filter(
+              (m) =>
+                !m.node.disabled &&
+                Math.hypot(m.x - origin.x, m.y - origin.y) < radius,
+            )
+            .slice(0, window.badCatLoot.level("bubble"));
+          for (const m of nearby) {
+            m.node.disabled = true;
+            m.node.classList.add("kitten-cleared");
+            impact(m.node, armed);
+            raid.remaining--;
+            raid.cleared++;
+          }
+          $("#raid-count").textContent = `${raid.remaining} kittens left`;
+        }
         if (!raid.remaining) finishRaid(true);
       });
       $("#kitten-field").append(b);

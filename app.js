@@ -66,15 +66,16 @@
   }
   const pick = (list) => list[Math.floor(Math.random() * list.length)];
   const state = {
-    mode: "test",
+    mode: "waiting",
     paused: false,
     follow: true,
     speed: 1,
     elapsed: 0,
     distance: 0,
-    car: [52.1995, 0.1198],
-    badcat: [52.199, 0.119],
-    metro: [52.1987, 0.1207],
+    car: [0, 0],
+    badcat: [0, 0],
+    metro: [0, 0],
+    locationRequest: 0,
     shieldUntil: 0,
     retreatUntil: 0,
     allyUntil: 0,
@@ -143,13 +144,8 @@
     return 6371000 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
   }
   let map,
-    tileLayer,
     markers = {},
-    buildings = [],
-    tileLoaded = false,
-    tileErrors = 0,
-    mapTimer;
-  const buildingDefs = []; // Fictional buildings stay in HQ, not over the real road map.
+    tileLoaded = false;
   function initFallback() {
     for (const [key, emoji, label] of [
       ["car", "", "White Honda Odyssey"],
@@ -191,50 +187,26 @@
     document.head.append(css);
     const script = document.createElement("script");
     script.src = "assets/leaflet/leaflet.js";
-    script.onload = initMap;
+    script.onload = async () => {
+      await window.badCatGameMap.prepare();
+      initMap();
+    };
     script.onerror = () =>
       mapNotice(
         "Road map unavailable. Enjoy the fictional imagination map, or play offline in Mission HQ.",
       );
     document.head.append(script);
-    mapTimer = setTimeout(() => {
-      if (!tileLoaded)
-        mapNotice(
-          "Road map unavailable. Imagination map active — this is not a navigation map.",
-        );
-    }, 9000);
   }
   function initMap() {
     if (!window.L) return;
     map = L.map("map", {
       zoomControl: false,
       attributionControl: true,
-    }).setView(state.car, 18);
+      maxZoom: 21,
+    }).setView(state.car, 20);
     L.control.zoom({ position: "bottomleft" }).addTo(map);
-    const tiles = (tileLayer = L.tileLayer(
-      "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        maxZoom: 19,
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',
-      },
-    ).addTo(map));
-    tiles.on("tileload", () => {
-      tileLoaded = true;
-      clearTimeout(mapTimer);
-      $("#map-stage").classList.add("has-map");
-      $("#map-stage").classList.remove("no-tiles");
-      mapNotice("");
-    });
-    tiles.on("tileerror", () => {
-      tileErrors++;
-      if (tileErrors > 2) {
-        $("#map-stage").classList.add("no-tiles");
-        mapNotice(
-          "Map tiles could not load. Showing fictional terrain; Mission HQ works offline.",
-        );
-      }
-    });
+    window.badCatLoot.attachMap(map);
+    if (["gps", "test"].includes(state.mode)) startGameMap();
     const icon = (emoji, extra = "") =>
       L.divIcon({
         className: `leaflet-actor ${extra}`,
@@ -313,6 +285,46 @@
     });
     setVehicle(progress.vehicle, false);
     if (state.view === "hq") setTimeout(() => map.invalidateSize(), 0);
+  }
+  function startGameMap() {
+    if (!map) return;
+    window.badCatGameMap.mount(map, {
+      ready: () => {
+        tileLoaded = true;
+        $("#map-stage").classList.add("has-map");
+        $("#map-stage").classList.remove("no-tiles");
+        mapNotice("");
+      },
+      unavailable: (message) => {
+        tileLoaded = false;
+        $("#map-stage").classList.add("no-tiles");
+        mapNotice(message);
+      },
+    });
+  }
+  function locationGate(show, title, message) {
+    $("#location-gate").hidden = !show;
+    $("#map-stage").classList.toggle("awaiting-location", show);
+    if (title) $("#gps-gate-title").textContent = title;
+    if (message) $("#gps-gate-message").textContent = message;
+  }
+  function locationUnavailable(message, keepWatching = false) {
+    if (!keepWatching) browserLocation.stop();
+    state.mode = keepWatching ? "locating" : "unavailable";
+    state.gpsStarting = keepWatching;
+    $("#pause").disabled = true;
+    $("#speed").disabled = true;
+    $("#test-drive").classList.remove("selected");
+    $("#gps").classList.remove("selected");
+    $("#source-badge").textContent = "GPS UNAVAILABLE";
+    $("#gps").textContent = "⌖ Retry GPS";
+    $("#accuracy").textContent = message;
+    locationGate(
+      true,
+      "GPS needs a little help",
+      message + " Retry GPS, visit HQ, or explicitly choose Test Drive.",
+    );
+    story(message);
   }
   function updateFollow() {
     $("#follow").textContent = state.follow
@@ -397,7 +409,7 @@
           t + Math.cos(state.elapsed / 17) * 0.06 - (retreat ? 0.14 : 0.12),
         );
       } else {
-        const r = retreat ? 0.004 : 0.0012;
+        const r = retreat ? 0.0009 : 0.00022;
         state.ticks += dt;
         state.badcat = [
           state.car[0] + Math.sin(state.ticks / 12) * r,
@@ -432,9 +444,18 @@
       state.metro = [state.car[0] + 0.00075, state.car[1] + 0.0006];
     }
     updateActors();
+    window.badCatLoot.update(
+      dt,
+      state.car,
+      state.mode,
+      state.mode === "test" ? 0 : state.gpsAccuracy,
+      state.heading,
+    );
   }
   function setTestDrive() {
+    state.locationRequest++;
     browserLocation.stop();
+    locationGate(false);
     state.mode = "test";
     state.gpsStarting = false;
     state.lastGPS = null;
@@ -453,31 +474,51 @@
     $("#gps").textContent = "⌖ Use my GPS";
     state.follow = true;
     updateFollow();
-    if (map) map.setView(state.car, 18);
+    if (map) map.setView(state.car, 20);
+    startGameMap();
     toast("Test Drive ready. Let the adventure roll!");
   }
   function startGPS() {
     if (!navigator.geolocation) {
-      toast("This browser does not support GPS. Test Drive is ready.");
+      locationUnavailable("This browser cannot provide GPS.");
       return;
     }
     if (!window.isSecureContext) {
-      toast("GPS needs HTTPS or localhost. Use Test Drive here.");
+      locationUnavailable("GPS needs HTTPS or localhost.");
       return;
     }
-    if (
-      !confirm(
-        "Use this tablet’s location? Only the current position is kept in memory; no location history is saved. Online road-map tiles reveal the viewed area to OpenStreetMap. A phone hotspot does not share the phone’s GPS. Use only as a passenger.",
-      )
-    )
-      return;
+    state.paused = false;
+    const request = ++state.locationRequest;
     const firstGPS = state.mode !== "gps";
+    if (firstGPS) {
+      state.mode = "locating";
+      locationGate(
+        true,
+        "Finding the Odyssey…",
+        "Waiting for this tablet’s GPS. Allow location in Chrome when asked.",
+      );
+    }
+    $("#source-badge").textContent = "FINDING GPS";
     state.gpsStarting = true;
     $("#gps").textContent = "⌖ Finding you…";
     browserLocation.start(
       (fix) => {
-        if (!state.gpsStarting && state.mode !== "gps") return;
+        if (
+          request !== state.locationRequest ||
+          (!state.gpsStarting && state.mode !== "gps")
+        )
+          return;
+        locationGate(false);
         const previous = state.lastGPS;
+        state.gpsAccuracy = fix.coords.accuracy;
+        if (Number.isFinite(fix.coords.heading))
+          state.heading = (fix.coords.heading * Math.PI) / 180;
+        else if (previous)
+          state.heading = Math.atan2(
+            (fix.coords.longitude - previous[1]) *
+              Math.cos((fix.coords.latitude * Math.PI) / 180),
+            fix.coords.latitude - previous[0],
+          );
         state.mode = "gps";
         state.gpsStarting = false;
         state.car = [fix.coords.latitude, fix.coords.longitude];
@@ -500,24 +541,24 @@
         if (map && state.follow)
           map.setView(
             state.car,
-            firstGPS && !state.lastGPSZoomed ? 18 : map.getZoom(),
+            firstGPS && !state.lastGPSZoomed ? 20 : map.getZoom(),
             { animate: false },
           );
         state.lastGPSZoomed = true;
+        startGameMap();
         window.badCatAdventure.onFix(state.car, fix.coords.accuracy);
         updateActors();
       },
       (error) => {
+        if (request !== state.locationRequest) return;
         const messages = {
-          1: "GPS permission was declined. Test Drive works without it.",
+          1: "GPS permission was declined. You can allow location in Chrome settings.",
           2: "The tablet could not find a position. A hotspot does not provide phone GPS.",
           3: "GPS took too long. Try near a window, or use Test Drive.",
         };
         const message =
           messages[error.code] || "GPS unavailable. Test Drive is ready.";
-        setTestDrive();
-        story(message);
-        toast(message);
+        locationUnavailable(message, error.code === 2 || error.code === 3);
       },
     );
   }
@@ -601,13 +642,16 @@
     save();
     sound(kind);
     if (kind === "shield") {
-      state.shieldUntil = Date.now() + 12000;
+      state.shieldUntil =
+        Date.now() + 12000 + window.badCatLoot.level("shield") * 5000;
       state.retreatUntil = Date.now() + 8000;
       $("#map-stage").classList.add("shielded");
       story(
         "Forcefield up! The cats bounce gently away, like marshmallows on a trampoline.",
       );
-      toast("Forcefield active for 12 seconds. Boing!");
+      toast(
+        `Forcefield active for ${12 + window.badCatLoot.level("shield") * 5} seconds. Boing!`,
+      );
     }
     if (kind === "laser") {
       const beam = document.createElement("div");
@@ -798,10 +842,7 @@
         "Offline · Mission HQ and all gadgets work. Road maps need a connection.",
       );
     else if (tileLoaded) mapNotice("");
-    if (online && tileLayer) {
-      tileErrors = 0;
-      tileLayer.redraw();
-    }
+    if (online) window.badCatGameMap.retry();
   }
   $$("[data-view]").forEach((b) =>
     b.addEventListener("click", () => setView(b.dataset.view)),
@@ -842,6 +883,9 @@
       );
     }),
   );
+  $("#retry-gps").addEventListener("click", startGPS);
+  $("#choose-test").addEventListener("click", setTestDrive);
+  $("#choose-hq").addEventListener("click", () => setView("hq"));
   $("#test-drive").addEventListener("click", setTestDrive);
   $("#gps").addEventListener("click", startGPS);
   $("#pause").addEventListener("click", () => {
@@ -958,12 +1002,21 @@
   window.addEventListener("pagehide", () => browserLocation.stop());
   window.addEventListener("pageshow", (event) => {
     if (event.persisted && state.mode === "gps") {
-      setTestDrive();
-      toast("Welcome back. Tap Use my GPS to reconnect your location.");
+      startGPS();
     }
   });
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && audio) audio.suspend().catch(() => {});
+  });
+  window.badCatLoot.init({
+    view: () => state.view,
+    paused: () => state.paused,
+    metres,
+    sound,
+    say: (message) => {
+      story(message);
+      toast(message);
+    },
   });
   window.badCatCampaign.init((message) => {
     story(message);
@@ -977,7 +1030,10 @@
     apply: (kind, target) => {
       if (gadget(kind) === false) return false;
       state.targetEffects ||= {};
-      state.targetEffects[target] = { kind, until: Date.now() + 9000 };
+      state.targetEffects[target] = {
+        kind,
+        until: Date.now() + 9000 + window.badCatLoot.level(kind) * 3000,
+      };
       return true;
     },
   });
@@ -991,7 +1047,8 @@
       if (!soundEnabled) $("#sound").click();
     },
     view: () => state.view,
-    paused: () => state.paused,
+    startJourney: startGPS,
+    paused: () => state.paused || !["gps", "test"].includes(state.mode),
     shielded: () => Date.now() < state.shieldUntil,
     setView,
     win: (reward = true) => {
@@ -1007,6 +1064,9 @@
   updateConnection();
   save();
   updateActors();
+  locationGate(true);
+  $("#pause").disabled = true;
+  $("#speed").disabled = true;
   loadMap();
   if (progress.gadgets)
     $("#gadget-count").textContent = `${progress.gadgets} big ideas unleashed`;
@@ -1047,6 +1107,8 @@
     inventions: progress.inventions.length,
     cacheSupported: "serviceWorker" in navigator,
     zoom: map?.getZoom() || null,
+    mapAppearance: window.badCatGameMap.diagnostics(),
+    inventory: window.badCatLoot.diagnostics(),
     adventure: window.badCatAdventure.diagnostics(),
     targeting: window.badCatTargeting.diagnostics(),
     campaign: window.badCatCampaign.snapshot(),

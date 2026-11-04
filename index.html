@@ -43,7 +43,7 @@
           ><img src="assets/bad-cat.svg" alt="BC"
         /></span>
         <span
-          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.3</b></span></span
+          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.4</b></span></span
         ></a
       >
       <nav aria-label="Game sections">
@@ -126,9 +126,11 @@
           <button id="launch-play">LET’S RIDE, DYLAN! <span>▶</span></button
           ><button id="launch-silent">Play quietly ♪ OFF</button>
         </div>
-        <p class="launch-hint">GPS optional. Imagination essential.</p>
+        <p class="launch-hint">
+          Starts with this tablet’s GPS. Allow location when asked.
+        </p>
       </div>
-      <span class="launch-version">v0.3 · THE LAKELINE ADVENTURES</span
+      <span class="launch-version">v0.4 · THE LAKELINE ADVENTURES</span
       ><button id="launch-skip" aria-label="Skip opening and play quietly">
         Skip intro →
       </button>
@@ -213,8 +215,8 @@
             <div class="map-location">
               <span>⌖</span>
               <div id="location-label">
-                Test Drive · Cambridge, UK<small id="accuracy"
-                  >No location permission needed</small
+                Tablet GPS · waiting<small id="accuracy"
+                  >Allow location to follow your crew</small
                 >
               </div>
             </div>
@@ -226,12 +228,28 @@
               <span>🚙 Your crew</span><span>🐈‍⬛ Bad Cat</span
               ><span>🐱 Metro</span><span>✦ Fictional overlays</span>
             </div>
+            <div id="location-gate" role="status">
+              <div class="location-gate-card">
+                <span class="gps-compass">⌖</span>
+                <h2 id="gps-gate-title">Ready for your real adventure?</h2>
+                <p id="gps-gate-message">
+                  Start the game to use this tablet’s GPS. Your real position
+                  stays on this device.
+                </p>
+                <img src="assets/odyssey.svg" alt="White Honda Odyssey" />
+                <div>
+                  <button id="retry-gps">⌖ Retry GPS</button
+                  ><button id="choose-hq">Visit HQ</button
+                  ><button id="choose-test">Choose Test Drive</button>
+                </div>
+              </div>
+            </div>
             <div id="effect-layer" aria-hidden="true"></div>
             <div id="shield-overlay" aria-hidden="true"></div>
           </div>
         </section>
         <div class="map-hud">
-          <span id="source-badge" class="badge">TEST DRIVE</span
+          <span id="source-badge" class="badge">TABLET GPS</span
           ><button id="follow" class="small-button" aria-pressed="true">
             ⌖ Following car
           </button>
@@ -258,6 +276,15 @@
             <button class="gadget yellow" data-gadget="puppy">
               <span class="gadget-icon">🐶</span><b>Deploy puppies</b
               ><small>The goodest backup</small><kbd>5</kbd>
+            </button>
+            <button
+              id="net-launch"
+              class="gadget mint"
+              aria-label="Select the supply-catching net"
+            >
+              <img class="net-icon" src="assets/net.svg" alt="" /><b
+                >Catch supplies</b
+              >
             </button>
             <button class="gadget peach" data-gadget="encounter">
               <span class="gadget-icon">✦</span><b>Surprise</b
@@ -294,8 +321,7 @@
           <summary>⚙ Journey controls</summary>
           <div class="drive-controls">
             <div class="mode-buttons">
-              <button id="test-drive" class="small-button selected">
-                ▶ Test Drive</button
+              <button id="test-drive" class="small-button">▶ Test Drive</button
               ><button id="gps" class="small-button">⌖ Use my GPS</button>
             </div>
             <button id="pause" class="small-button" aria-pressed="false">
@@ -473,6 +499,8 @@
     <script src="puppy-options.js" defer></script>
     <script src="adventure.js" defer></script>
     <script src="targeting.js" defer></script>
+    <script src="game-map.js" defer></script>
+    <script src="loot.js" defer></script>
     <script src="app.js" defer></script>
   </body>
 </html>

@@ -1,0 +1,149 @@
+{
+  "version": 8,
+  "name": "Dylan's road adventure",
+  "sources": {
+    "terrain": {
+      "type": "vector",
+      "url": "https://tiles.openfreemap.org/planet"
+    }
+  },
+  "layers": [
+    {
+      "id": "soft-ground",
+      "type": "background",
+      "paint": { "background-color": "#dce9c5" }
+    },
+    {
+      "id": "parks",
+      "type": "fill",
+      "source": "terrain",
+      "source-layer": "landuse",
+      "filter": [
+        "in",
+        "class",
+        "park",
+        "wood",
+        "grass",
+        "cemetery",
+        "recreation_ground"
+      ],
+      "paint": { "fill-color": "#b9d7a8", "fill-opacity": 0.65 }
+    },
+    {
+      "id": "water",
+      "type": "fill",
+      "source": "terrain",
+      "source-layer": "water",
+      "paint": { "fill-color": "#9bd3e0" }
+    },
+    {
+      "id": "road-edges",
+      "type": "line",
+      "source": "terrain",
+      "source-layer": "transportation",
+      "filter": [
+        "all",
+        ["==", "$type", "LineString"],
+        [
+          "in",
+          "class",
+          "motorway",
+          "trunk",
+          "primary",
+          "secondary",
+          "tertiary",
+          "minor",
+          "service"
+        ]
+      ],
+      "layout": { "line-cap": "round", "line-join": "round" },
+      "paint": {
+        "line-color": "#a4b998",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          12,
+          3,
+          16,
+          7,
+          18,
+          14,
+          20,
+          30,
+          22,
+          60
+        ]
+      }
+    },
+    {
+      "id": "friendly-roads",
+      "type": "line",
+      "source": "terrain",
+      "source-layer": "transportation",
+      "filter": [
+        "all",
+        ["==", "$type", "LineString"],
+        [
+          "in",
+          "class",
+          "motorway",
+          "trunk",
+          "primary",
+          "secondary",
+          "tertiary",
+          "minor",
+          "service"
+        ]
+      ],
+      "layout": { "line-cap": "round", "line-join": "round" },
+      "paint": {
+        "line-color": "#fff9e6",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          12,
+          1,
+          16,
+          5,
+          18,
+          11,
+          20,
+          25,
+          22,
+          52
+        ]
+      }
+    },
+    {
+      "id": "major-road-centres",
+      "type": "line",
+      "source": "terrain",
+      "source-layer": "transportation",
+      "filter": [
+        "all",
+        ["==", "$type", "LineString"],
+        ["in", "class", "motorway", "trunk", "primary"]
+      ],
+      "layout": { "line-cap": "round" },
+      "paint": {
+        "line-color": "#e9c98c",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          12,
+          0.5,
+          16,
+          1,
+          20,
+          3,
+          22,
+          5
+        ],
+        "line-dasharray": [2, 4]
+      }
+    }
+  ]
+}

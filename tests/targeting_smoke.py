@@ -8,7 +8,7 @@ with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
  ctx=b.new_context(viewport={'width':1280,'height':800},reduced_motion='reduce')
  ctx.route('https://tile.openstreetmap.org/**',lambda r:r.abort());ctx.route('https://nominatim.openstreetmap.org/**',lambda r:r.abort())
- page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto('http://127.0.0.1:8000/',wait_until='domcontentloaded');page.locator('#launch-silent').click();page.wait_for_timeout(500)
+ page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto('http://127.0.0.1:8000/',wait_until='domcontentloaded');page.locator('#launch-silent').click(); page.locator('#test-drive').evaluate('(el)=>el.click()');page.wait_for_timeout(500)
  page.locator('[data-gadget="bubble"]').click()
  check(page.evaluate('badCatDiagnostics().targeting.armed')=='bubble','Choosing a gadget arms it without immediately firing')
  page.locator('#actor-metro').click()

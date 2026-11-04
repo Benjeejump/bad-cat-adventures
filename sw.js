@@ -1,9 +1,16 @@
-const CACHE = "bad-cat-shell-v4";
+const CACHE = "bad-cat-shell-v5";
 const SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
+  "./game-map.js",
+  "./loot.js",
+  "./assets/net.svg",
+  "./game-map-style.json",
+  "./assets/maplibre/maplibre-gl.js",
+  "./assets/maplibre/maplibre-gl.css",
+  "./assets/maplibre/leaflet-maplibre-gl.js",
   "./adventure.js",
   "./targeting.js",
   "./campaign.js",
