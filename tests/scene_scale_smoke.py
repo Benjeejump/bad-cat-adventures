@@ -1,3 +1,4 @@
+from ui_helpers import tap_tool, equip_puppies
 """New original environments, common sprite scale and random surprise Pipeworks."""
 from playwright.sync_api import sync_playwright
 
@@ -14,16 +15,16 @@ with sync_playwright() as p:
  check(page.evaluate('badCatPipes.isOpen()'),'Foreground timer randomly deploys Pipeworks as a surprise')
  check('underfloor-world.png' in page.locator('#pipe-board').evaluate('(n)=>getComputedStyle(n).backgroundImage'),'Pipe puzzle sits under lifted floorboards')
  page.screenshot(path='/tmp/underfloor-pipeworks.png');page.locator('#pipe-close').click()
- page.locator('[data-vehicle=walking]').first.click()
+ tap_tool(page, '[data-vehicle=walking]')
  for selector in ['#actor-car','#actor-badcat','#actor-metro']:
   box=page.locator(selector).bounding_box();check(box['width']==80 and box['height']==80,selector+' has the common 80px sprite frame')
  for mode,bg in [('plane','sky-world'),('submarine','sea-world')]:
-  page.locator('[data-vehicle='+mode+']').first.click();box=page.locator('#world-vehicle').bounding_box()
+  tap_tool(page, f'[data-vehicle="{mode}"]');box=page.locator('#world-vehicle').bounding_box()
   check(abs(box['width']-80)<1 and abs(box['height']-80)<1,mode+' matches Dylan’s map sprite size')
   check(bg+'.png' in page.locator('.world-scenery').evaluate('(n)=>getComputedStyle(n).backgroundImage'),mode+' has its own original full background')
   page.screenshot(path='/tmp/'+mode+'-scaled-world.png')
- page.locator('[data-vehicle=car]').first.click();page.evaluate('badCatAdventure.encounter("badcat")')
+ tap_tool(page, '[data-vehicle=car]');page.evaluate('badCatAdventure.encounter("badcat")')
  check('surprise-world.png' in page.locator('.story-world').evaluate('(n)=>getComputedStyle(n).backgroundImage'),'Story surprise uses the modern town environment')
- page.screenshot(path='/tmp/modern-surprise.png');page.locator('#close-encounter').click();page.locator('#carwash-launch').click()
+ page.screenshot(path='/tmp/modern-surprise.png');page.locator('#close-encounter').click();tap_tool(page, '#carwash-launch')
  check(page.locator('.windscreen-squid').get_attribute('src')=='assets/carwash-squid.png','Windscreen uses the big tentacled squid asset')
  page.screenshot(path='/tmp/tentacled-squid-windscreen.png');check(not errors,'No scene-scale JavaScript errors: '+str(errors));b.close()

@@ -18,6 +18,7 @@ with sync_playwright() as p:
   page.evaluate('badCatHouse.open()');overlap(f'{w} puppy house');page.evaluate('document.querySelectorAll("dialog[open]").forEach(d=>d.close())')
   page.evaluate('badCatAdventure.encounter("puppy")');overlap(f'{w} surprise');page.evaluate('document.querySelectorAll("dialog[open]").forEach(d=>d.close())')
   page.locator('#edit-arsenal').evaluate('(n)=>n.click()');overlap(f'{w} arsenal');page.evaluate('document.querySelectorAll("dialog[open]").forEach(d=>d.close())')
+  page.locator('#puppy-hq-launch').click();overlap(f'{w} Puppy HQ');page.locator('#close-puppy-hq').click()
   page.locator('#parent-controls').evaluate('(d)=>d.showModal()');overlap(f'{w} parent controls');page.locator('#parent-controls').evaluate('(d)=>d.close()')
   page.evaluate('badCatTargeting.startRaid()');overlap(f'{w} kittens');page.evaluate('badCatTargeting.abortRaid()')
   page.locator('[data-view="hq"]').first.click();overlap(f'{w} HQ');page.locator('[data-view="drive"]').first.click()

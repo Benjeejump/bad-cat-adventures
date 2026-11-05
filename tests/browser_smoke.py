@@ -1,3 +1,4 @@
+from ui_helpers import tap_tool, equip_puppies, select_tool
 """Integration checks. Run against python3 -m http.server 8000.
 Requires Python Playwright and a Chromium executable, not application dependencies.
 """
@@ -36,18 +37,18 @@ with sync_playwright() as p:
     metro = page.locator('#actor-metro').get_attribute('style')
     page.wait_for_timeout(800)
     check(metro != page.locator('#actor-metro').get_attribute('style'), 'Metro chases the car')
-    page.locator('.journey-settings summary').click()
-    page.locator('#pause').click()
+    tap_tool(page, '.journey-settings summary')
+    tap_tool(page, '#pause')
     before = page.evaluate('badCatDiagnostics().simulationElapsed')
     page.wait_for_timeout(600)
     check(page.evaluate('badCatDiagnostics().simulationElapsed') == before, 'Pause freezes Test Drive')
-    page.locator('#pause').click()
-    page.locator('#speed').select_option('4')
+    tap_tool(page, '#pause')
+    select_tool(page, '#speed', '4')
     before = page.evaluate('badCatDiagnostics().simulationElapsed')
     page.wait_for_timeout(800)
     check(page.evaluate('badCatDiagnostics().simulationElapsed') > before + 1.5, 'Speed control changes simulation speed')
     for vehicle in ['plane','submarine','car']:
-        page.locator(f'.transform-picker [data-vehicle="{vehicle}"]').click()
+        tap_tool(page, f'.transform-picker [data-vehicle="{vehicle}"]')
         check(page.evaluate('badCatDiagnostics().vehicle')==vehicle, f'{vehicle} transformation works')
     page.locator('#sound').click()
     check(page.evaluate('badCatDiagnostics().audioState')=='running', 'Web Audio runs after interaction')
@@ -55,7 +56,7 @@ with sync_playwright() as p:
     page.locator('#actor-metro').click()
     check('shielded' in page.locator('#map-stage').get_attribute('class'), 'Forcefield visible')
     for gadget in ['laser','sonar','bubble','puppy']:
-        page.locator(f'[data-gadget="{gadget}"]').click()
+        equip_puppies(page) if gadget == 'puppy' else page.locator(f'[data-gadget="{gadget}"]').click()
         page.locator('#actor-metro').click()
         check(page.locator('.free-shot, .target-pop').count()>0, f'{gadget} visible targeted shot effect')
     for kind in ["vacuum","trap"]:
@@ -93,7 +94,7 @@ with sync_playwright() as p:
     page.evaluate('navigator.serviceWorker.ready')
     page.wait_for_function('navigator.serviceWorker.controller !== null')
     cached = page.evaluate('caches.keys()')
-    check('bad-cat-shell-v14' in cached, 'Offline shell cached')
+    check('bad-cat-shell-v15' in cached, 'Offline shell cached')
     context.set_offline(True)
     page.reload(wait_until='domcontentloaded')
     page.locator('#launch-silent').click(); page.locator('#test-drive').evaluate('(el)=>el.click()')
@@ -113,16 +114,16 @@ with sync_playwright() as p:
     page.screenshot(path='/tmp/bad-cat-tablet.png', full_page=True)
     # Browser-level permission denial, then synthetic allowed GPS fix.
     page.on('dialog', lambda d: d.accept())
-    page.locator('.journey-settings summary').click()
-    page.locator('#gps').click()
+    tap_tool(page, '.journey-settings summary')
+    tap_tool(page, '#gps')
     page.wait_for_function('document.querySelector("#story").textContent.includes("permission")')
     check(page.evaluate('badCatDiagnostics().mode')=='unavailable', 'Denied GPS waits for an explicit mode choice')
     context.grant_permissions(['geolocation'])
     context.set_geolocation({'latitude':51.501,'longitude':-.142,'accuracy':12})
-    page.locator('#gps').click()
+    tap_tool(page, '#gps')
     page.wait_for_function('badCatDiagnostics().mode === "gps"')
     check('±12 m' in page.locator('#accuracy').inner_text(), 'GPS fix and accuracy display')
-    page.locator('#test-drive').click()
+    tap_tool(page, '#test-drive')
     check(page.evaluate('badCatDiagnostics().mode')=='test', 'Can stop GPS and return to simulation')
     stored = page.evaluate('localStorage.getItem("bad-cat-progress-v1")')
     check('latitude' not in stored and 'longitude' not in stored and '51.501' not in stored, 'Saved progress contains no location data')

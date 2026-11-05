@@ -1,3 +1,4 @@
+from ui_helpers import tap_tool, equip_puppies
 """Real touch tracing, stroke order, two-sentence handwritten notes and local resume."""
 from playwright.sync_api import sync_playwright
 
@@ -14,7 +15,7 @@ with sync_playwright() as p:
  c=b.new_context(viewport={'width':1024,'height':600},has_touch=True,is_mobile=True,reduced_motion='reduce')
  for url in ['https://tiles.openfreemap.org/**','https://basemaps.cartocdn.com/**','https://nominatim.openstreetmap.org/**']:c.route(url,lambda r:r.abort())
  page=c.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
- page.goto('http://127.0.0.1:8000/');page.locator('#launch-silent').click();page.locator('#pencil-launch').click();page.locator('#pencil-message').select_option('You are kind. I like your hugs.');page.locator('#pencil-begin').click()
+ page.goto('http://127.0.0.1:8000/');page.locator('#launch-silent').click();tap_tool(page, '#pencil-launch');page.locator('#pencil-message').select_option('You are kind. I like your hugs.');page.locator('#pencil-begin').click()
  check(page.locator('.note-print-label').count()==2 and page.locator('.cursive-glyph').count()==25,'Both complete sentences are visible on the two-line cursive page')
  check(page.evaluate('new Set(badCatHandwriting.diagnostics().curriculum.join("").toLowerCase().replace(/[^a-z]/g,"")).size')==26,'Completing the note curriculum covers every letter A–Z')
  check(page.evaluate('''()=>{const chars=new Set(badCatHandwriting.diagnostics().curriculum.join('').replace(/[^A-Za-z]/g,''));return [...chars].every(ch=>Array.isArray(badCatCursive.letters[ch])&&badCatCursive.letters[ch].every(d=>{const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',d);return p.getTotalLength()>0}))}'''),'Every letter used by the course has valid cursive formation paths')
@@ -31,7 +32,7 @@ with sync_playwright() as p:
  session.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]});page.wait_for_timeout(500)
  check(page.evaluate('badCatHandwriting.diagnostics().index')>=2,'Joined cursive letters can be traced without lifting the finger')
  position=page.evaluate('badCatHandwriting.diagnostics()');check(position['index']>0 or position['stroke']>0,'Actual finger input follows cursive formation in order')
- page.locator('#pencil-later').click();page.reload();page.locator('#launch-silent').click();page.locator('#pencil-launch').click()
+ page.locator('#pencil-later').click();page.reload();page.locator('#launch-silent').click();tap_tool(page, '#pencil-launch')
  check(page.evaluate('badCatHandwriting.diagnostics().index')==position['index'] and page.evaluate('badCatHandwriting.diagnostics().stroke')==position['stroke'],'Saved cursive note resumes at the same place after reload')
  for size in [(1024,600),(390,844)]:
   page.set_viewport_size({'width':size[0],'height':size[1]});box=page.locator('#writing-pad').bounding_box();check(page.locator('#pencil-page-scroll').bounding_box()['width']<=size[0] and box['height']<=size[1],'Tracing pad fits '+str(size))
@@ -45,6 +46,6 @@ with sync_playwright() as p:
  check(page.evaluate('badCatCampaign.snapshot().supplies')==min(99,before+2),'Finished note earns puppy treats')
  check(page.evaluate('badCatHandwriting.diagnostics().saved')==1,'Finished note is saved locally')
  page.screenshot(path='/tmp/magic-pencil-note.png');page.locator('#pencil-close').click()
- page.evaluate('navigator.serviceWorker.ready');page.wait_for_function('navigator.serviceWorker.controller!==null');c.set_offline(True);page.reload();page.locator('#launch-silent').click();page.locator('#pencil-launch').click()
+ page.evaluate('navigator.serviceWorker.ready');page.wait_for_function('navigator.serviceWorker.controller!==null');c.set_offline(True);page.reload();page.locator('#launch-silent').click();tap_tool(page, '#pencil-launch')
  check('Your saved notes' in page.locator('#pencil-keepsakes').inner_text(),'Handwritten keepsake remains available offline')
  check(not errors,'No handwriting JavaScript errors: '+str(errors));b.close()

@@ -6,7 +6,9 @@ Dylan’s imagination-powered, child-friendly adventure console. A static web ga
 
 The small Dylan logo stays at the top right, including inside surprise games. Hold it for five seconds to leave a task without completing it or changing treats. Tap it five times quickly to open parent controls. Reset treats sets the balance to zero; resetting the whole game requires a second confirmation and clears this game’s saved progress on this device. These are development shortcuts, not a security lock.
 
-Choose a launcher, then tap anywhere in the playfield to fire. Nearby cats can be hit; empty-space shots miss. Dragging the map does not fire. Routine shots use effects and the story strip instead of notification popups.
+Choose a launcher, then tap anywhere in the playfield to fire. Nearby cats can be hit; empty-space shots miss. Dragging the map does not fire. Routine shots use effects; guidance stays in the HQ story log instead of covering play with notification popups.
+
+Four launcher pads form the toes of a paw print. The larger Puppy HQ heel shows the treat balance and opens vehicle choices, side games, inventions, launcher editing, the puppy house, supply net, crew details and journey settings. Instruction notifications and the aiming popup are removed; launcher selection stays highlighted on its pad.
 
 ## Play locally
 
@@ -175,7 +177,7 @@ The opening and mode bar offer **GPS map** or **Road Adventure**. GPS is still t
 
 ## Five direct arsenal slots
 
-**My five launchers** lets Dylan assign any saved invention or standard gadget to each main action button. A custom recipe can replace Sonar, Forcefield or another default, then be armed directly from that button or its number key (1–5). The five choices save locally; retiring an invention resets its equipped slot to the original gadget. The full invention menu remains available for other recipes.
+**My four launchers** lets Dylan assign any saved invention or standard gadget to each main action button. A custom recipe can replace Sonar, Forcefield or another default, then be armed directly from that button or its number key (1–4). The four choices save locally; retiring an invention resets its equipped slot to the original gadget. The full invention menu remains available for other recipes.
 
 ## Puppy House and spending treats
 

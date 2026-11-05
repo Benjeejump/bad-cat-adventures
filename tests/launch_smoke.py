@@ -1,3 +1,4 @@
+from ui_helpers import tap_tool, equip_puppies
 """Opening sequence, real animation timings, sound gesture and automatic mischief."""
 from playwright.sync_api import sync_playwright
 
@@ -41,7 +42,7 @@ with sync_playwright() as p:
    page.evaluate('badCatTargeting.tick(46)')
   else:check(page.locator('.story-world.resolved').count()==1,'Automatic event decision starts its animated result')
   page.locator('#close-encounter').evaluate('(n)=>n.click()')
- page.locator('#carwash-launch').click();page.locator('#wash-wipers').click()
+ tap_tool(page, '#carwash-launch');page.locator('#wash-wipers').click()
  check(page.locator('.wiper').first.evaluate('(el)=>getComputedStyle(el).animationName')=='wiper-sweep','Wiper animation runs without reduced-motion emulation')
  for _ in range(3):page.locator('#wash-bubbles').click()
  page.locator('#wash-boosters').click();page.wait_for_timeout(300)

@@ -1,4 +1,5 @@
-"""No-GPS road play, villains, five-slot recipes and the complete treat-funded housing ladder."""
+from ui_helpers import tap_tool, equip_puppies
+"""No-GPS road play, villains, four-slot recipes and the complete treat-funded housing ladder."""
 from playwright.sync_api import sync_playwright
 
 def check(v,m):
@@ -27,14 +28,14 @@ with sync_playwright() as p:
  page.evaluate('window.oldRandom=Math.random;Math.random=()=>0;badCatRoad.deploy("trap","metro");Math.random=oldRandom')
  check(page.evaluate('badCatPipes.isOpen()'),'A road villain deploys a surprise side game')
  check(page.locator('#pipeworks-dialog').bounding_box()['width']==1280,'Side game fills the entire viewport')
- page.locator('#pipe-close').click();page.locator('#journey-mode-bar [data-journey-mode=gps]').click();check(page.evaluate('gpsCalls')==1,'GPS mode is still explicitly available')
+ page.locator('#pipe-close').click();tap_tool(page, '#journey-mode-bar [data-journey-mode=gps]');check(page.evaluate('gpsCalls')==1,'GPS mode is still explicitly available')
  page.locator('#choose-road').click();page.evaluate('lateGPS({coords:{latitude:30,longitude:-97,accuracy:5,heading:90}})')
  check(page.evaluate('badCatDiagnostics().mode')=='road','A late GPS fix cannot take over Road Adventure')
- page.locator('[data-view=hq]').click();page.locator('#invention-name').fill('Dylan’s Yarn Slide');page.locator('#invention-form [type=submit]').click();page.locator('[data-view=drive]').click();page.locator('#edit-arsenal').click()
+ page.locator('[data-view=hq]').click();page.locator('#invention-name').fill('Dylan’s Yarn Slide');page.locator('#invention-form [type=submit]').click();page.locator('[data-view=drive]').click();tap_tool(page, '#edit-arsenal')
  page.locator('#arsenal-slots button').nth(2).click();page.locator('#arsenal-choices button').filter(has_text='Dylan’s Yarn Slide').click();page.locator('#close-loadout').click()
- check('Yarn Slide' in page.locator('[data-gadget=sonar]').inner_text(),'A built invention replaces Sonar in the main five-slot arsenal')
+ check('Yarn Slide' in page.locator('[data-gadget=sonar]').inner_text(),'A built invention replaces Sonar in the main four-slot arsenal')
  page.locator('[data-gadget=sonar]').click();check('Dylan’s Yarn Slide' in page.locator('#target-instruction').inner_text(),'One tap directly arms the equipped invention')
- page.locator('#cancel-target').click();page.keyboard.press('3');check('Dylan’s Yarn Slide' in page.locator('#target-instruction').inner_text(),'Number keys use the equipped launcher slots too');page.locator('#cancel-target').click();page.locator('[data-puppy-house]').first.click()
+ page.evaluate('badCatTargeting.cancel()');page.keyboard.press('3');check('Dylan’s Yarn Slide' in page.locator('#target-instruction').inner_text(),'Number keys use the equipped launcher slots too');page.evaluate('badCatTargeting.cancel()');tap_tool(page, '[data-puppy-house]')
  d=page.evaluate('badCatHouse.diagnostics()');check(len(d['catalog'])==100 and len({i['id'] for i in d['catalog']})==100,'Exactly 100 distinct furnishings across five homes')
  check(d['homes']==['Dog house','Dog apartment','House','Big house','Mansion'],'Housing follows the requested five-stage progression')
  check(page.locator('#puppy-house-dialog').bounding_box()['width']==1280,'Puppy House is full screen')
@@ -50,17 +51,17 @@ with sync_playwright() as p:
  for tier in range(5):
   current=page.evaluate('badCatHouse.diagnostics()')
   for item in [i for i in current['catalog'] if i['tier']==tier and i['id'] not in current['owned']]:
-   page.evaluate('badCatCampaign.awardTreats(99)');page.locator('#house-close').click();page.locator('[data-puppy-house]').first.click();page.locator('[data-buy-item='+item['id']+']').click()
+   page.evaluate('badCatCampaign.awardTreats(99)');page.locator('#house-close').click();tap_tool(page, '[data-puppy-house]');page.locator('[data-buy-item='+item['id']+']').click()
   check(page.evaluate('badCatHouse.diagnostics().furnished')==20,'All twenty furnishings can be placed in stage '+str(tier+1))
   if tier<4:
-   page.evaluate('badCatCampaign.awardTreats(99)');page.locator('#house-close').click();page.locator('[data-puppy-house]').first.click();page.locator('#house-upgrade').click()
+   page.evaluate('badCatCampaign.awardTreats(99)');page.locator('#house-close').click();tap_tool(page, '[data-puppy-house]');page.locator('#house-upgrade').click()
    check(page.evaluate('badCatHouse.diagnostics().tier')==tier+1 and page.evaluate('badCatHouse.diagnostics().furnished')==0,'Upgrade opens an empty new home while keeping the old one')
  check(page.evaluate('badCatHouse.diagnostics().owned.length')==100,'All 100 purchased items stay saved')
  page.locator('#house-visit').select_option('0');check(page.locator('.house-item').count()==20,'The original fully furnished dog house can be revisited')
  page.locator('.house-item').first.click();check('Dylan explores' in page.locator('#house-status').inner_text(),'Purchased objects have a puppy play interaction')
  page.screenshot(path='/tmp/puppy-house-complete.png');page.locator('#house-close').click();page.reload();page.locator('#launch-journey').select_option('road');page.locator('#launch-silent').click()
- check('Yarn Slide' in page.locator('[data-gadget=sonar]').inner_text(),'Five-slot loadout survives reload')
- page.locator('[data-puppy-house]').first.click();check(page.evaluate('badCatHouse.diagnostics().tier')==4 and page.evaluate('badCatHouse.diagnostics().owned.length')==100,'Housing upgrades and all purchases survive reload')
+ check('Yarn Slide' in page.locator('[data-gadget=sonar]').inner_text(),'Four-slot loadout survives reload')
+ tap_tool(page, '[data-puppy-house]');check(page.evaluate('badCatHouse.diagnostics().tier')==4 and page.evaluate('badCatHouse.diagnostics().owned.length')==100,'Housing upgrades and all purchases survive reload')
  page.locator('#house-close').click();page.evaluate('navigator.serviceWorker.ready');page.wait_for_function('navigator.serviceWorker.controller!==null');c.set_offline(True);page.reload();page.locator('#launch-journey').select_option('road');page.locator('#launch-silent').click();check(page.locator('#road-world').is_visible(),'Road Adventure works after offline reload')
  for size in [(1024,600),(390,844)]:
   page.set_viewport_size({'width':size[0],'height':size[1]})

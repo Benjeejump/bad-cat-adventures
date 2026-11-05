@@ -1,3 +1,4 @@
+from ui_helpers import tap_tool, equip_puppies
 """Drifting emoji bubbles, lasting setbacks and every Giant Puppy option/outcome."""
 from playwright.sync_api import sync_playwright
 
@@ -28,7 +29,7 @@ with sync_playwright() as p:
    check(after['condition']>=before['condition'] if success else after['condition']<before['condition'] or before['condition']==0,f'{option}: outcome changes the lasting crew state')
    page.locator('#close-encounter').evaluate('(n)=>n.click()')
  page.evaluate('badCatPuppyOptions.sample=realPuppySample;badCatCampaign.repair();badCatCampaign.repair();badCatCampaign.repair();badCatCampaign.repair();badCatCampaign.resupply()')
- page.locator('#kitten-launch').click();page.locator('#encounter-actions button').first.click()
+ tap_tool(page, '#kitten-launch');page.locator('#encounter-actions button').first.click()
  page.wait_for_timeout(300)
  check(page.locator('.kitten-target .kitten-emoji').count()==20,'Twenty kitten emojis are inside forcefield bubbles')
  before=page.locator('[data-kitten="1"]').bounding_box();page.wait_for_timeout(600);after=page.locator('[data-kitten="1"]').bounding_box()

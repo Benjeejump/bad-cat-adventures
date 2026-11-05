@@ -1016,3 +1016,252 @@ dialog > .parent-logo {
 #launch-skip {
   right: 76px;
 }
+
+/* Four toe pads and one HQ heel form the entire play menu. */
+body.map-mode .action-rail {
+  width: 216px;
+  bottom: auto;
+  padding: 10px;
+  gap: 8px;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+  backdrop-filter: none;
+}
+.action-rail .rail-label {
+  display: none;
+}
+.action-rail .gadget-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+  padding-bottom: 22px;
+}
+.action-rail .gadget-grid > .gadget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 44px;
+  min-height: 70px;
+  padding: 7px 2px;
+  border: 3px solid #91e5f6;
+  border-bottom-width: 6px;
+  border-radius: 55% 55% 44% 44%;
+  background: linear-gradient(#286aa0, #173f6b);
+  color: #fff;
+  box-shadow:
+    0 4px 0 #082b50,
+    inset 0 2px 0 #b6edff55;
+}
+.action-rail .gadget-grid > .gadget:nth-child(1) {
+  transform: translateY(22px) rotate(-20deg);
+}
+.action-rail .gadget-grid > .gadget:nth-child(2) {
+  transform: rotate(-7deg);
+}
+.action-rail .gadget-grid > .gadget:nth-child(3) {
+  transform: rotate(7deg);
+}
+.action-rail .gadget-grid > .gadget:nth-child(4) {
+  transform: translateY(22px) rotate(20deg);
+}
+.action-rail .gadget-grid > .gadget.aiming {
+  background: linear-gradient(#ffdf89, #ee9b35);
+  color: #173654;
+  border-color: #fff0be;
+  outline: 2px solid #fff4cd;
+}
+.action-rail .gadget b {
+  font-size: 8px;
+  line-height: 1.15;
+  max-width: 45px;
+  overflow: hidden;
+  max-height: 28px;
+}
+.action-rail .gadget-icon {
+  font-size: 25px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+}
+.action-rail .gadget-icon img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+.action-rail .gadget small,
+.action-rail .gadget kbd {
+  display: none;
+}
+#puppy-hq-launch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 142px;
+  min-height: 88px;
+  align-self: center;
+  margin: 0;
+  border: 4px solid #93e5f7;
+  border-bottom: 7px solid #5bafcf;
+  border-radius: 46% 46% 40% 40%;
+  background: linear-gradient(#2786b8, #174671);
+  box-shadow: 0 5px 0 #082b50;
+  color: white;
+}
+#puppy-hq-launch span {
+  font-size: 32px;
+  line-height: 1;
+}
+#puppy-hq-launch b {
+  font-size: 15px;
+}
+#puppy-hq-menu {
+  width: min(650px, 96vw);
+  max-height: 94dvh;
+  overflow: auto;
+  background: #173e62;
+  color: #fff;
+  border: 4px solid #83d9f1;
+  border-radius: 26px;
+  padding: 20px;
+}
+#puppy-hq-menu::backdrop {
+  background: #061c36aa;
+}
+#puppy-hq-menu > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+#close-puppy-hq {
+  width: 44px;
+  height: 44px;
+  font-size: 25px;
+}
+.puppy-hq-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.puppy-hq-options > button,
+.puppy-hq-options .transform-picker button {
+  min-height: 62px;
+  border: 2px solid #87d5ef;
+  border-radius: 18px;
+  background: #245b86;
+  color: #fff;
+  padding: 10px;
+  font-weight: 800;
+}
+.puppy-hq-options img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+.puppy-hq-options .rail-transform,
+.puppy-hq-options .journey-settings {
+  grid-column: 1/-1;
+}
+.puppy-hq-options .transform-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.puppy-hq-options .journey-settings {
+  position: static;
+  width: auto;
+  max-width: none;
+  background: #123350;
+  padding: 12px;
+  border-radius: 16px;
+}
+.puppy-hq-options .transform-picker span {
+  display: block;
+}
+#target-bar,
+#toast {
+  display: none !important;
+}
+@media (min-width: 701px) {
+  .map-mode .topbar {
+    right: 240px;
+  }
+}
+@media (max-width: 700px) {
+  body.map-mode .action-rail {
+    width: 192px;
+    right: 18px;
+    padding: 4px;
+  }
+  .action-rail .gadget-grid {
+    gap: 2px;
+  }
+  .action-rail .gadget-grid > .gadget {
+    min-width: 44px;
+    min-height: 64px;
+  }
+  #puppy-hq-launch {
+    width: 126px;
+    min-height: 78px;
+  }
+  .puppy-hq-options {
+    gap: 8px;
+  }
+}
+.map-mode .campaign-hud {
+  left: 12px;
+  right: auto;
+  max-width: 170px;
+}
+@media (max-width: 700px) {
+  .map-mode .campaign-hud {
+    top: 160px;
+    max-width: 155px;
+  }
+}
+
+/* The paw floats over the world; no empty strip is needed beside the road. */
+.road-mode #road-world {
+  right: 0;
+}
+.puppy-hq-options #journey-mode-bar {
+  position: static;
+  grid-column: 1/-1;
+  justify-content: center;
+}
+.map-mode #source-badge {
+  top: 160px;
+}
+#puppy-hq-menu .campaign-hud {
+  display: block;
+  position: static;
+  grid-column: 1/-1;
+  max-width: none;
+  width: 100%;
+}
+#puppy-hq-menu #follow {
+  position: static;
+  inset: auto;
+}
+#paw-treat-balance {
+  font-size: 11px;
+  line-height: 1.1;
+  color: #ffdf95;
+}
+
+.puppy-hq-options .journey-story {
+  position: static;
+  inset: auto;
+  grid-column: 1/-1;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  box-sizing: border-box;
+}

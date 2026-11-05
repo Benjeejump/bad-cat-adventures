@@ -1,3 +1,4 @@
+from ui_helpers import tap_tool, equip_puppies
 """v0.2 integration: scenes, squid mechanics, fixed pins, geofence and updates.
 Geocoder responses are synthetic fixtures; this does not verify real business coordinates.
 """
@@ -42,7 +43,7 @@ with sync_playwright() as p:
   check(page.locator('.story-world.resolved').count()==1,f'{event} decision produces an animated result')
   page.locator('#close-encounter').evaluate('(n)=>n.click()')
  # No automatic carwash in random events. It has its own always-available button.
- page.locator('#carwash-launch').click()
+ tap_tool(page, '#carwash-launch')
  check(page.locator('.windscreen-squid').count()==1,'Full windscreen squid scene opens')
  page.locator('#wash-boosters').click()
  check(not page.evaluate('badCatAdventure.diagnostics().round.won'),'Boosters alone do not instantly win')
@@ -73,7 +74,7 @@ with sync_playwright() as p:
  check(page.locator('#encounter-dialog').evaluate('(n)=>n.open'),'Leaving and returning re-arms arrival')
  page.locator('#close-encounter').click()
  # User zoom survives live fixes, and fixed business pins never move with GPS.
- page.locator('.journey-settings summary').click();page.on('dialog',lambda d:d.accept());page.locator('#gps').click();page.wait_for_function('badCatDiagnostics().mode==="gps"')
+ tap_tool(page, '.journey-settings summary');page.on('dialog',lambda d:d.accept());tap_tool(page, '#gps');page.wait_for_function('badCatDiagnostics().mode==="gps"')
  page.locator('.leaflet-control-zoom-out').click();page.wait_for_function('badCatDiagnostics().zoom===19');zoom=page.evaluate('badCatDiagnostics().zoom');context.set_geolocation({'latitude':30.451,'longitude':-97.82,'accuracy':12});page.wait_for_timeout(500)
  check(page.evaluate('badCatDiagnostics().zoom')==zoom,'GPS updates preserve manual zoom')
  check(page.evaluate('BAD_CAT_SITES.map(s=>s.coordinates)')==[BASE,PUPPY],'Site pins remain fixed while GPS moves')
@@ -83,7 +84,7 @@ with sync_playwright() as p:
   check(page.locator('#map-stage').bounding_box()['height']==h,'Map remains full-height at '+str((w,h)))
  page.set_viewport_size({'width':1280,'height':800});page.screenshot(path='/tmp/bad-cat-v2-map-final.png')
  page.evaluate('navigator.serviceWorker.ready');page.wait_for_function('navigator.serviceWorker.controller')
- context.set_offline(True);page.reload(wait_until='domcontentloaded');page.locator('#launch-silent').click(); page.locator('#test-drive').evaluate('(el)=>el.click()');page.locator('#carwash-launch').click();page.locator('#wash-wipers').click()
+ context.set_offline(True);page.reload(wait_until='domcontentloaded');page.locator('#launch-silent').click(); page.locator('#test-drive').evaluate('(el)=>el.click()');tap_tool(page, '#carwash-launch');page.locator('#wash-wipers').click()
  check(page.evaluate('badCatAdventure.diagnostics().round.wipers')==1,'New car wash works after offline reload')
  page.locator('#close-encounter').click();page.evaluate('badCatAdventure.encounter("amy")');page.locator('#encounter-actions button').first.click()
  check(page.locator('.story-world.resolved').count()==1,'Amy decision and animated result work offline')

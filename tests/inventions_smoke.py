@@ -1,3 +1,4 @@
+from ui_helpers import tap_tool, equip_puppies
 """Picture recipes persist and launch their actual chosen item; puppy walking uses GPS roads."""
 from playwright.sync_api import sync_playwright
 
@@ -20,14 +21,14 @@ with sync_playwright() as p:
  page.locator('#inventions .use-invention').first.click();check(page.locator('#drive-view').is_visible(),'Deploy returns to the adventure')
  page.locator('#actor-badcat').click();check(page.locator('.recipe-launch[data-item=acorns][data-feature=stinky]').count()>0,'Targeted invention fires the selected item and special feature')
  check(page.evaluate('badCatCharacters.diagnostics().badcat.shield')==2,'Custom invention wears down the enemy forcefield')
- page.locator('#cancel-target').click();page.locator('[data-vehicle=walking]').first.click()
+ page.evaluate('badCatTargeting.cancel()');tap_tool(page, '[data-vehicle=walking]')
  check(page.evaluate('badCatVehicle.mode()')=='walking' and not page.evaluate('badCatVehicle.worldActive()'),'Walking stays in the GPS road world')
  check('dylan.png' in page.locator('#actor-car img').get_attribute('src'),'Walking replaces the car with an animated puppy')
- page.reload();page.locator('#launch-silent').click();page.locator('#test-drive').evaluate('(n)=>n.click()');page.locator('#arsenal-launch').click()
+ page.reload();page.locator('#launch-silent').click();page.locator('#test-drive').evaluate('(n)=>n.click()');tap_tool(page, '#arsenal-launch')
  check('Dylan’s Acorn Surprise' in page.locator('#field-inventions').inner_text(),'Saved recipe remains accessible from the map after reload')
  page.locator('#field-inventions button').first.click();check('Dylan’s Acorn Surprise' in page.locator('#target-instruction').inner_text(),'Map arsenal arms the named invention')
- page.locator('#cancel-target').click();page.evaluate('badCatTargeting.startRaid()')
- page.locator('#arsenal-launch').click();page.locator('#field-inventions button').first.click()
+ page.evaluate('badCatTargeting.cancel()');page.evaluate('badCatTargeting.startRaid()')
+ tap_tool(page, '#arsenal-launch');page.locator('#field-inventions button').first.click()
  page.locator('[data-kitten="1"]').click()
  check(page.evaluate('badCatTargeting.diagnostics().raid.remaining')==19,'Saved invention works against the kitten raid')
  check(page.locator('.recipe-launch[data-item=acorns]').count()>0,'Kitten hit shows the selected custom projectile')

@@ -79,6 +79,8 @@
       state.supplies <= 2
         ? "We’re low on treats! Practice spelling to earn more."
         : "Puppy treats buy puppy help.";
+    const balance = document.querySelector("#paw-treat-balance");
+    if (balance) balance.textContent = `🍪 ${state.supplies}`;
     summary.textContent = `🚙 ${state.condition}%   🍪 ${state.supplies}   🐈 ${state.heat}/5`;
     document.querySelector("#crew-detail").textContent =
       `Car condition ${state.condition}%. Treats ${state.supplies}. Cats’ advantage ${state.heat}/5. ${

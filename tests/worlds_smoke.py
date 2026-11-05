@@ -1,3 +1,4 @@
+from ui_helpers import tap_tool, equip_puppies
 """Playable worlds, enemy shields, automatic spelling celebration and kitten net result."""
 from playwright.sync_api import sync_playwright
 
@@ -17,10 +18,10 @@ with sync_playwright() as p:
  page.locator('#actor-badcat').click()
  check(page.evaluate('badCatCharacters.diagnostics().badcat.shield')==0,'Second laser shatters the forcefield')
  check(page.evaluate('badCatCharacters.diagnostics().badcat.plan') is None,'Breaking the forcefield interrupts the announced plan')
- page.locator('#cancel-target').click()
+ page.evaluate('badCatTargeting.cancel()')
  page.locator('#theme-toggle').click();check(page.locator('html').get_attribute('data-theme')=='night','Night mode applies')
  for mode in ['plane','submarine','car']:
-  page.locator('[data-vehicle="'+mode+'"]').first.click()
+  tap_tool(page, f'[data-vehicle="{mode}"]')
   check(page.evaluate('badCatVehicle.mode()')==mode,'Vehicle switches to '+mode)
   check(page.locator('#vehicle-world').is_visible()==(mode!='car'),'World visibility follows '+mode)
   if mode!='car':

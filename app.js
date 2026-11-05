@@ -55,15 +55,9 @@
       ? "Progress stays on this device. ✓"
       : "Storage unavailable — progress lasts for this visit.";
   }
-  let toastTimer;
+  // Routine guidance stays in the HQ story log instead of opening notifications.
   function toast(message) {
-    $("#toast").textContent = message;
-    $("#toast").classList.add("visible");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(
-      () => $("#toast").classList.remove("visible"),
-      4200,
-    );
+    story(message);
   }
   function story(message) {
     $("#story").textContent = message;
@@ -1183,10 +1177,9 @@
     )
       return;
     const index = Number(event.key) - 1;
-    if (index >= 0 && index < 6) {
+    if (index >= 0 && index < 4) {
       event.preventDefault();
-      if (index === 5) encounter();
-      else window.badCatArsenal.arm(index);
+      window.badCatArsenal.arm(index);
     }
   });
   window.addEventListener("online", updateConnection);

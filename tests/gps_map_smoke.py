@@ -1,3 +1,4 @@
+from ui_helpers import tap_tool, equip_puppies
 """GPS-first launch, no silent simulation, and the label-free game map style.
 Uses synthetic geography to exercise the actual renderer, not real network tiles.
 """
@@ -32,7 +33,7 @@ with sync_playwright() as p:
  check(page.evaluate('badCatGameMap.getRenderedStyle().layers.every(l=>l.type!=="symbol" && !l.id.includes("building"))'),'No labels, POI symbols or buildings in the game style')
  page.screenshot(path='/tmp/bad-cat-game-map.png')
  page.evaluate('Math.random=()=>0;badCatLoot.update(7,[30.478,-97.81],"gps",8,0)')
- page.locator('#net-launch').click();parcel=page.locator('.loot-marker').bounding_box();page.locator('.loot-marker').click()
+ tap_tool(page, '#net-launch');parcel=page.locator('.loot-marker').bounding_box();page.locator('.loot-marker').click()
  check(page.evaluate('badCatLoot.diagnostics().captured')==1,'Net catches work on the live vector map overlay')
  check(abs(page.locator('.net-catch-effect').evaluate('(n)=>parseFloat(n.style.left)')-parcel['x'])<2,'Net animation starts at the real map parcel')
  page.locator('.leaflet-control-zoom-out').click();page.wait_for_function('badCatDiagnostics().zoom===19')
@@ -48,7 +49,7 @@ with sync_playwright() as p:
  page.mouse.move(550,500);page.mouse.down();page.mouse.move(650,500,steps=8);page.mouse.up();page.wait_for_timeout(200)
  check(page.locator('#follow').get_attribute('aria-pressed')=='false','Dragging a rotated map releases follow normally')
  check(abs(page.evaluate('badCatDiagnostics().mapAppearance.roadBearing')-90)<1,'Dragging preserves heading-up roads')
- page.locator('#follow').click()
+ tap_tool(page, '#follow')
  page.locator('.leaflet-control-zoom-out').click();page.wait_for_function('badCatDiagnostics().zoom===18')
  check(abs(page.evaluate('badCatDiagnostics().mapAppearance.roadBearing')-90)<1,'Zooming preserves heading-up roads')
  # Revoking permission must not start a fake drive.
@@ -60,10 +61,10 @@ with sync_playwright() as p:
  check(page.evaluate('badCatDiagnostics().mode')=='test' and page.evaluate('badCatDiagnostics().simulationElapsed')>0,'Test Drive runs only after explicitly selecting it')
  # A delayed fix from a cancelled GPS request cannot steal the selected mode.
  page.evaluate('window.originalWatch=navigator.geolocation.watchPosition;navigator.geolocation.watchPosition=(ok,bad)=>{window.lateFix=ok;window.lateError=bad;return 99}')
- page.locator('.journey-settings summary').click();page.locator('#gps').click();page.locator('#choose-test').click()
+ tap_tool(page, '.journey-settings summary');tap_tool(page, '#gps');page.locator('#choose-test').click()
  page.evaluate('lateFix({coords:{latitude:0,longitude:0,accuracy:1}});lateError({code:1})')
  check(page.evaluate('badCatDiagnostics().mode')=='test','Old GPS callbacks cannot override a later explicit mode choice')
- page.locator('#gps').click();page.evaluate('lateError({code:2})')
+ tap_tool(page, '#gps');page.evaluate('lateError({code:2})')
  check(page.evaluate('badCatDiagnostics().mode')=='locating','Temporary GPS loss keeps waiting for a real fix, without simulation')
  page.evaluate('lateFix({coords:{latitude:30.478,longitude:-97.81,accuracy:8,heading:0}})')
  check(page.evaluate('badCatDiagnostics().mode')=='gps','The live GPS watch recovers automatically after a transient error')

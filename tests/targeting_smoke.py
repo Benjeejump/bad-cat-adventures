@@ -1,3 +1,4 @@
+from ui_helpers import tap_tool, equip_puppies
 """Targeted gadgets and the 20-kitten timed attack, including a forgiving timeout."""
 from playwright.sync_api import sync_playwright
 
@@ -14,14 +15,14 @@ with sync_playwright() as p:
  page.locator('#actor-metro').click()
  check(page.evaluate('badCatCharacters.diagnostics().metro.shield')==3,'The chosen action affects Metro')
  check(page.locator('.target-pop').count()>0,'Targeted action has a visible impact animation')
- page.locator('#cancel-target').click();page.locator('#actor-badcat').click()
+ page.evaluate('badCatTargeting.cancel()');page.locator('#actor-badcat').click()
  check(page.evaluate('badCatDiagnostics().targeting.selected')=='badcat','Can select BC before choosing an action')
  page.locator('[data-gadget="sonar"]').click()
  check('reveals' in page.locator('#story').inner_text().lower(),'Selecting an action then affects the selected BC')
- page.locator('#kitten-launch').click();page.locator('#encounter-actions button').first.click()
+ tap_tool(page, '#kitten-launch');page.locator('#encounter-actions button').first.click()
  check(page.locator('.kitten-target').count()==20,'Exactly 20 kittens arrive')
  check(page.evaluate('badCatDiagnostics().targeting.raid.seconds')<=45,'Visible 45-second countdown starts')
- page.locator('[data-gadget="puppy"]').click()
+ equip_puppies(page)
  for i in range(1,21):page.locator(f'[data-kitten="{i}"]').click()
  check('All 20 kittens' in page.locator('#encounter-title').inner_text(),'Clearing all 20 within the timer wins the round')
  page.locator('#encounter-actions button').first.click()
@@ -30,7 +31,7 @@ with sync_playwright() as p:
  page.evaluate('badCatTargeting.tick(46)')
  check('kittens got away' in page.locator('#encounter-title').inner_text(),'Timeout produces lasting setbacks, without game over')
  page.locator('#close-encounter').evaluate('(n)=>n.click()')
- page.locator('#kitten-launch').click();page.locator('#encounter-actions button').first.click();page.set_viewport_size({'width':1024,'height':600})
+ tap_tool(page, '#kitten-launch');page.locator('#encounter-actions button').first.click();page.set_viewport_size({'width':1024,'height':600})
  check(page.locator('#kitten-field').bounding_box()['width']>400,'Kitten playfield remains usable at tablet landscape size')
  page.locator('#raid-close').click();page.locator('#close-encounter').evaluate('(n)=>n.click()')
  check(not errors,f'No targeting JavaScript errors: {errors}');b.close()

@@ -1,3 +1,4 @@
+from ui_helpers import tap_tool, equip_puppies
 """Inventory drops, net reach, persistent levels and actual upgraded gadget effects."""
 from playwright.sync_api import sync_playwright
 
@@ -13,7 +14,7 @@ with sync_playwright() as p:
  check(page.evaluate('badCatLoot.diagnostics().drop.type')=='net','A fictional upgrade appears near the current GPS car')
  page.locator('.loot-fallback').click()
  check(page.evaluate('badCatLoot.diagnostics().captured')==0,'A drop cannot be grabbed without selecting the net')
- page.locator('#net-launch').click();page.locator('.loot-fallback').click()
+ tap_tool(page, '#net-launch');page.locator('.loot-fallback').click()
  check(page.evaluate('badCatLoot.diagnostics().levels.net')==1,'Net catch awards an actual inventory upgrade')
  check(page.evaluate('badCatLoot.diagnostics().reachMetres')==35,'Long net actually extends reach from 25 to 35 metres')
  check(page.locator('.net-catch-effect').count()==1,'Catching a drop animates the net')
@@ -27,7 +28,7 @@ with sync_playwright() as p:
  context.set_geolocation({'latitude':30.480,'longitude':-97.81,'accuracy':8});page.wait_for_timeout(400)
  page.wait_for_function('badCatLoot.diagnostics().drop !== null')
  check(page.evaluate('badCatLoot.diagnostics().drop.type')=='bubble','Travel reveals another random upgrade type')
- page.locator('#net-launch').click();page.locator('.loot-fallback').evaluate('(el)=>el.click()')
+ tap_tool(page, '#net-launch');page.locator('.loot-fallback').evaluate('(el)=>el.click()')
  check(page.evaluate('badCatLoot.diagnostics().captured')==1,'A parcel outside net reach cannot be caught')
  context.set_geolocation({'latitude':30.4802,'longitude':-97.81,'accuracy':8});page.wait_for_timeout(400)
  page.locator('.loot-fallback').evaluate('(el)=>el.click()')

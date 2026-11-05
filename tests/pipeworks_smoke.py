@@ -1,3 +1,4 @@
+from ui_helpers import tap_tool, equip_puppies
 """Original connected pipe puzzles: solvability, relaxed flow, rewards, controls and offline play."""
 from playwright.sync_api import sync_playwright
 
@@ -38,7 +39,7 @@ with sync_playwright() as p:
  c=b.new_context(viewport={'width':1280,'height':800},reduced_motion='reduce')
  for url in ['https://tiles.openfreemap.org/**','https://basemaps.cartocdn.com/**','https://nominatim.openstreetmap.org/**']:c.route(url,lambda r:r.abort())
  page=c.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
- page.goto('http://127.0.0.1:8000/');page.locator('#launch-silent').click();page.locator('#test-drive').evaluate('(n)=>n.click()');page.locator('#pipe-launch').click()
+ page.goto('http://127.0.0.1:8000/');page.locator('#launch-silent').click();page.locator('#test-drive').evaluate('(n)=>n.click()');tap_tool(page, '#pipe-launch')
  d=page.evaluate('badCatPipes.diagnostics()');solution=solve(d)
  check(not page.locator('#pipe-result').is_visible(),'Replay and next-puzzle controls stay hidden until the flow finishes')
  check(d['hasTimeLimit']==False and d['practice'],'Default workshop has no deadline and slow visible flow')
@@ -61,10 +62,10 @@ with sync_playwright() as p:
  for size in [(1024,600),(390,844)]:
   page.set_viewport_size({'width':size[0],'height':size[1]});box=page.locator('#pipe-board').bounding_box()
   check(box['width']<=size[0] and page.evaluate('document.documentElement.scrollWidth<=innerWidth'),'Workshop fits '+str(size))
- page.locator('#pipe-close').click();page.evaluate('navigator.serviceWorker.ready');page.wait_for_function('navigator.serviceWorker.controller!==null');c.set_offline(True);page.reload();page.locator('#launch-silent').click();page.locator('#pipe-launch').click()
+ page.locator('#pipe-close').click();page.evaluate('navigator.serviceWorker.ready');page.wait_for_function('navigator.serviceWorker.controller!==null');c.set_offline(True);page.reload();page.locator('#launch-silent').click();tap_tool(page, '#pipe-launch')
  check(page.evaluate('badCatPipes.diagnostics().record.wins')==1,'Repair record and workshop survive offline reload')
  page.locator('#pipe-close').click();c.set_offline(False)
- page.evaluate('localStorage.setItem("metro-pipeworks-v1",JSON.stringify({wins:4,level:5}))');page.reload();page.locator('#launch-silent').click();page.locator('#pipe-launch').click()
+ page.evaluate('localStorage.setItem("metro-pipeworks-v1",JSON.stringify({wins:4,level:5}))');page.reload();page.locator('#launch-silent').click();tap_tool(page, '#pipe-launch')
  d=page.evaluate('badCatPipes.diagnostics()')
  check(d['placement'] and len(d['obstacles'])>=3,'Later workshops add obstacles and a pipe-piece tray')
  check(page.locator('#pipe-piece-tray').is_visible(),'Dylan can select straight and bent pipe shapes')

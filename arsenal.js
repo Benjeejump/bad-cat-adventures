@@ -1,4 +1,4 @@
-/* Five directly usable slots; recipe snapshots survive reload, retired recipes reset. */
+/* Four directly usable slots; recipe snapshots survive reload, retired recipes reset. */
 "use strict";
 (() => {
   const base = [
@@ -10,14 +10,15 @@
   ];
   let hooks,
     dialog,
-    slots = base.map((x) => x[0]),
+    hqMenu,
+    slots = base.slice(0, 4).map((x) => x[0]),
     editing = 0,
     buttons = [];
   const signature = (v) =>
     JSON.stringify([v.name, v.power, v.launcher, v.item, v.feature]);
   try {
     const raw = JSON.parse(localStorage.getItem("bad-cat-arsenal-v1"));
-    if (Array.isArray(raw) && raw.length === 5) slots = raw;
+    if (Array.isArray(raw) && raw.length >= 4) slots = raw.slice(0, 4);
   } catch {}
   function resolve(i) {
     const value = slots[i];
@@ -34,6 +35,7 @@
     } catch {}
   }
   function arm(i) {
+    if (!Number.isInteger(i) || i < 0 || i >= 4) return;
     const inv = resolve(i);
     if (typeof inv === "string") window.badCatTargeting.arm(inv);
     else window.badCatTargeting.arm(inv.power, inv);
@@ -62,10 +64,8 @@
         icon.textContent = base.find(
           (x) => x[0] === (typeof inv === "string" ? inv : inv.power),
         )[2];
-      b.title =
-        typeof inv === "string"
-          ? label.textContent
-          : window.badCatInventions.describe(inv);
+      b.removeAttribute("title");
+      b.setAttribute("aria-label", label.textContent);
     });
     save();
   }
@@ -73,7 +73,7 @@
     render();
     const root = dialog.querySelector("#arsenal-slots");
     root.replaceChildren();
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
       const b = document.createElement("button");
       b.textContent = `${i + 1} · ${buttons[i].querySelector("b").textContent}`;
       b.setAttribute("aria-pressed", i === editing);
@@ -103,9 +103,9 @@
   }
   function init(h) {
     hooks = h;
-    buttons = base.map(([power]) =>
-      document.querySelector(`[data-gadget="${power}"]`),
-    );
+    buttons = base
+      .slice(0, 4)
+      .map(([power]) => document.querySelector(`[data-gadget="${power}"]`));
     buttons.forEach((b, i) =>
       b.addEventListener(
         "click",
@@ -119,7 +119,7 @@
     dialog = document.createElement("dialog");
     dialog.id = "arsenal-editor";
     dialog.innerHTML =
-      '<header><h2>My five launchers</h2><button id="close-loadout" aria-label="Close arsenal menu">×</button></header><p>Choose a slot, then choose a standard gadget or one of your inventions. Changes save right away.</p><div id="arsenal-slots"></div><h3 id="arsenal-edit-heading"></h3><div id="arsenal-choices"></div><button id="arsenal-build">Build more at HQ</button>';
+      '<header><h2>My four launchers</h2><button id="close-loadout" aria-label="Close arsenal menu">×</button></header><p>Choose a slot, then choose a standard gadget or one of your inventions. Changes save right away.</p><div id="arsenal-slots"></div><h3 id="arsenal-edit-heading"></h3><div id="arsenal-choices"></div><button id="arsenal-build">Build more at HQ</button>';
     document.body.append(dialog);
     dialog.querySelector("#close-loadout").onclick = () => dialog.close();
     dialog.querySelector("#arsenal-build").onclick = () => {
@@ -133,13 +133,56 @@
       menu();
       dialog.showModal();
     };
+    const rail = document.querySelector(".action-rail");
+    hqMenu = document.createElement("dialog");
+    hqMenu.id = "puppy-hq-menu";
+    hqMenu.setAttribute("aria-labelledby", "puppy-hq-title");
+    hqMenu.innerHTML =
+      '<header><h2 id="puppy-hq-title">Puppy HQ</h2><button id="close-puppy-hq" aria-label="Close Puppy HQ">×</button></header><div class="puppy-hq-options"></div>';
+    const options = hqMenu.querySelector(".puppy-hq-options");
+    [...rail.querySelector(".gadget-grid").children]
+      .filter((n) => !buttons.includes(n))
+      .forEach((n) => options.append(n));
+    [...rail.children]
+      .filter((n) => !n.matches(".gadget-grid,.rail-label"))
+      .forEach((n) => options.append(n));
+    const journeyModes = document.querySelector("#journey-mode-bar");
+    if (journeyModes) options.append(journeyModes);
+    const storyPanel = document.querySelector(".journey-story");
+    if (storyPanel) options.append(storyPanel);
+    const crew = document.querySelector(".campaign-hud");
+    if (crew) options.append(crew);
+    const follow = document.querySelector("#follow");
+    if (follow) options.append(follow);
+    const settings = document.querySelector(".journey-settings");
+    if (settings) options.append(settings);
+    const workshop = document.createElement("button");
+    workshop.textContent = "✦ Build inventions at HQ";
+    workshop.onclick = () => hooks.hq();
+    options.prepend(workshop);
+    const hqButton = document.createElement("button");
+    hqButton.id = "puppy-hq-launch";
+    hqButton.innerHTML = `<span aria-hidden="true">⌂</span><b>Puppy HQ</b><small id="paw-treat-balance">🍪 ${window.badCatCampaign.snapshot().supplies}</small>`;
+    hqButton.setAttribute("aria-haspopup", "dialog");
+    hqButton.onclick = () => hqMenu.showModal();
+    rail.append(hqButton);
+    hqMenu.querySelector("#close-puppy-hq").onclick = () => hqMenu.close();
+    hqMenu.addEventListener(
+      "click",
+      (e) => {
+        if (e.target.closest(".puppy-hq-options button")) hqMenu.close();
+      },
+      true,
+    );
+    document.body.append(hqMenu);
+    document.querySelector("#edit-arsenal").textContent = "⚙ My four launchers";
     render();
   }
   window.badCatArsenal = {
     init,
     render,
     arm,
-    isOpen: () => !!dialog?.open,
+    isOpen: () => !!dialog?.open || !!hqMenu?.open,
     diagnostics: () =>
       slots.map((_, i) => {
         const v = resolve(i);
