@@ -272,6 +272,16 @@
       state.condition < 35 ? 0.65 : state.condition < 65 ? 0.85 : 1,
     pressure: () => state.heat,
     raidSeconds: () => Math.max(30, 45 - state.heat * 2),
+    spendTreats: (amount) => {
+      if (
+        !Number.isSafeInteger(amount) ||
+        amount < 0 ||
+        state.supplies < amount
+      )
+        return false;
+      change({ supplies: -amount });
+      return true;
+    },
     awardTreats: (amount) => {
       if (!Number.isFinite(amount)) return 0;
       const before = state.supplies;

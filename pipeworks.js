@@ -91,6 +91,56 @@
       tiles[route[0]] = rotate(tiles[route[0]]);
     return { solution, tiles, start: route[0], end: route.at(-1) };
   }
+  let selectedPiece = 10;
+  function placementPuzzle(rows, cols, level) {
+    const mid = Math.floor(rows / 2),
+      detour = Math.random() < 0.5 ? 0 : rows - 1,
+      path = [mid * cols, mid * cols + 1];
+    let r = mid;
+    while (r !== detour) {
+      r += detour > r ? 1 : -1;
+      path.push(r * cols + 1);
+    }
+    for (let c = 2; c < cols - 1; c++) path.push(detour * cols + c);
+    while (r !== mid) {
+      r += mid > r ? 1 : -1;
+      path.push(r * cols + cols - 2);
+    }
+    path.push(mid * cols + cols - 1);
+    const solution = Array(rows * cols).fill(0);
+    solution[path[0]] = 8;
+    solution[path.at(-1)] = 2;
+    for (let i = 1; i < path.length; i++) {
+      const diff = path[i] - path[i - 1],
+        out = diff === 1 ? 2 : diff === -1 ? 8 : diff === cols ? 4 : 1;
+      solution[path[i - 1]] |= out;
+      solution[path[i]] |= rotate(rotate(out));
+    }
+    const centre = mid * cols + Math.floor(cols / 2),
+      obstacles = [
+        centre,
+        ...shuffle(
+          [...solution.keys()].filter((i) => !path.includes(i) && i !== centre),
+        ).slice(
+          0,
+          Math.min(2 + Math.floor(level / 2), rows * cols - path.length - 1),
+        ),
+      ];
+    const tiles = Array(rows * cols).fill(0),
+      start = path[0],
+      end = path.at(-1);
+    tiles[start] = solution[start];
+    tiles[end] = solution[end];
+    return {
+      solution,
+      tiles,
+      start,
+      end,
+      obstacles,
+      fixed: [start, end],
+      required: path.length,
+    };
+  }
   function svg(mask) {
     let d = "";
     for (const [, , bit] of directions)
@@ -136,13 +186,23 @@
     return {
       wet,
       leaks,
-      complete: wet.size === tiles.length && !leaks && !!(tiles[end] & 2),
+      complete:
+        (round.placement ? wet.has(end) : wet.size === tiles.length) &&
+        !leaks &&
+        !!(tiles[end] & 2),
     };
   }
   function paint() {
     const flow = connections();
     board.querySelectorAll("button").forEach((b, i) => {
-      b.innerHTML = svg(round.tiles[i]);
+      const blocked = round.obstacles.includes(i);
+      b.innerHTML = blocked
+        ? '<span class="pipe-obstacle-art">🪨</span>'
+        : round.tiles[i]
+          ? svg(round.tiles[i])
+          : '<span class="pipe-empty-socket">＋</span>';
+      b.classList.toggle("pipe-obstacle", blocked);
+      b.classList.toggle("pipe-fixed", round.fixed.includes(i));
       b.classList.toggle(
         "pipe-wet",
         [...flow.wet].slice(0, Math.floor(round.flowCount)).includes(i) &&
@@ -150,26 +210,43 @@
       );
       b.classList.toggle("pipe-start", i === round.start);
       b.classList.toggle("pipe-end", i === round.end);
-      b.disabled = round.done || round.paused;
+      b.disabled =
+        round.done ||
+        round.paused ||
+        round.obstacles.includes(i) ||
+        round.fixed.includes(i);
       b.setAttribute(
         "aria-label",
         `Pipe row ${Math.floor(i / round.cols) + 1}, column ${(i % round.cols) + 1}. ${round.tiles[i] === 5 ? "Vertical" : round.tiles[i] === 10 ? "Horizontal" : "Corner"}. Turn clockwise.`,
       );
     });
-    $("#pipe-connected").textContent =
-      `${flow.wet.size} / ${round.tiles.length} pipes connected`;
+    $("#pipe-connected").textContent = round.placement
+      ? `${flow.wet.size} pipes flowing · reach OUT`
+      : `${flow.wet.size} / ${round.tiles.length} pipes connected`;
     $("#pipe-turns").textContent = `${round.turns} turns`;
     if (
       round.started &&
       !round.done &&
       flow.complete &&
-      round.flowCount >= round.tiles.length
+      round.flowCount >= (round.placement ? flow.wet.size : round.tiles.length)
     )
       finish();
   }
   function turn(i) {
     if (!round || round.done || round.paused) return;
-    round.tiles[i] = rotate(round.tiles[i]);
+    if (round.obstacles.includes(i) || round.fixed.includes(i)) return;
+    if (round.placement) {
+      const sameShape =
+        round.tiles[i] &&
+        (round.tiles[i] === 5 || round.tiles[i] === 10) ===
+          (selectedPiece === 5 || selectedPiece === 10);
+      round.tiles[i] =
+        selectedPiece === 0
+          ? 0
+          : sameShape
+            ? rotate(round.tiles[i])
+            : selectedPiece;
+    } else round.tiles[i] = rotate(round.tiles[i]);
     round.flowCount = 0;
     round.turns++;
     hooks.sound("sonar");
@@ -181,7 +258,15 @@
     const rows = level >= 5 ? 5 : 3,
       cols = level >= 3 ? 5 : 4;
     round = {
-      ...generate(rows, cols),
+      ...(level >= 3
+        ? placementPuzzle(rows, cols, level)
+        : {
+            ...generate(rows, cols),
+            obstacles: [],
+            fixed: [],
+            required: rows * cols,
+          }),
+      placement: level >= 3,
       rows,
       cols,
       level,
@@ -193,6 +278,7 @@
       practice: $("#pipe-practice").checked,
       flowCount: 0,
     };
+    $("#pipe-piece-tray").hidden = !round.placement;
     board.style.setProperty("--pipe-cols", cols);
     board.style.setProperty("--pipe-rows", rows);
     board.replaceChildren();
@@ -205,8 +291,9 @@
     }
     $("#pipe-level").textContent =
       `Metro’s prank ${level} · ${record.wins} repairs completed`;
-    $("#pipe-status").textContent =
-      "Metro scrambled every pipe! Help Dylan connect ALL pipes, from the blue inlet to the green outlet. Then start the flow.";
+    $("#pipe-status").textContent = round.placement
+      ? "Metro blocked the crawlspace! Choose straight or bent pipes from the tray. Place them around the rocks to reach OUT. Tap a matching piece to turn it. No timer!"
+      : "Metro scrambled every pipe! Help Dylan connect ALL pipes, from the blue inlet to the green outlet. Then start the flow.";
     $("#pipe-result").hidden = true;
     $("#pipe-start-water").hidden = false;
     $("#pipe-pause").hidden = true;
@@ -220,7 +307,9 @@
   }
   function updateClock() {
     $("#pipe-timer").textContent = round.done ? "Connected!" : "No rush";
-    $("#pipe-tank").value = (round.flowCount / round.tiles.length) * 100;
+    $("#pipe-tank").value = round.done
+      ? 100
+      : (round.flowCount / round.required) * 100;
     $("#pipe-tank").setAttribute(
       "aria-label",
       `${Math.min(round.tiles.length, Math.floor(round.flowCount))} pipes filled. No time limit.`,
@@ -308,9 +397,38 @@
     dialog.id = "pipeworks-dialog";
     dialog.setAttribute("aria-labelledby", "pipe-title");
     dialog.innerHTML =
-      '<header class="pipe-header"><img src="assets/metro.png" alt="Metro"><div><p>DYLAN’S MISSION · NO TIME LIMIT</p><h2 id="pipe-title">Pipeworks!</h2><small id="pipe-level"></small></div><button id="pipe-close" aria-label="Close Pipeworks">×</button></header><section class="pipe-content"><p id="pipe-status" role="status"></p><div class="pipe-gauges"><b id="pipe-timer"></b><progress id="pipe-tank" max="100"></progress><span id="pipe-connected"></span><span id="pipe-turns"></span></div><p id="pipe-route-label"></p><div id="pipe-board" aria-label="Rotate pipe tiles to carry water"></div><div class="pipe-controls"><label><input type="checkbox" id="pipe-practice" checked> Slow flow · watch it travel</label><label>Send <select id="pipe-fluid"><option value="water">Water</option><option value="slime">Green slime</option><option value="honey">Golden goo</option><option value="sparkles">Purple sparkle juice</option></select></label><button id="pipe-start-water">Start the flow</button><button id="pipe-pause" hidden>Pause water</button><button id="pipe-hint">Luna’s hint</button><button id="pipe-small">Smaller puzzle</button></div><div id="pipe-result" hidden><button id="pipe-next"></button><button id="pipe-replay">Replay this workshop</button></div></section>';
+      '<header class="pipe-header"><img src="assets/metro.png" alt="Metro"><div><p>DYLAN’S MISSION · NO TIME LIMIT</p><h2 id="pipe-title">Pipeworks!</h2><small id="pipe-level"></small></div><button id="pipe-close" aria-label="Close Pipeworks">×</button></header><section class="pipe-content"><p id="pipe-status" role="status"></p><div class="pipe-gauges"><b id="pipe-timer"></b><progress id="pipe-tank" max="100"></progress><span id="pipe-connected"></span><span id="pipe-turns"></span></div><p id="pipe-route-label"></p><div id="pipe-piece-tray" hidden><b>Pick a piece</b><button data-pipe-piece="10">━ Straight</button><button data-pipe-piece="3">┗ Bend</button><button id="pipe-piece-turn">↻ Turn chosen piece</button><button data-pipe-piece="0">× Remove</button><span id="pipe-piece-preview"></span></div><div id="pipe-board" aria-label="Rotate or place pipes to carry water around obstacles"></div><div class="pipe-controls"><label><input type="checkbox" id="pipe-practice" checked> Slow flow · watch it travel</label><label>Send <select id="pipe-fluid"><option value="water">Water</option><option value="slime">Green slime</option><option value="honey">Golden goo</option><option value="sparkles">Purple sparkle juice</option></select></label><button id="pipe-start-water">Start the flow</button><button id="pipe-pause" hidden>Pause water</button><button id="pipe-hint">Luna’s hint</button><button id="pipe-small">Smaller puzzle</button></div><div id="pipe-result" hidden><button id="pipe-next"></button><button id="pipe-replay">Replay this workshop</button></div></section>';
     document.body.append(dialog);
     board = $("#pipe-board");
+    const preview = () => {
+      $("#pipe-piece-preview").innerHTML = selectedPiece
+        ? svg(selectedPiece)
+        : "×";
+      dialog
+        .querySelectorAll("[data-pipe-piece]")
+        .forEach((b) =>
+          b.setAttribute(
+            "aria-pressed",
+            Number(b.dataset.pipePiece) === 0
+              ? selectedPiece === 0
+              : Number(b.dataset.pipePiece) === 10
+                ? [5, 10].includes(selectedPiece)
+                : ![0, 5, 10].includes(selectedPiece),
+          ),
+        );
+    };
+    dialog.querySelectorAll("[data-pipe-piece]").forEach(
+      (b) =>
+        (b.onclick = () => {
+          selectedPiece = Number(b.dataset.pipePiece);
+          preview();
+        }),
+    );
+    $("#pipe-piece-turn").onclick = () => {
+      selectedPiece = rotate(selectedPiece);
+      preview();
+    };
+    preview();
     $("#pipe-close").onclick = () => dialog.close();
     dialog.addEventListener("close", () => {
       cancelAnimationFrame(frame);
@@ -355,6 +473,9 @@
       round
         ? {
             rows: round.rows,
+            placement: round.placement,
+            obstacles: [...round.obstacles],
+            fixed: [...round.fixed],
             cols: round.cols,
             tiles: [...round.tiles],
             start: round.start,

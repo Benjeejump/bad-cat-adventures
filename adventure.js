@@ -644,6 +644,8 @@
   function tick(dt) {
     if (!hooks) return;
     if (
+      window.badCatHouse?.isOpen() ||
+      window.badCatArsenal?.isOpen() ||
       window.badCatHandwriting?.isOpen() ||
       window.badCatPipes?.isOpen() ||
       window.badCatTargeting?.raidActive() ||
@@ -750,7 +752,7 @@
           .querySelectorAll(".topbar,main")
           .forEach((node) => (node.inert = false));
         if (soundOn) hooks.startSound();
-        hooks.startJourney();
+        hooks.startJourney($("#launch-journey").value);
         $("#game-launch").classList.add("launch-finished");
         document.body.classList.remove("launching");
         setTimeout(() => {
@@ -766,6 +768,7 @@
       $("#game-launch").addEventListener("keydown", (event) => {
         if (event.key !== "Tab") return;
         const buttons = [
+          $("#launch-journey"),
           $("#launch-play"),
           $("#launch-silent"),
           $("#launch-skip"),
@@ -773,8 +776,8 @@
         const i = buttons.indexOf(document.activeElement);
         if (event.shiftKey && i <= 0) {
           event.preventDefault();
-          buttons[2].focus();
-        } else if (!event.shiftKey && i === 2) {
+          buttons.at(-1).focus();
+        } else if (!event.shiftKey && i === buttons.length - 1) {
           event.preventDefault();
           buttons[0].focus();
         }
@@ -795,6 +798,14 @@
     carwash,
     tick,
     onFix,
+    resetLocationArrival: () => {
+      pendingArrival = false;
+      arrivalSince = null;
+      arrivalDwell = 0;
+      lastFixTime = 0;
+      arrivalReceivedAt = 0;
+      arrivalArmed = true;
+    },
     onGadget,
     tunnelState: () =>
       hazard === "tunnel"
@@ -807,6 +818,8 @@
     isOpen: () =>
       dialog.open ||
       launching ||
+      !!window.badCatHouse?.isOpen() ||
+      !!window.badCatArsenal?.isOpen() ||
       !!window.badCatHandwriting?.isOpen() ||
       !!window.badCatPipes?.isOpen() ||
       !!window.badCatTargeting?.raidActive() ||

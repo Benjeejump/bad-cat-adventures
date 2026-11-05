@@ -2,6 +2,7 @@
 "use strict";
 (() => {
   const $ = (s) => document.querySelector(s);
+  const targetNames = { badcat: "BC", metro: "M", captain: "Captain Squirrel" };
   const names = {
     shield: "Forcefield",
     laser: "Confetti laser",
@@ -28,11 +29,17 @@
     const bar = $("#target-bar");
     bar.hidden = !armed && !selected;
     $("#target-instruction").textContent = armed
-      ? `${armedInvention?.name || names[armed]} ready — tap ${raid ? "a kitten" : "BC or M"}!`
-      : `${selected === "badcat" ? "BC" : "M"} selected — choose a gadget.`;
+      ? `${armedInvention?.name || names[armed]} ready — tap ${raid ? "a kitten" : "BC, Metro or Captain Squirrel"}!`
+      : `${targetNames[selected] || "A character"} selected — choose a gadget.`;
     document.querySelectorAll("[data-gadget]").forEach((b) => {
-      b.classList.toggle("aiming", b.dataset.gadget === armed);
-      b.setAttribute("aria-pressed", b.dataset.gadget === armed);
+      b.classList.toggle(
+        "aiming",
+        (b.dataset.arsenalPower || b.dataset.gadget) === armed,
+      );
+      b.setAttribute(
+        "aria-pressed",
+        (b.dataset.arsenalPower || b.dataset.gadget) === armed,
+      );
     });
   }
   function arm(power, invention = null) {
@@ -41,7 +48,11 @@
     window.badCatLoot?.cancel();
     armed = power;
     if (selected) {
-      target(selected, document.querySelector(`#actor-${selected}`));
+      target(
+        selected,
+        window.badCatTargeting.targetNode(selected) ||
+          document.querySelector(`#actor-${selected}`),
+      );
       selected = null;
     }
     update();
@@ -88,7 +99,7 @@
       puppy: "is led away by the puppy squad",
     }[power];
     hooks.story(
-      strike?.message || `${character === "badcat" ? "BC" : "M"} ${line}!`,
+      strike?.message || `${targetNames[character] || character} ${line}!`,
     );
     selected = null;
     update();
@@ -260,7 +271,7 @@
     targetNode: (key) =>
       [
         ...document.querySelectorAll(
-          `.world-${key},.${key}-marker,#actor-${key}`,
+          `.road-${key},.world-${key},.${key}-marker,#actor-${key}`,
         ),
       ].find(
         (n) =>

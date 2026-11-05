@@ -216,7 +216,7 @@
     }).setView(state.car, 20);
     L.control.zoom({ position: "bottomleft" }).addTo(map);
     window.badCatLoot.attachMap(map);
-    if (["gps", "test"].includes(state.mode)) startGameMap();
+    if (["gps", "test", "road"].includes(state.mode)) startGameMap();
     const icon = (emoji, extra = "") =>
       L.divIcon({
         className: `leaflet-actor ${extra}`,
@@ -297,7 +297,12 @@
     if (state.view === "hq") setTimeout(() => map.invalidateSize(), 0);
   }
   function startGameMap() {
-    if (!map || !["car", "walking"].includes(progress.vehicle)) return;
+    if (
+      !map ||
+      state.mode === "road" ||
+      !["car", "walking"].includes(progress.vehicle)
+    )
+      return;
     window.badCatGameMap.mount(map, {
       ready: () => {
         tileLoaded = true;
@@ -321,6 +326,7 @@
   function locationUnavailable(message, keepWatching = false) {
     if (!keepWatching) browserLocation.stop();
     state.mode = keepWatching ? "locating" : "unavailable";
+    updateJourneyMode();
     state.gpsStarting = keepWatching;
     $("#pause").disabled = true;
     $("#speed").disabled = true;
@@ -415,6 +421,7 @@
     window.badCatCharacters.tick(dt);
     window.badCatTargeting.tick(dt);
     window.badCatAdventure.tick(dt);
+    if (state.mode === "road") return;
     if (
       state.mode === "test" &&
       !state.paused &&
@@ -490,7 +497,41 @@
       state.heading,
     );
   }
+  function setRoadAdventure() {
+    window.badCatAdventure.resetLocationArrival();
+    state.locationRequest++;
+    browserLocation.stop();
+    state.gpsStarting = false;
+    state.lastGPS = null;
+    state.mode = "road";
+    state.paused = false;
+    locationGate(false);
+    setVehicle("car", false);
+    window.badCatRoad.change(true);
+    setView("drive");
+    $("#source-badge").textContent = "ROAD ADVENTURE";
+    $("#accuracy").textContent = "Fictional road · GPS off";
+    $("#pause").disabled = false;
+    $("#speed").disabled = true;
+    $("#pause").textContent = "Ⅱ Pause";
+    $("#pause").setAttribute("aria-pressed", "false");
+    updateJourneyMode();
+    story(
+      "Steer with arrows or drag the Odyssey. Pick a launcher, fire confetti, and catch treats!",
+    );
+  }
+  function updateJourneyMode() {
+    document
+      .querySelectorAll("[data-journey-mode]")
+      .forEach((b) =>
+        b.setAttribute(
+          "aria-pressed",
+          b.dataset.journeyMode === (state.mode === "road" ? "road" : "gps"),
+        ),
+      );
+  }
   function setTestDrive() {
+    window.badCatRoad.change(false);
     state.locationRequest++;
     browserLocation.stop();
     locationGate(false);
@@ -517,6 +558,9 @@
     toast("Test Drive ready. Let the adventure roll!");
   }
   function startGPS() {
+    setView("drive");
+    window.badCatRoad.change(false);
+    updateJourneyMode();
     if (!navigator.geolocation) {
       locationUnavailable("This browser cannot provide GPS.");
       return;
@@ -530,6 +574,7 @@
     const firstGPS = state.mode !== "gps";
     if (firstGPS) {
       state.mode = "locating";
+      updateJourneyMode();
       locationGate(
         true,
         "Finding the Odyssey…",
@@ -568,6 +613,7 @@
             next[0] - previous[0],
           );
         state.mode = "gps";
+        updateJourneyMode();
         state.gpsStarting = false;
         state.car = [fix.coords.latitude, fix.coords.longitude];
         if (
@@ -898,6 +944,7 @@
     window.badCatAdventure.encounter(kind);
   }
   function renderInventions() {
+    window.badCatArsenal?.render?.();
     $("#inventions").replaceChildren();
     progress.inventions.forEach((inv, index) => {
       const li = document.createElement("li"),
@@ -984,6 +1031,14 @@
     }),
   );
   $("#retry-gps").addEventListener("click", startGPS);
+  document
+    .querySelectorAll("[data-journey-mode]")
+    .forEach(
+      (b) =>
+        (b.onclick = () =>
+          b.dataset.journeyMode === "road" ? setRoadAdventure() : startGPS()),
+    );
+  $("#choose-road").onclick = setRoadAdventure;
   $("#choose-test").addEventListener("click", setTestDrive);
   $("#choose-hq").addEventListener("click", () => setView("hq"));
   $("#test-drive").addEventListener("click", setTestDrive);
@@ -1100,10 +1155,7 @@
     if (index >= 0 && index < 6) {
       event.preventDefault();
       if (index === 5) encounter();
-      else
-        window.badCatTargeting.arm(
-          ["shield", "laser", "sonar", "bubble", "puppy"][index],
-        );
+      else window.badCatArsenal.arm(index);
     }
   });
   window.addEventListener("online", updateConnection);
@@ -1150,9 +1202,9 @@
       toast(message);
     },
     changed: (type) => {
-      if (["car", "walking"].includes(type) && map) {
+      if (["car", "walking"].includes(type) && map && state.mode !== "road") {
         map.invalidateSize();
-        if (["gps", "test"].includes(state.mode)) {
+        if (["gps", "test", "road"].includes(state.mode)) {
           map.setView(state.car, map.getZoom(), { animate: false });
           startGameMap();
         }
@@ -1163,10 +1215,13 @@
     active: () =>
       state.view === "drive" &&
       !state.paused &&
-      (["gps", "test"].includes(state.mode) ||
+      (["gps", "test", "road"].includes(state.mode) ||
         window.badCatVehicle.worldActive()) &&
       !window.badCatAdventure.isOpen(),
-    plan: (kind) => window.badCatAdventure.enactPlan(kind),
+    plan: (kind, key) =>
+      state.mode === "road" && window.badCatRoad.visible()
+        ? window.badCatRoad.deploy(kind, key)
+        : window.badCatAdventure.enactPlan(kind),
     sound,
   });
   window.badCatTargeting.init({
@@ -1207,10 +1262,10 @@
       if (!soundEnabled) $("#sound").click();
     },
     view: () => state.view,
-    startJourney: startGPS,
+    startJourney: (mode) => (mode === "road" ? setRoadAdventure() : startGPS()),
     paused: () =>
       state.paused ||
-      (!["gps", "test"].includes(state.mode) &&
+      (!["gps", "test", "road"].includes(state.mode) &&
         !window.badCatVehicle.worldActive()),
     shielded: () => Date.now() < state.shieldUntil,
     setView,
@@ -1225,6 +1280,29 @@
     closed: () => window.badCatAdventure.deferSpelling(),
   });
   window.badCatPipes.init({
+    sound,
+    closed: () => window.badCatAdventure.deferSpelling(),
+  });
+  window.badCatRoad.init({
+    active: () =>
+      state.mode === "road" &&
+      state.view === "drive" &&
+      !state.paused &&
+      !document.hidden &&
+      !window.badCatAdventure.isOpen(),
+    sound,
+    surprise: (kind) => window.badCatAdventure.encounter(kind),
+    hit: (key, node) => {
+      if (!window.badCatTargeting.diagnostics().armed)
+        window.badCatArsenal.arm(1);
+      window.badCatTargeting.target(key, node);
+    },
+  });
+  window.badCatArsenal.init({
+    list: () => progress.inventions,
+    hq: () => setView("hq"),
+  });
+  window.badCatHouse.init({
     sound,
     closed: () => window.badCatAdventure.deferSpelling(),
   });
@@ -1287,6 +1365,8 @@
     spelling: window.badCatSpelling.diagnostics(),
     characters: window.badCatCharacters.diagnostics(),
     theme: window.badCatTheme.mode(),
+    road: window.badCatRoad.diagnostics(),
+    arsenal: window.badCatArsenal.diagnostics(),
     vehicleWorld: window.badCatVehicle.diagnostics(),
   });
 })();

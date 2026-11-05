@@ -42,6 +42,7 @@
     <link rel="stylesheet" href="pipeworks.css" />
     <link rel="stylesheet" href="handwriting.css" />
     <link rel="stylesheet" href="team-style.css" />
+    <link rel="stylesheet" href="road-home.css" />
   </head>
   <body class="map-mode launching">
     <header class="topbar">
@@ -50,7 +51,7 @@
           ><img src="assets/bad-cat.png" alt="BC"
         /></span>
         <span
-          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.9</b></span></span
+          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.10</b></span></span
         ></a
       >
       <nav aria-label="Game sections">
@@ -136,14 +137,17 @@
           happen.
         </p>
         <div class="launch-buttons">
-          <button id="launch-play">LET’S RIDE, DYLAN! <span>▶</span></button
+          <select id="launch-journey" aria-label="Choose how to play">
+            <option value="gps">GPS map · use tablet location</option>
+            <option value="road">Road Adventure · no GPS needed</option></select
+          ><button id="launch-play">LET’S RIDE, DYLAN! <span>▶</span></button
           ><button id="launch-silent">Play quietly ♪ OFF</button>
         </div>
         <p class="launch-hint">
-          Starts with this tablet’s GPS. Allow location when asked.
+          Choose GPS map or the new scrolling Road Adventure.
         </p>
       </div>
-      <span class="launch-version">v0.9 · THE LAKELINE ADVENTURES</span
+      <span class="launch-version">v0.10 · THE LAKELINE ADVENTURES</span
       ><button id="launch-skip" aria-label="Skip opening and play quietly">
         Skip intro →
       </button>
@@ -258,7 +262,8 @@
                 <div>
                   <button id="retry-gps">⌖ Retry GPS</button
                   ><button id="choose-hq">Visit HQ</button
-                  ><button id="choose-test">Choose Test Drive</button>
+                  ><button id="choose-road">Play Road Adventure · no GPS</button
+                  ><button id="choose-test">Try map demo</button>
                 </div>
               </div>
             </div>
@@ -267,6 +272,13 @@
           </div>
         </section>
         <div class="map-hud">
+          <div id="journey-mode-bar">
+            <button data-journey-mode="gps" aria-pressed="true">
+              ⌖ GPS map</button
+            ><button data-journey-mode="road" aria-pressed="false">
+              ▶ Road Adventure
+            </button>
+          </div>
           <span id="source-badge" class="badge">TABLET GPS</span
           ><button id="follow" class="small-button" aria-pressed="true">
             ⌖ Following car
@@ -327,6 +339,8 @@
               </button>
             </div>
           </div>
+          <button id="edit-arsenal">⚙ My five launchers</button
+          ><button data-puppy-house>🏠 Puppy House</button>
           <button id="pencil-launch" data-handwriting type="button">
             ✏️<span>Magic Pencil</span>
           </button>
@@ -366,7 +380,7 @@
           <summary>⚙ Journey controls</summary>
           <div class="drive-controls">
             <div class="mode-buttons">
-              <button id="test-drive" class="small-button">▶ Test Drive</button
+              <button id="test-drive" class="small-button">▶ Map demo</button
               ><button id="gps" class="small-button">⌖ Use my GPS</button>
             </div>
             <button id="pause" class="small-button" aria-pressed="false">
@@ -432,6 +446,23 @@
           <span>🏡</span>
         </div>
         <div class="hq-grid">
+          <section class="panel hq-card">
+            <h2>Dylan’s Puppy House</h2>
+            <p>
+              Trade treats for 100 things across five homes. Furnish each one to
+              unlock the next!
+            </p>
+            <button data-puppy-house>Build and play at home</button>
+          </section>
+          <section class="panel hq-card">
+            <h2>Choose your adventure</h2>
+            <p>
+              Play the real GPS map, or steer along an imaginary scrolling road
+              without GPS.
+            </p>
+            <button data-journey-mode="gps">⌖ GPS map</button
+            ><button data-journey-mode="road">▶ Road Adventure</button>
+          </section>
           <section class="panel hq-card">
             <div class="handwriting-promo">
               <img src="assets/luna.png" alt="Luna" />
@@ -639,6 +670,9 @@
     <script src="pipeworks.js" defer></script>
     <script src="cursive.js" defer></script>
     <script src="handwriting.js" defer></script>
+    <script src="road.js" defer></script>
+    <script src="arsenal.js" defer></script>
+    <script src="puppy-house.js" defer></script>
     <script src="app.js" defer></script>
   </body>
 </html>

@@ -1,7 +1,17 @@
-/* BC is a heavyweight mastermind. Metro is a wiry mechanic with dangerous inventions. */
+/* A biker kitten, an inventor cat and a pirate squirrel lead the playful villains. */
 "use strict";
 (() => {
   const defs = {
+    captain: {
+      name: "Captain Squirrel",
+      badge: "CS",
+      max: 3,
+      plans: [
+        ["tornado", "Arrr! A whirlwind of kittens off the starboard bow!"],
+        ["puppy", "Hoist the acorns! My next surprise is coming aboard!"],
+        ["kittens", "My kitten crew will board your Odyssey!"],
+      ],
+    },
     badcat: {
       name: "Bad Cat",
       badge: "BC",
@@ -30,6 +40,7 @@
     },
   };
   const state = {
+    captain: { shield: 3, exposedTime: 0, plan: null },
     badcat: { shield: 3, exposedTime: 0, plan: null },
     metro: { shield: 4, exposedTime: 0, plan: null },
   };
@@ -52,6 +63,7 @@
         JSON.stringify({
           badcat: state.badcat.shield,
           metro: state.metro.shield,
+          captain: state.captain.shield,
         }),
       );
     } catch {}
@@ -60,8 +72,10 @@
     return [
       ...document.querySelectorAll(
         key === "badcat"
-          ? "#actor-badcat,.badcat-marker,.world-badcat"
-          : "#actor-metro,.metro-marker,.world-metro",
+          ? "#actor-badcat,.badcat-marker,.world-badcat,.road-badcat"
+          : key === "captain"
+            ? ".road-captain"
+            : "#actor-metro,.metro-marker,.world-metro,.road-metro",
       ),
     ];
   }
@@ -118,10 +132,11 @@
     bubble.hidden = Date.now() > bubbleUntil;
   }
   function speak(key, text) {
+    if (key === "captain" && !text.startsWith("Arrr")) text = "Arrr! " + text;
     spoken = key;
     bubbleUntil = Date.now() + 6500;
     bubble.querySelector("img").src =
-      `assets/${key === "badcat" ? "bad-cat" : "metro"}.png`;
+      `assets/${key === "badcat" ? "bad-cat" : key === "captain" ? "captain-squirrel" : "metro"}.png`;
     bubble.querySelector("img").alt = defs[key].name;
     bubble.querySelector("b").textContent =
       `${defs[key].badge} · ${defs[key].name}`;
@@ -233,7 +248,7 @@
         cat.plan.remaining -= dt;
         if (cat.plan.remaining <= 0) {
           const kind = cat.plan.kind;
-          if (hooks.plan(kind)) {
+          if (hooks.plan(kind, key)) {
             cat.plan = null;
             speak(
               key,
@@ -265,6 +280,11 @@
     hit,
     tick,
     decorate,
+    clearPlans: () => {
+      for (const cat of Object.values(state)) cat.plan = null;
+      spoken = null;
+      if (bubble) bubble.hidden = true;
+    },
     diagnostics: () =>
       Object.fromEntries(
         Object.entries(state).map(([k, v]) => [

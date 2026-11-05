@@ -65,3 +65,7 @@ Modern artwork review confirms Dylan is the Dalmatian hero, BC and Metro remain 
 ## v0.9 two-line cursive and environments
 
 The handwriting suite checks two full printed prompts with cursive guide glyphs, A–Z coverage across fifteen notes, actual touch input, continuous joined-letter tracing, saved position, scrolling phone/tablet fit, neat completed cursive and offline progress. `scene_scale_smoke.py` checks surprise Pipeworks, equal sprite frames, scene background delivery and the floorboard setting. Earlier monoline-note coverage describes the previous version.
+
+## v0.10 road, arsenal and puppy homes
+
+`road_home_smoke.py` verifies a no-GPS launch, real upward projectile collision, drag/button steering, all three villains, surprise dispatch, stale-GPS rejection, direct recipe slots and reload persistence. It exercises all 100 purchases and every housing upgrade, insufficient-balance rejection, free store/place actions, archived homes, object play interactions, offline road launch and phone/tablet fit. Pipeworks coverage now checks the later obstacle-and-piece placement game and a completed route that goes around rocks, leaving unused sockets empty. All play dialogs fill the viewport.

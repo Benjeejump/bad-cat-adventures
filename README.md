@@ -1,4 +1,4 @@
-# Bad Cat Adventures v0.9
+# Bad Cat Adventures v0.10
 
 Dylan’s imagination-powered, child-friendly adventure console. A static web game with no accounts, advertising, purchases, backend, API keys or paid services.
 
@@ -135,7 +135,7 @@ Puppy **treats** are the shared currency (maximum 99). Existing saved supply bal
 
 On the tablet, check word pronunciation, repeat audio, duplicate letters (for example the three Ps in **puppy**), calm-bee controls, hints after mistakes, the displayed correct spelling, word collection and sentence-code typing. For offline speech, install an offline English voice if the tablet needs one; offline text practice still works.
 
-## v0.9 characters and worlds
+## v0.10 characters and worlds
 
 Bad Cat and Metro have speech bubbles, announced mischief plans and persistent forcefields. Attacks wear down the fields before affecting the cat; sonar reveals their remaining layers. Day, Night and Auto display choices save on this device. Story results return to play automatically. A completed kitten mission shows all twenty kittens together in a net.
 
@@ -159,6 +159,20 @@ An original optional pipe-rotation puzzle available from the map, HQ and the ran
 
 Choose a teammate and one of fifteen two-sentence notes covering all A–Z. Both sentences stay on a two-line writing page: prompts are printed, while original curved cursive guides show the tracing route. As Dylan follows the pencil, neat connected cursive ink appears. Joined one-stroke letters support continuous finger tracing; dots and cross strokes prompt a lift. The page scrolls automatically and offers a whole-page/tracing-size toggle. There is no timer or failed attempt. Notes resume after reload, completed cursive pages become keepsakes, and a saved alphabet tracker recommends notes with unexplored letters. `cursive.js` supplies original formation paths; `handwriting.js` manages touch practice and local progress. No writing goes to an application server.
 
-## v0.9 environments and scale
+## v0.10 environments and scale
 
 Bees are bee-shaped insects; the windscreen squid has a mantle, arms and long tentacles. Sky, sea, town surprises and the exposed-floorboard pipe game use original full-scene backgrounds. Dylan, BC, Metro and flight/dive player sprites use a consistent 80 px frame. Real GPS roads remain unchanged.
+
+## Road Adventure and Captain Squirrel
+
+The opening and mode bar offer **GPS map** or **Road Adventure**. GPS is still the default choice; Road Adventure never requests location and cancels an existing watch. The original simulated map remains under Journey controls as Map demo. Road Adventure is an original vertical scrolling-road arcade game: drag the overhead Odyssey or use steering buttons/arrow keys, choose a launcher and fire (hold the fire button or use Space). Collect cookies for treats. Bad Cat is now a cuter biker kitten; he, Metro and the pirate Captain Squirrel pop into formations, have attackable forcefields and announce surprise-game plans. Their appearances, shots, steering and road movement run on animation frames. Gameplay pauses during side games, HQ, menus and tab inactivity. No road position is supplied to the real GPS map. Returning to GPS requires its own live fix; stale callbacks cannot take over the road game.
+
+## Five direct arsenal slots
+
+**My five launchers** lets Dylan assign any saved invention or standard gadget to each main action button. A custom recipe can replace Sonar, Forcefield or another default, then be armed directly from that button or its number key (1–5). The five choices save locally; retiring an invention resets its equipped slot to the original gadget. The full invention menu remains available for other recipes.
+
+## Puppy House and spending treats
+
+The full-screen home game has five stages: **Dog house → Dog apartment → House → Big house → Mansion**. Each stage offers twenty distinct furnishings, for **100 items total**, with visible prices from 1 to 32 treats. The starting dog-house shell is free. Purchases place furnishings automatically; tap an object to let Dylan explore it, move it, or store/place it without paying again. All twenty furnishings must be placed before the next upgrade unlocks. Home upgrades cost 8, 15, 25 and 35 treats respectively. The new home starts empty with its own twenty-item catalogue; previous homes and their furnishings remain saved for revisiting. Purchases cannot spend more treats than the current balance. Houses, positions, ownership and upgrades stay on this device. Treats are only game currency, with no real-money purchase.
+
+Pipeworks and Magic Pencil now fill the viewport. From workshop 3, Pipeworks adds blocked sockets and a tray of straight/bent pipe pieces to place around obstacles. Later boards add more obstacles and longer detours. Hints, slow flow and the smaller-puzzle option remain available, with no timer or failure penalty.

@@ -534,6 +534,8 @@
     if (
       !hooks ||
       dialog.open ||
+      window.badCatHouse?.isOpen() ||
+      window.badCatArsenal?.isOpen() ||
       window.badCatHandwriting?.isOpen() ||
       window.badCatPipes?.isOpen() ||
       window.badCatTargeting?.raidActive() ||
