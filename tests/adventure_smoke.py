@@ -40,7 +40,7 @@ with sync_playwright() as p:
   if event=='amy': check('100% imaginary' in page.locator('.amy-home').inner_text(),'Amy’s secret building is explicitly imaginary')
   page.locator('#encounter-actions button').first.click()
   check(page.locator('.story-world.resolved').count()==1,f'{event} decision produces an animated result')
-  page.locator('#encounter-actions button').last.click()
+  page.locator('#close-encounter').evaluate('(n)=>n.click()')
  # No automatic carwash in random events. It has its own always-available button.
  page.locator('#carwash-launch').click()
  check(page.locator('.windscreen-squid').count()==1,'Full windscreen squid scene opens')
@@ -67,7 +67,7 @@ with sync_playwright() as p:
  check(not page.locator('#encounter-dialog').evaluate('(n)=>n.open'),'Brief drive-by does not trigger arrival')
  fix(BASE,12,29000)
  check('Ready for the squid wash' in page.locator('#encounter-title').inner_text(),'Accurate dwell near fixed GO address offers car wash')
- page.locator('#encounter-actions button').last.click();fix(BASE,12,39000)
+ page.locator('#close-encounter').evaluate('(n)=>n.click()');fix(BASE,12,39000)
  check(not page.locator('#encounter-dialog').evaluate('(n)=>n.open'),'Declined arrival does not keep interrupting')
  fix([30.49,-97.81],12,40000);fix(BASE,12,50000);fix(BASE,12,59000)
  check(page.locator('#encounter-dialog').evaluate('(n)=>n.open'),'Leaving and returning re-arms arrival')

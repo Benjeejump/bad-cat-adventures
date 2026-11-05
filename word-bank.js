@@ -1318,7 +1318,7 @@ window.BAD_CAT_WORDS = [
   {
     word: "ribbon",
     grade: 3,
-    sentence: "The adventure word is ribbon.",
+    sentence: "I tied a ribbon around the birthday present.",
   },
   {
     word: "secret",

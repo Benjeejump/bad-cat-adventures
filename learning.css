@@ -1016,3 +1016,4 @@
 #spelling-dialog .letter-bee {
   transition: filter 0.15s;
 }
+.bee-victory-flight{position:fixed;inset:0;z-index:20;overflow:hidden;pointer-events:none}.bee-victory-flight .letter-bee{position:absolute;opacity:1!important;pointer-events:none}.bee-victory-flight .letter-bee b{pointer-events:none}.word-won #spell-title{animation:code-victory-pop .65s cubic-bezier(.2,1.8,.4,1)}.word-won #spell-reveal{box-shadow:0 0 40px #f4dc9166;animation:code-victory-pop .65s .1s both}#spell-close[aria-label="Finish the spelling challenge to escape"]{font-size:20px;background:#456774;color:#f1d89c}@keyframes code-victory-pop{from{transform:scale(.65);opacity:0}to{transform:scale(1);opacity:1}}@media(prefers-reduced-motion:reduce){.bee-victory-flight{opacity:.3}}

@@ -1,0 +1,944 @@
+/* Saturated adventure art direction and a real night palette. */
+:root {
+  --ink: #17354b;
+  --paper: #e6d7b8;
+  --border: #9ba88b;
+  --mint: #55b493;
+  --orange: #e28c42;
+}
+body {
+  background: #e6d7b8;
+  color: #17354b;
+}
+.map-mode .topbar {
+  background: linear-gradient(110deg, #193f55, #102c42);
+  border-color: #4d7987;
+}
+.map-mode .brand {
+  color: #ffd27c;
+}
+.action-rail {
+  background: linear-gradient(130deg, #245b6b, #112f47);
+  border-color: #608b91;
+}
+.action-rail .gadget.mint {
+  background: #72c9a7;
+}
+.action-rail .gadget.coral {
+  background: #eb9a6d;
+}
+.action-rail .gadget.blue {
+  background: #75bed3;
+}
+.action-rail .gadget.lilac {
+  background: #b79cd9;
+}
+.action-rail .gadget.yellow {
+  background: #e6c16f;
+}
+.action-rail .gadget.peach {
+  background: #dcaa6d;
+}
+.map-mode .nav-tab.active {
+  background: #35677a;
+  border-bottom-color: #e9ba64;
+}
+.panel.hq-card {
+  background: #fff1d0;
+  border-color: #bba56e;
+  box-shadow: 0 5px #6a6c4935;
+}
+.hq-banner {
+  background: linear-gradient(120deg, #d8b96f, #8abc8a);
+  border-color: #799a72;
+}
+.brand-cat img {
+  height: 45px;
+  width: 42px;
+  object-fit: contain;
+}
+.launch-bc {
+  width: 145px;
+  height: 165px;
+}
+.launch-metro {
+  width: 125px;
+  height: 140px;
+}
+.launch-bc img,
+.launch-metro img {
+  object-fit: contain;
+}
+.actor.enemy-actor {
+  height: 74px;
+  width: 70px;
+}
+.actor#actor-badcat {
+  height: 90px;
+  width: 90px;
+}
+.actor#actor-metro {
+  height: 76px;
+  width: 72px;
+}
+.actor.enemy-actor > img,
+.leaflet-actor.enemy-icon img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+}
+.leaflet-actor.enemy-icon > div {
+  width: 100%;
+  height: 100%;
+}
+.enemy-forcefield {
+  position: absolute;
+  inset: -6px;
+  border: 3px solid #84e9fd;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 25% 18%,
+    #ffffff66,
+    transparent 30%,
+    #478fd122 65%,
+    #7eaff544
+  );
+  box-shadow:
+    0 0 16px #7ddaf477,
+    inset 0 0 12px #b9f9ff66;
+  pointer-events: none;
+  z-index: 2;
+}
+.npc-shield-hp {
+  position: absolute;
+  right: -9px;
+  top: -5px;
+  background: #173f5b;
+  border: 2px solid #91e6ef;
+  color: #e6ffff;
+  border-radius: 9px;
+  padding: 3px 5px;
+  font-size: 9px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+.enemy-field-cracked .enemy-forcefield {
+  border-style: dashed;
+  background:
+    linear-gradient(30deg, transparent 48%, #d9ffffaa 49% 51%, transparent 52%),
+    radial-gradient(circle, #92e2ed22, #4778b144);
+  box-shadow: 0 0 12px #e4d98766;
+}
+.enemy-unshielded .enemy-forcefield {
+  border-color: transparent;
+  background: none;
+  box-shadow: none;
+}
+.enemy-unshielded .npc-shield-hp {
+  border-color: #d4a26a;
+  color: #ffd7a0;
+  background: #614b39;
+}
+.npc-character-badge {
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  transform: translateX(-50%);
+  border: 2px solid #ffe5a8;
+  background: #19384e;
+  color: #ffe5a8;
+  border-radius: 8px;
+  min-width: 26px;
+  text-align: center;
+  padding: 2px 5px;
+  font-size: 10px;
+  font-weight: 950;
+  z-index: 3;
+  pointer-events: none;
+}
+.field-shattering .enemy-forcefield:after {
+  content: "✦";
+  position: absolute;
+  inset: -15px;
+  color: #dcfcff;
+  font-size: 90px;
+  text-align: center;
+  animation: field-shards 0.85s ease-out forwards;
+}
+#npc-speech {
+  position: fixed;
+  z-index: 865;
+  background: #fff1c8;
+  border: 3px solid #75533e;
+  border-bottom: 6px solid #715a42;
+  border-radius: 18px 18px 18px 3px;
+  padding: 12px;
+  color: #2b4654;
+  box-shadow: 0 7px 18px #122f4550;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+#npc-speech[hidden] {
+  display: none;
+}
+#npc-speech > img {
+  width: 70px;
+  height: 83px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+#npc-speech b {
+  font-size: 11px;
+  letter-spacing: 0.7px;
+  color: #795345;
+}
+#npc-speech p {
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 5px 0 0;
+  font-weight: 750;
+}
+body:not(.map-mode) #npc-speech {
+  display: none;
+}
+#theme-toggle {
+  min-width: 64px !important;
+  font-size: 10px !important;
+  white-space: nowrap;
+  padding: 8px;
+}
+html[data-theme="night"] {
+  --paper: #142b3e;
+  --ink: #d3e0df;
+  --border: #416276;
+  color-scheme: dark;
+}
+html[data-theme="night"] body {
+  background: #142b3e;
+  color: #d6e7e6;
+}
+html[data-theme="night"] .hq-card {
+  background: #203d50;
+  color: #e0e9db;
+  border-color: #557487;
+  box-shadow: 0 5px #0d2038;
+}
+html[data-theme="night"] .hq-card p {
+  color: #b6ccca;
+}
+html[data-theme="night"] .hq-banner {
+  background: linear-gradient(120deg, #284c58, #253c55);
+  color: #e4dbb8;
+  border-color: #64817a;
+}
+html[data-theme="night"] .local-status,
+html[data-theme="night"] #sentence-code-words {
+  background: #304f60;
+  color: #dfebd6;
+}
+html[data-theme="night"] .hq-card input,
+html[data-theme="night"] .hq-card select,
+html[data-theme="night"] .hq-card textarea {
+  background: #173348;
+  color: #eef1d4;
+  border-color: #688982;
+}
+html[data-theme="night"] .journey-settings,
+html[data-theme="night"] .map-location {
+  background: #173b50f2;
+  color: #e0e8dc;
+  border-color: #6a8b8b;
+}
+html[data-theme="night"] .small-button {
+  background: #345969;
+  color: #e5eddd;
+}
+html[data-theme="night"] .map-notice {
+  background: #3e4649ed;
+  color: #e6d4ad;
+}
+html[data-theme="night"] #fallback-map > svg {
+  filter: brightness(0.4) saturate(1.5) hue-rotate(25deg);
+}
+html[data-theme="night"] .night-road-tiles {
+  filter: invert(0.9) hue-rotate(175deg) saturate(0.6) brightness(0.8);
+}
+html[data-theme="night"] #npc-speech {
+  background: #314e61;
+  color: #f2e3c1;
+  border-color: #a48860;
+}
+html[data-theme="night"] #npc-speech b {
+  color: #f4cb87;
+}
+html[data-theme="night"] .falling-sky {
+  background: linear-gradient(#102847, #244f70 70%, #405e78);
+}
+html[data-theme="night"] .rising-cloud {
+  background: #abc1d0b3;
+}
+html[data-theme="night"] .story-world > svg {
+  filter: brightness(0.65) saturate(1.3);
+}
+html[data-theme="night"] .net-result-sky {
+  background: linear-gradient(#153747, #244e58);
+}
+html[data-theme="night"] .spell-header,
+html[data-theme="night"] #spelling-dialog {
+  background: #102b40;
+}
+html[data-theme="night"] .launch-sky {
+  background: radial-gradient(ellipse at 70% 10%, #214964, #10243c 70%);
+}
+html[data-theme="night"] .launch-road {
+  background: #263c52;
+}
+html[data-theme="night"] .location-gate-card {
+  background: #102d43;
+}
+html[data-theme="night"] #location-gate {
+  background: linear-gradient(150deg, #1b384ee8, #18374cf5);
+}
+@keyframes field-shards {
+  to {
+    transform: scale(2) rotate(50deg);
+    opacity: 0;
+  }
+}
+/* Flight and dive replace the map visually; the real location source continues. */
+.vehicle-world {
+  position: absolute;
+  inset: 0;
+  z-index: 405;
+  overflow: hidden;
+  background: #397aa0;
+}
+.vehicle-world[hidden] {
+  display: none;
+}
+.mode-plane #map,
+.mode-plane #fallback-map,
+.mode-submarine #map,
+.mode-submarine #fallback-map {
+  visibility: hidden;
+  pointer-events: none;
+}
+.mode-plane #location-gate,
+.mode-submarine #location-gate,
+.mode-plane .map-location,
+.mode-submarine .map-location,
+.mode-plane #map-notice,
+.mode-submarine #map-notice,
+.mode-plane #follow,
+.mode-submarine #follow {
+  display: none !important;
+}
+.world-scenery {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.plane-world .world-scenery {
+  background: linear-gradient(#3666a0, #79bad5 70%, #b9dce0);
+}
+.world-cloud-stream {
+  position: absolute;
+  inset: 0;
+}
+.world-cloud-stream > i {
+  position: absolute;
+  left: var(--cloud-x);
+  top: 100%;
+  width: 260px;
+  height: 88px;
+  background: #edf5e7de;
+  border-radius: 50%;
+  animation: world-clouds 14s linear infinite;
+  animation-delay: var(--cloud-delay);
+}
+.world-cloud-stream > i:before,
+.world-cloud-stream > i:after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: inherit;
+  width: 120px;
+  height: 140px;
+  left: 35px;
+  bottom: 0;
+}
+.world-cloud-stream > i:after {
+  width: 100px;
+  height: 110px;
+  left: 130px;
+}
+.world-heading {
+  position: absolute;
+  left: 50%;
+  top: 103px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #12374bdb;
+  border: 2px solid #8db4b3;
+  border-radius: 12px;
+  padding: 12px 18px;
+  color: #fff0bd;
+  z-index: 10;
+}
+.world-heading b {
+  font-size: 12px;
+  letter-spacing: 1.6px;
+  white-space: nowrap;
+}
+.world-heading span {
+  font-size: 10px;
+  white-space: nowrap;
+  color: #c7e0d7;
+}
+.world-family-vehicle {
+  position: absolute;
+  width: min(54vw, 560px);
+  height: auto;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  animation: world-cruise 4s ease-in-out infinite;
+  filter: drop-shadow(0 20px 10px #17374a44);
+}
+.world-enemy {
+  position: absolute;
+  z-index: 6;
+  width: 95px;
+  height: 112px;
+  top: 32%;
+  cursor: pointer;
+}
+.world-enemy > img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.world-enemy > span:not(.npc-character-badge) {
+  display: none;
+}
+.world-badcat {
+  left: 17%;
+  width: 115px;
+  height: 135px;
+  animation: world-enemy-bob 4s ease-in-out infinite;
+}
+.world-metro {
+  right: 20%;
+  top: 51%;
+  animation: world-enemy-bob 3s ease-in-out infinite reverse;
+}
+.world-controls {
+  position: absolute;
+  z-index: 12;
+  left: 20px;
+  bottom: 95px;
+  background: #17394ee8;
+  border: 2px solid #81aaae;
+  border-bottom: 5px solid #18334b;
+  border-radius: 16px;
+  padding: 13px 16px;
+  color: #e3ebd4;
+  max-width: calc(100vw - 190px);
+}
+.world-controls > p {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 10px;
+  max-width: 620px;
+}
+.world-controls > div {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.world-controls button {
+  min-height: 46px;
+  padding: 10px 14px;
+  background: #e4b56a;
+  border: 2px solid #ffe0a2;
+  border-bottom: 4px solid #9b7744;
+  color: #193e52;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 900;
+}
+.world-controls details {
+  margin-top: 9px;
+  font-size: 10px;
+}
+.world-controls details p {
+  max-width: 600px;
+  line-height: 1.5;
+  color: #c3dad6;
+}
+.world-controls summary {
+  cursor: pointer;
+}
+.world-controls #repeat-flight {
+  min-width: 36px;
+  min-height: 32px;
+  padding: 5px;
+  margin-left: 8px;
+}
+.world-storm {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 25%, #243d54cc, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.world-hazard-storm .world-storm {
+  opacity: 1;
+}
+.world-hazard-turbulence .world-family-vehicle,
+.world-hazard-storm .world-family-vehicle {
+  animation: world-turbulence 0.35s ease-in-out infinite;
+}
+.world-protected .world-family-vehicle {
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 4px #91e8d0,
+    0 0 55px #92e8e788;
+}
+.submarine-world {
+  background: #0a486a;
+}
+.submarine-world .world-scenery {
+  background: linear-gradient(#1b859f, #104e72 55%, #0e294b);
+}
+.submarine-world .world-cloud-stream,
+.plane-world .sea-floor,
+.plane-world .sea-fish,
+.plane-world .sea-rays,
+.plane-world .sea-ink,
+.plane-world .sub-wiper {
+  display: none;
+}
+.sea-rays {
+  position: absolute;
+  inset: -40%;
+  background: repeating-conic-gradient(
+    from -20deg at 50% 0%,
+    #9ff1e21a 0deg 10deg,
+    transparent 11deg 24deg
+  );
+  animation: sea-sunlight 10s ease-in-out infinite alternate;
+}
+.sea-floor {
+  position: absolute;
+  bottom: -5%;
+  left: -10%;
+  right: -10%;
+  height: 30%;
+  border-radius: 70% 60% 0 0;
+  background: radial-gradient(ellipse at 40% 0, #488d83, #1d505e);
+}
+.sea-floor:after {
+  content: "";
+  position: absolute;
+  inset: -15% 0 0;
+  background: repeating-linear-gradient(
+    80deg,
+    transparent 0 30px,
+    #397e6b66 31px 40px,
+    transparent 41px 95px
+  );
+  clip-path: polygon(
+    0 40%,
+    7% 0,
+    10% 50%,
+    20% 10%,
+    23% 50%,
+    30% 0,
+    35% 60%,
+    43% 10%,
+    47% 50%,
+    60% 0,
+    66% 60%,
+    80% 10%,
+    85% 50%,
+    93% 0,
+    100% 50%,
+    100% 100%,
+    0 100%
+  );
+}
+.sea-fish {
+  position: absolute;
+  font-size: 38px;
+  top: 28%;
+  left: -10%;
+  animation: world-fish 18s linear infinite;
+}
+.sea-fish.fish-two {
+  top: 65%;
+  animation-delay: -9s;
+  animation-direction: reverse;
+}
+.sea-ink {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 35% 30%, #0a1427e8 0 20%, transparent 45%),
+    radial-gradient(ellipse at 70% 50%, #11152deb 0 15%, transparent 43%);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.world-hazard-ink .sea-ink {
+  opacity: 0.9;
+}
+.world-hazard-current .world-family-vehicle {
+  animation: sub-current 0.8s ease-in-out infinite;
+}
+.sub-wiper {
+  position: absolute;
+  left: 10%;
+  bottom: 29%;
+  height: 8px;
+  width: 39%;
+  background: #0f293b;
+  border-top: 2px solid #7d9da9;
+  transform-origin: left center;
+  transform: rotate(-4deg);
+  border-radius: 8px;
+  z-index: 9;
+  pointer-events: none;
+}
+.sub-wiper-right {
+  left: 51%;
+  width: 34%;
+}
+.world-wiping .sub-wiper {
+  animation: wiper-sweep 0.9s ease-in-out 2;
+}
+.world-sonar {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  height: 70px;
+  width: 70px;
+  border: 5px solid #83eed8;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 8;
+}
+.world-pinging .world-sonar {
+  animation: scene-ping 2s ease-out;
+}
+.world-enemy-hit {
+  animation: world-hit-retreat 2.5s ease-out !important;
+}
+.mode-plane .campaign-hud,
+.mode-submarine .campaign-hud {
+  top: 160px;
+}
+.net-result-sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(#277890, #5aa69c);
+}
+.kitten-net-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 83%;
+  animation: net-catch-sway 3s ease-in-out infinite;
+}
+.result-net-caught .kitten-net-art {
+  filter: drop-shadow(0 12px 20px #143d5260);
+}
+html[data-theme="night"] .plane-world .world-scenery {
+  background: radial-gradient(ellipse at 70% 8%, #35607c, #15283f 70%);
+}
+html[data-theme="night"] .world-cloud-stream > i {
+  background: #9ab8c3a0;
+}
+html[data-theme="night"] .submarine-world .world-scenery {
+  background: linear-gradient(#12445f, #102a43 55%, #0b182f);
+}
+@keyframes world-clouds {
+  from {
+    transform: translate(40vw, 20vh);
+  }
+  to {
+    transform: translate(-60vw, -140vh);
+  }
+}
+@keyframes world-cruise {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) rotate(-2deg);
+  }
+  50% {
+    transform: translate(-50%, calc(-50% - 12px)) rotate(2deg);
+  }
+}
+@keyframes world-enemy-bob {
+  50% {
+    transform: translate(18px, -18px) rotate(5deg);
+  }
+}
+@keyframes world-turbulence {
+  50% {
+    transform: translate(-48%, -48%) rotate(5deg);
+  }
+}
+@keyframes sea-sunlight {
+  to {
+    transform: rotate(12deg);
+  }
+}
+@keyframes world-fish {
+  to {
+    transform: translateX(125vw);
+  }
+}
+@keyframes sub-current {
+  50% {
+    transform: translate(-45%, -55%) rotate(10deg);
+  }
+}
+@keyframes world-hit-retreat {
+  to {
+    transform: translateX(120px) rotate(20deg);
+    opacity: 0.2;
+  }
+}
+@keyframes net-catch-sway {
+  50% {
+    transform: rotate(2deg);
+  }
+}
+@media (max-width: 1000px) {
+  #theme-toggle {
+    min-width: 54px !important;
+    font-size: 8px !important;
+  }
+  .world-heading {
+    top: 90px;
+    padding: 9px;
+    gap: 8px;
+  }
+  .world-heading b {
+    font-size: 10px;
+  }
+  .world-heading span {
+    font-size: 8px;
+  }
+  .world-family-vehicle {
+    width: 55vw;
+  }
+  .world-controls {
+    padding: 10px 12px;
+  }
+  .world-controls > p {
+    font-size: 11px;
+  }
+  .world-controls button {
+    font-size: 10px;
+    padding: 8px 10px;
+  }
+  .world-enemy {
+    width: 75px;
+    height: 90px;
+  }
+  .world-badcat {
+    width: 90px;
+    height: 106px;
+  }
+}
+@media (max-width: 800px) {
+  .map-mode #theme-toggle {
+    display: none;
+  }
+  .world-heading {
+    left: 12px;
+    right: 112px;
+    transform: none;
+    top: 92px;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .world-heading b {
+    font-size: 9px;
+    letter-spacing: 0.6px;
+  }
+  .world-family-vehicle {
+    left: 43%;
+    width: 70vw;
+    top: 38%;
+  }
+  .world-controls {
+    left: 12px;
+    right: 112px;
+    bottom: 190px;
+    max-width: none;
+  }
+  .world-controls > div {
+    gap: 5px;
+  }
+  .world-controls button {
+    font-size: 9px;
+    min-height: 44px;
+    padding: 8px;
+  }
+  .world-controls > p {
+    font-size: 10px;
+  }
+  .world-controls details {
+    font-size: 9px;
+  }
+  .world-badcat {
+    left: 7%;
+    top: 24%;
+    width: 80px;
+    height: 95px;
+  }
+  .world-metro {
+    right: 29%;
+    top: 49%;
+    width: 70px;
+    height: 83px;
+  }
+  .mode-plane .campaign-hud,
+  .mode-submarine .campaign-hud {
+    top: 145px;
+  }
+  #npc-speech {
+    max-width: calc(100vw - 130px);
+    padding: 8px;
+  }
+  #npc-speech > img {
+    width: 50px;
+    height: 65px;
+  }
+  #npc-speech p {
+    font-size: 10px;
+  }
+  #npc-speech b {
+    font-size: 9px;
+  }
+  .actor#actor-badcat {
+    width: 78px;
+    height: 80px;
+  }
+  .actor#actor-metro {
+    width: 66px;
+    height: 70px;
+  }
+  .npc-character-badge {
+    font-size: 8px;
+  }
+  .kitten-net-art {
+    height: 76%;
+    width: 150%;
+    left: -25%;
+  }
+  .launch-bc {
+    width: 110px;
+    height: 140px;
+  }
+  .launch-metro {
+    width: 90px;
+    height: 110px;
+  }
+}
+@media (max-height: 650px) and (min-width: 801px) {
+  .world-controls {
+    bottom: 83px;
+    padding: 9px 12px;
+  }
+  .world-controls > p {
+    font-size: 11px;
+    margin-bottom: 7px;
+  }
+  .world-controls button {
+    min-height: 44px;
+    font-size: 11px;
+  }
+  .world-controls details {
+    margin-top: 4px;
+  }
+  .world-heading {
+    top: 88px;
+  }
+  .world-family-vehicle {
+    width: min(47vw, 440px);
+    top: 42%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-family-vehicle,
+  .world-enemy,
+  .kitten-net-art {
+    animation: none !important;
+  }
+  .field-shattering .enemy-forcefield:after {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+.display-setting {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 12px 16px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.display-setting select {
+  min-height: 44px;
+  padding: 9px;
+  border: 2px solid #72938d;
+  border-radius: 8px;
+  background: #e5d5aa;
+  color: #294d5b;
+}
+.kitten-target .kitten-emoji {
+  display: block;
+  width: 88%;
+  height: 88%;
+}
+.kitten-target .kitten-emoji img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: none;
+  filter: hue-rotate(var(--kitten-hue));
+  pointer-events: none;
+}
+.spell-header > img {
+  width: 75px;
+  height: 85px;
+}
+#spell-result-puppy {
+  object-fit: contain;
+}
+.launch-car img {
+  filter: drop-shadow(0 10px 5px #17283b44);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-cloud-stream > i {
+    animation: none;
+    top: calc(12% + var(--cloud-x) * 0.4);
+  }
+}

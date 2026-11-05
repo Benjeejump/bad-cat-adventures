@@ -1,0 +1,48 @@
+"""Playable worlds, enemy shields, automatic spelling celebration and kitten net result."""
+from playwright.sync_api import sync_playwright
+
+def check(v,m):
+ assert v,m
+ print('PASS',m,flush=True)
+with sync_playwright() as p:
+ b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
+ c=b.new_context(viewport={'width':1280,'height':800},reduced_motion='reduce')
+ c.add_init_script("""window.spoken=[];window.cancelled=0;Object.defineProperty(window,'speechSynthesis',{value:{cancel(){cancelled++},getVoices(){return []},speak(u){spoken.push(u.text);u.onstart?.()}}});window.SpeechSynthesisUtterance=class{constructor(t){this.text=t}};""")
+ c.route('https://tiles.openfreemap.org/**',lambda r:r.abort());c.route('https://basemaps.cartocdn.com/**',lambda r:r.abort());c.route('https://nominatim.openstreetmap.org/**',lambda r:r.abort())
+ page=c.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+ page.goto('http://127.0.0.1:8000/');page.locator('#launch-silent').click();page.locator('#test-drive').evaluate('(n)=>n.click()')
+ page.locator('#actor-badcat').click();check(page.locator('#npc-speech').is_visible(),'Bad Cat answers with a character speech bubble')
+ page.locator('[data-gadget="laser"]').click()
+ check(page.evaluate('badCatCharacters.diagnostics().badcat.shield')==1,'Laser wears down Bad Cat’s forcefield')
+ page.locator('#actor-badcat').click()
+ check(page.evaluate('badCatCharacters.diagnostics().badcat.shield')==0,'Second laser shatters the forcefield')
+ check(page.evaluate('badCatCharacters.diagnostics().badcat.plan') is None,'Breaking the forcefield interrupts the announced plan')
+ page.locator('#cancel-target').click()
+ page.locator('#theme-toggle').click();check(page.locator('html').get_attribute('data-theme')=='night','Night mode applies')
+ for mode in ['plane','submarine','car']:
+  page.locator('[data-vehicle="'+mode+'"]').first.click()
+  check(page.evaluate('badCatVehicle.mode()')==mode,'Vehicle switches to '+mode)
+  check(page.locator('#vehicle-world').is_visible()==(mode!='car'),'World visibility follows '+mode)
+  if mode!='car':
+   check(page.locator('[data-world-tool]').count()==3,'Three mode-specific tools')
+   page.evaluate('badCatVehicle.tick(15)');check(page.evaluate('badCatVehicle.diagnostics().hazard') is not None,'Mode-specific hazard arrives')
+   page.screenshot(path='/tmp/'+mode+'-verified.png')
+  if mode=='plane':check(page.evaluate('badCatVehicle.diagnostics().announcement').startswith('Welcome aboard this Honda Odyssey flight.'),'Flight starts with the requested welcome')
+ page.evaluate('badCatSpelling.open("ribbon")');page.locator('#hear-word').click()
+ check('birthday present' in page.evaluate('spoken.at(-1)'),'Ribbon has meaningful spoken context')
+ cancels=page.evaluate('cancelled');spoken=page.evaluate('spoken.length')
+ for letter in 'RIBBON':page.locator('.letter-bee[data-letter="'+letter+'"]:not([disabled])').first.evaluate('(n)=>n.click()')
+ check(page.evaluate('badCatSpelling.diagnostics().done'),'Correct last letter automatically completes the word')
+ check(page.evaluate('cancelled')>cancels and page.evaluate('spoken.length')==spoken,'Victory cancels speech without repeating the word')
+ check(page.evaluate('badCatDiagnostics().lastSoundEffect')=='victory','Correct spelling plays the celebration fanfare')
+ check(page.locator('.bee-victory-flight').count()>0,'Bees fly away on victory')
+ page.wait_for_timeout(3700);check(not page.evaluate('badCatSpelling.isOpen()'),'Celebration returns automatically to play')
+ page.evaluate('badCatAdventure.raidResult(true,20)')
+ check(page.locator('.kitten-net-art image').count()==20,'Mission result shows all twenty kittens in the net')
+ check(page.locator('#scene-stage .scene-character').count()==0,'Kitten result contains no falling puppy')
+ page.screenshot(path='/tmp/kitten-net-verified.png');page.wait_for_timeout(4300)
+ check(not page.locator('#encounter-dialog').evaluate('(n)=>n.open'),'Kitten result returns automatically')
+ page.evaluate('badCatAdventure.tick(250)')
+ check(page.evaluate('badCatSpelling.isOpen()'),'Spelling deploys automatically during active play')
+ page.keyboard.press('Escape');check(page.evaluate('badCatSpelling.isOpen()'),'Random spelling trap cannot be skipped')
+ check(not errors,'No world or celebration JavaScript errors: '+str(errors));b.close()

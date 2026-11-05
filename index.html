@@ -36,15 +36,17 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="map-mode.css" />
     <link rel="stylesheet" href="learning.css" />
+    <link rel="stylesheet" href="character-style.css" />
+    <script src="theme.js" defer></script>
   </head>
   <body class="map-mode launching">
     <header class="topbar">
       <a class="brand" href="#" aria-label="Bad Cat Adventures home"
         ><span class="brand-cat"
-          ><img src="assets/bad-cat.svg" alt="BC"
+          ><img src="assets/bad-cat.png" alt="BC"
         /></span>
         <span
-          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.5</b></span></span
+          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.6</b></span></span
         ></a
       >
       <nav aria-label="Game sections">
@@ -55,6 +57,7 @@
         </button>
       </nav>
       <div class="top-tools">
+        <button id="theme-toggle" class="icon-button">◐ AUTO</button>
         <span id="connection" class="connection">● ONLINE</span
         ><button
           id="sound"
@@ -102,12 +105,12 @@
           /><span>DYLAN’S CREW</span>
         </div>
         <div class="launch-cat launch-bc">
-          <img src="assets/bad-cat.svg" alt="BC, Bad Cat" /><span
+          <img src="assets/bad-cat.png" alt="BC, Bad Cat" /><span
             >“I have a plan…”</span
           >
         </div>
         <div class="launch-cat launch-metro">
-          <img src="assets/metro.svg" alt="M, Metro" /><span
+          <img src="assets/metro.png" alt="M, Metro" /><span
             >“Use the pipes!”</span
           >
         </div>
@@ -131,7 +134,7 @@
           Starts with this tablet’s GPS. Allow location when asked.
         </p>
       </div>
-      <span class="launch-version">v0.5 · THE LAKELINE ADVENTURES</span
+      <span class="launch-version">v0.6 · THE LAKELINE ADVENTURES</span
       ><button id="launch-skip" aria-label="Skip opening and play quietly">
         Skip intro →
       </button>
@@ -352,6 +355,14 @@
           <div class="quiet">
             Fictional adventures · GPS position stays on your device
           </div>
+          <label class="display-setting"
+            >Display
+            <select id="theme-choice" aria-label="Day or night display">
+              <option value="auto">Auto</option>
+              <option value="day">Day</option>
+              <option value="night">Night</option>
+            </select></label
+          >
           <p id="place-status" class="place-status" role="status">
             Finding the two Lakeline places…
           </p>
@@ -509,6 +520,8 @@
     <script src="word-bank.js" defer></script>
     <script src="spelling.js" defer></script>
     <script src="adventure.js" defer></script>
+    <script src="vehicle-world.js" defer></script>
+    <script src="characters.js" defer></script>
     <script src="targeting.js" defer></script>
     <script src="game-map.js" defer></script>
     <script src="loot.js" defer></script>

@@ -9,7 +9,7 @@ def check(value,message):
 def solve(page):
  info=page.evaluate('badCatSpelling.diagnostics()');word=info['word'].upper()
  for letter in word[len(info['answer']):]:page.locator(f'.letter-bee[data-letter="{letter}"]:not([disabled])').first.evaluate('(n)=>n.click()')
- page.locator('#check-word').click()
+ if not page.evaluate('badCatSpelling.diagnostics().done'):page.locator('#check-word').click()
 def wrong(page):
  page.evaluate('''()=>{const d=badCatSpelling.diagnostics();const need=d.word.length-d.answer.length;const nodes=[...document.querySelectorAll('.letter-bee:not([disabled])')];const first=nodes.find(n=>!d.word.toUpperCase().includes(n.dataset.letter));const picked=[first,...nodes.filter(n=>n!==first).slice(0,need-1)];picked.forEach(n=>n.click());}''')
  page.locator('#check-word').click()
@@ -32,6 +32,7 @@ with sync_playwright() as p:
  wrong(page)
  check(page.locator('#correct-spelling').inner_text()=='garden','Wrong answer shows the correct spelling')
  check(page.evaluate('badCatSpelling.diagnostics().used')==1,'A wrong full spelling uses one attempt')
+ check(page.locator('#undo-letter').is_disabled() and page.locator('#clear-letters').is_disabled() and not page.locator('#spell-check-controls').is_visible(),'Wrong-answer controls are disabled and hidden while Try Again is shown')
  page.locator('#try-spelling-again').click()
  check(page.locator('.fixed-letter').count()==1,'Second try has a first-letter hint')
  wrong(page);page.locator('#try-spelling-again').click()
@@ -65,7 +66,7 @@ with sync_playwright() as p:
  page.reload(wait_until='domcontentloaded');page.locator('#launch-silent').click();page.wait_for_function('badCatSpelling.isOpen()')
  check(page.evaluate('badCatSpelling.diagnostics().used')==1,'Reload resumes the trap with attempts preserved')
  check(len(page.evaluate('badCatSpelling.diagnostics().collected'))==3,'Collected words survive reload')
- page.locator('#spell-rescue').click();page.locator('#spell-close').click()
+ page.locator('#try-spelling-again').click();solve(page);page.locator('#spell-close').click()
  page.evaluate('speechSynthesis=undefined;badCatSpelling.open("cloud")');page.locator('#hear-word').click()
  check('unavailable' in page.locator('#speech-status').inner_text(),'No speech engine gives a clear fallback')
  page.locator('#look-word').click()

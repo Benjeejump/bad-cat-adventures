@@ -20,7 +20,7 @@ with sync_playwright() as p:
   check(page.locator('.puppy-prop svg' if effect!='badcat' else '.puppy-prop img').count()==1,effect+' landing object is illustrated rather than an emoji')
   check(page.locator('.puppy-success').count()==1,effect+' catch has its own landing animation')
   if effect=='bubbles':page.screenshot(path='/tmp/puppy-bubble-landing.png')
-  page.locator('#encounter-actions button').last.click()
+  page.locator('#close-encounter').evaluate('(n)=>n.click()')
  page.evaluate('badCatPuppyOptions.sample=realSample;badCatAdventure.encounter("tornado")')
  check(page.locator('.scene-car').count()==0,'Tornado scene removes the old car poster')
  check(page.locator('.cyclone-cat').count()==24,'Tornado contains 24 orbiting illustrated kittens')

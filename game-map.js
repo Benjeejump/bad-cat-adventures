@@ -32,8 +32,39 @@
       /* Label-free raster fallback also works without WebGL. */
     }
   }
+  function applyPalette() {
+    const night = window.badCatTheme?.isNight();
+    if (renderer === "simple-raster") {
+      document
+        .querySelectorAll(".simple-road-tiles")
+        .forEach((node) => node.classList.toggle("night-road-tiles", !!night));
+      return;
+    }
+    if (!gl?.isStyleLoaded()) return;
+    const paints = night
+      ? {
+          "soft-ground": ["background-color", "#183449"],
+          parks: ["fill-color", "#214c4a"],
+          water: ["fill-color", "#175b7d"],
+          "road-edges": ["line-color", "#102431"],
+          "friendly-roads": ["line-color", "#a8bac0"],
+          "major-road-centres": ["line-color", "#dcaf63"],
+        }
+      : {
+          "soft-ground": ["background-color", "#a6c88b"],
+          parks: ["fill-color", "#6da56f"],
+          water: ["fill-color", "#328eb5"],
+          "road-edges": ["line-color", "#667c65"],
+          "friendly-roads": ["line-color", "#f4d495"],
+          "major-road-centres": ["line-color", "#d18c46"],
+        };
+    for (const [id, [property, color]] of Object.entries(paints))
+      if (gl.getLayer(id)) gl.setPaintProperty(id, property, color);
+  }
+  window.addEventListener("bad-cat-theme", applyPalette);
   function success() {
     ready = true;
+    applyPalette();
     clearTimeout(timer);
     callbacks.ready();
   }
@@ -90,6 +121,7 @@
       });
       layer.addTo(map);
       gl = layer.getMaplibreMap();
+      gl.on("style.load", applyPalette);
       gl.on("sourcedata", (e) => {
         if (e.sourceId === "terrain" && e.isSourceLoaded) success();
       });

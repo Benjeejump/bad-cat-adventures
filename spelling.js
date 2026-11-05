@@ -32,6 +32,13 @@
     },
     storage = true,
     codeWords = [];
+  let resultTimer = null;
+  function closeResultAfter(ms) {
+    clearTimeout(resultTimer);
+    resultTimer = setTimeout(() => {
+      if (round?.done) dialog.close();
+    }, ms);
+  }
   try {
     const data = JSON.parse(localStorage.getItem(KEY) || "null");
     if (data) {
@@ -115,7 +122,7 @@
     const token = ++speechToken;
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(
-      `The word is ${entry.word}. ${entry.sentence} Spell ${entry.word}.`,
+      `Listen to the sentence. ${entry.sentence} The word is ${entry.word}. Spell ${entry.word}.`,
     );
     u.lang = "en-US";
     u.rate = 0.78;
@@ -232,13 +239,13 @@
     $("#try-spelling-again").hidden = true;
     $("#spell-result-actions").replaceChildren();
     $("#spell-practice-area").hidden = false;
+    $("#check-word").hidden = false;
     $("#spell-check-controls").hidden = false;
-    $("#spell-rescue").hidden = round.used === 0;
+    $("#spell-rescue").hidden = true;
+    $("#spell-close").textContent = "🔒";
     $("#spell-close").setAttribute(
       "aria-label",
-      round.used
-        ? "Ask for puppy rescue (costs 2 treats)"
-        : "Try spelling before escaping",
+      "Finish the spelling challenge to escape",
     );
     slots();
     say(
@@ -348,6 +355,14 @@
     movers[index].node.disabled = true;
     round.answer.push({ letter: movers[index].letter, index });
     slots();
+    if (
+      round.answer.length === round.entry.word.length &&
+      round.answer
+        .map((a) => a.letter)
+        .join("")
+        .toLowerCase() === round.entry.word
+    )
+      check();
   }
   function undo() {
     if (!round || round.feedback || round.answer.length <= round.fixed) return;
@@ -362,10 +377,44 @@
       : "LET’S LEARN THE CORRECT SPELLING";
     $("#correct-spelling").textContent = round.entry.word;
   }
+  function beesFlyAway() {
+    const layer = document.createElement("div");
+    layer.className = "bee-victory-flight";
+    layer.setAttribute("aria-hidden", "true");
+    const snapshots = movers.map((m) => ({
+      node: m.node,
+      rect: m.node.getBoundingClientRect(),
+    }));
+    dialog.append(layer);
+    snapshots.forEach(({ node, rect }, i) => {
+      const bee = node.cloneNode(true);
+      bee.removeAttribute("disabled");
+      bee.tabIndex = -1;
+      bee.style.cssText = `left:${rect.x}px;top:${rect.y}px;width:${rect.width}px;height:${rect.height}px;opacity:1;transform:none;pointer-events:none`;
+      layer.append(bee);
+      const dir = i % 2 ? 1 : -1;
+      bee.animate(
+        [
+          { transform: "translate(0,0) rotate(0)", opacity: 1 },
+          {
+            transform: `translate(${dir * (innerWidth * 0.65 + 120)}px,${-innerHeight * 0.75 - (i % 4) * 70}px) rotate(${dir * 140}deg) scale(.55)`,
+            opacity: 0,
+          },
+        ],
+        { duration: 1400 + i * 28, easing: "ease-in", fill: "forwards" },
+      );
+    });
+    setTimeout(() => layer.remove(), 2600);
+  }
   function finish(won, early = false) {
     if (!round || round.done) return;
     round.done = true;
     round.feedback = true;
+    round.won = won;
+    speechToken++;
+    window.speechSynthesis?.cancel();
+    if (won) beesFlyAway();
+    hooks.finished?.();
     cancelAnimationFrame(frame);
     book.pending = null;
     const word = round.entry.word;
@@ -374,6 +423,7 @@
     $("#spell-check-controls").hidden = true;
     $("#try-spelling-again").hidden = true;
     $("#spell-rescue").hidden = true;
+    $("#spell-close").textContent = "×";
     $("#spell-close").setAttribute("aria-label", "Close word result");
     if (won) {
       const seen = book.words[word];
@@ -393,7 +443,7 @@
         `You spelled ${word}! It’s in your word collection. ${earned ? `+${earned} puppy ${earned === 1 ? "treat" : "treats"}!` : "Your treat jar is full!"}`,
       );
       dialog.classList.add("word-won");
-      hooks.sound("puppy");
+      hooks.celebrate(announced);
     } else {
       book.missed = [...new Set([...book.missed, word])].slice(-30);
       save();
@@ -405,7 +455,7 @@
       hooks.sound("puppy");
     }
     $("#spell-title").textContent = won
-      ? "You cracked Bad Cat’s bee code!"
+      ? "Da-dah! You cracked Bad Cat’s bee code!"
       : "Puppy rescue! Look at the word together.";
     const image = $("#spell-result-puppy");
     image.hidden = false;
@@ -422,8 +472,12 @@
       open();
     });
     actions.append(practice);
-    speak(round.entry, false);
+    $("#hear-word").disabled = won;
+    $("#speech-status").textContent = won
+      ? "The code is cracked! Watch the bees fly away."
+      : "Tap Hear the word if you’d like to learn it again.";
     renderBook();
+    closeResultAfter(won ? 3400 : 7500);
   }
   function check() {
     if (
@@ -451,7 +505,11 @@
       "Not quite. Look at the correct word and say it with the puppy. Mistakes help us learn.",
     );
     $("#check-word").disabled = true;
-    $("#spell-rescue").hidden = false;
+    $("#undo-letter").disabled = true;
+    $("#clear-letters").disabled = true;
+    $("#spell-check-controls").hidden = true;
+    $("#spell-practice-area").hidden = true;
+    $("#spell-rescue").hidden = true;
     speak(round.entry, false);
     if (round.used >= 3) {
       finish(false);
@@ -467,14 +525,10 @@
       dialog.close();
       return;
     }
-    if (round.used === 0) {
-      say(
-        "Try the word once before a puppy breaks the code. Use Hear the word or Look at the word if you need help.",
-      );
-      $("#hear-word").focus();
-      return;
-    }
-    finish(false, true);
+    say(
+      "Bad Cat’s code is still locked. Keep trying the word—there’s no timer. Hear it again, look at the spelling, or calm the bees. A puppy will help after three tries.",
+    );
+    $("#hear-word").focus();
   }
   function open(word) {
     if (
@@ -488,6 +542,7 @@
     )
       return false;
     if (document.querySelector("#encounter-dialog").open) return false;
+    clearTimeout(resultTimer);
     speechToken++;
     window.speechSynthesis?.cancel();
     const resume = book.pending,
@@ -504,6 +559,7 @@
       feedback: false,
     };
     announced = false;
+    $("#hear-word").disabled = false;
     dialog.className = "spelling-dialog";
     $("#spell-title").textContent = "Bad Cat’s spelling bees trapped the crew!";
     $("#spell-result-puppy").hidden = true;
@@ -512,6 +568,7 @@
       "No timer. Hear the word as often as you need.";
     book.recent = [...book.recent, entry.word].slice(-8);
     dialog.showModal();
+    hooks.started?.();
     prepareAttempt();
     if (resume?.feedback && round.used > 0) {
       round.feedback = true;
@@ -519,7 +576,11 @@
       reveal(false);
       $("#try-spelling-again").hidden = false;
       $("#check-word").disabled = true;
-      $("#spell-rescue").hidden = false;
+      $("#spell-rescue").hidden = true;
+      $("#spell-check-controls").hidden = true;
+      $("#spell-practice-area").hidden = true;
+      $("#undo-letter").disabled = true;
+      $("#clear-letters").disabled = true;
       say("Welcome back. Here is the spelling to review before your next try.");
     }
     speak(entry, false);
@@ -588,7 +649,7 @@
     dialog = document.createElement("dialog");
     dialog.id = "spelling-dialog";
     dialog.setAttribute("aria-labelledby", "spell-title");
-    dialog.innerHTML = `<div class="bee-backdrop" aria-hidden="true"></div><header class="spell-header"><img src="assets/bad-cat.svg" alt="BC"><div><p>CRACK THE SPELLING-BEE CODE</p><h2 id="spell-title"></h2></div><button id="spell-close" aria-label="Try spelling before escaping">×</button></header><section class="spell-body"><div class="spell-tools"><button id="hear-word">🔊 Hear the word</button><span id="spell-attempt">Try 1 of 3</span><button id="calm-bees" aria-pressed="false">Calm the bees</button><button id="look-word">Look at the word · learning hint</button></div><p id="speech-status" role="status"></p><div id="word-slots" aria-label="Your spelling"></div><p id="spell-message" role="status" aria-live="polite"></p><div id="spell-reveal" hidden><small id="spell-reveal-label"></small><strong id="correct-spelling"></strong><span id="your-spelling" hidden></span></div><img id="spell-result-puppy" src="assets/giant-puppy.svg" alt="Captain Biscuit celebrates or helps you escape" hidden><div id="spell-practice-area"><div id="bee-field" aria-label="Choose letter bees in word order"></div></div><div id="spell-check-controls"><button id="undo-letter">← Undo letter</button><button id="clear-letters">Clear my letters</button><button id="check-word">Unlock the bee code</button></div><button id="try-spelling-again" hidden>Try again with a hint</button><button id="spell-rescue" hidden>Puppy rescue · uses up to 2 treats</button><div id="spell-result-actions"></div></section>`;
+    dialog.innerHTML = `<div class="bee-backdrop" aria-hidden="true"></div><header class="spell-header"><img src="assets/bad-cat.png" alt="BC"><div><p>CRACK THE SPELLING-BEE CODE</p><h2 id="spell-title"></h2></div><button id="spell-close" aria-label="Try spelling before escaping">×</button></header><section class="spell-body"><div class="spell-tools"><button id="hear-word">🔊 Hear the word</button><span id="spell-attempt">Try 1 of 3</span><button id="calm-bees" aria-pressed="false">Calm the bees</button><button id="look-word">Look at the word · learning hint</button></div><p id="speech-status" role="status"></p><div id="word-slots" aria-label="Your spelling"></div><p id="spell-message" role="status" aria-live="polite"></p><div id="spell-reveal" hidden><small id="spell-reveal-label"></small><strong id="correct-spelling"></strong><span id="your-spelling" hidden></span></div><img id="spell-result-puppy" src="assets/giant-puppy.png" alt="Captain Biscuit celebrates or helps you escape" hidden><div id="spell-practice-area"><div id="bee-field" aria-label="Choose letter bees in word order"></div></div><div id="spell-check-controls"><button id="undo-letter">← Undo letter</button><button id="clear-letters">Clear my letters</button><button id="check-word">Unlock the bee code</button></div><button id="try-spelling-again" hidden>Try again with a hint</button><button id="spell-rescue" hidden>Puppy rescue · uses up to 2 treats</button><div id="spell-result-actions"></div></section>`;
     document.body.append(dialog);
     $("#calm-bees").setAttribute("aria-pressed", book.calm);
     $("#calm-bees").textContent = book.calm ? "Bees calm ✓" : "Calm the bees";
@@ -645,6 +706,7 @@
     });
     dialog.addEventListener("close", () => {
       if (dialog.open) return;
+      clearTimeout(resultTimer);
       cancelAnimationFrame(frame);
       speechToken++;
       window.speechSynthesis?.cancel();

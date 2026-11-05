@@ -38,7 +38,7 @@ with sync_playwright() as p:
  page.set_viewport_size({'width':390,'height':844});page.wait_for_timeout(150)
  page.locator('[data-kitten="1"]').evaluate('(el)=>el.click()')
  check(page.evaluate('badCatTargeting.diagnostics().raid.cleared')>=2,'Bubble upgrade actually clears an extra nearby kitten')
- page.locator('#raid-close').click();page.locator('#encounter-actions button').last.click()
+ page.locator('#raid-close').click();page.locator('#close-encounter').evaluate('(n)=>n.click()')
  page.locator('[data-view="hq"]').click()
  check('Bubble 1/3' in page.locator('#inventory-readout').inner_text(),'HQ displays the saved arsenal')
  check(not errors,f'No inventory JavaScript errors: {errors}');b.close()

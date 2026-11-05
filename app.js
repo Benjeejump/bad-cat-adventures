@@ -158,7 +158,7 @@
       node.innerHTML =
         key === "car"
           ? ""
-          : `<img src="assets/${key === "badcat" ? "bad-cat" : "metro"}.svg" alt="${key === "badcat" ? "BC, Bad Cat" : "M, Metro"}">`;
+          : `<img src="assets/${key === "badcat" ? "bad-cat" : "metro"}.png" alt="${key === "badcat" ? "BC, Bad Cat" : "M, Metro"}">`;
       node.setAttribute("aria-label", label);
       if (key !== "car") {
         node.setAttribute("role", "button");
@@ -211,8 +211,16 @@
       L.divIcon({
         className: `leaflet-actor ${extra}`,
         html: `<div>${emoji}</div>`,
-        iconSize: [44, 44],
-        iconAnchor: [22, 22],
+        iconSize: extra.includes("badcat-marker")
+          ? [82, 82]
+          : extra.includes("metro-marker")
+            ? [68, 68]
+            : [44, 44],
+        iconAnchor: extra.includes("badcat-marker")
+          ? [41, 41]
+          : extra.includes("metro-marker")
+            ? [34, 34]
+            : [22, 22],
       });
     markers.car = L.marker(state.car, {
       icon: icon("🚙"),
@@ -221,14 +229,14 @@
     }).addTo(map);
     markers.badcat = L.marker(state.badcat, {
       icon: icon(
-        '<img src="assets/bad-cat.svg" alt="BC, Bad Cat">',
+        '<img src="assets/bad-cat.png" alt="BC, Bad Cat">',
         "enemy-icon badcat-marker",
       ),
       title: "Bad Cat · fictional character",
     }).addTo(map);
     markers.metro = L.marker(state.metro, {
       icon: icon(
-        '<img src="assets/metro.svg" alt="M, Metro">',
+        '<img src="assets/metro.png" alt="M, Metro">',
         "enemy-icon metro-marker",
       ),
       title: "Metro · fictional character",
@@ -287,7 +295,7 @@
     if (state.view === "hq") setTimeout(() => map.invalidateSize(), 0);
   }
   function startGameMap() {
-    if (!map) return;
+    if (!map || progress.vehicle !== "car") return;
     window.badCatGameMap.mount(map, {
       ready: () => {
         tileLoaded = true;
@@ -354,12 +362,21 @@
         $("#map-stage").style.setProperty("--car-y", `${y}%`);
       }
     }
-    if (map && state.follow && state.view === "drive")
+    if (
+      map &&
+      state.follow &&
+      state.view === "drive" &&
+      progress.vehicle === "car"
+    )
       map.panTo(c, { animate: false });
-    if (map && tileLoaded) {
+    if (map && tileLoaded && progress.vehicle === "car") {
       const p = map.latLngToContainerPoint(c);
       $("#map-stage").style.setProperty("--car-x", `${p.x}px`);
       $("#map-stage").style.setProperty("--car-y", `${p.y}px`);
+    }
+    if (progress.vehicle !== "car") {
+      $("#map-stage").style.setProperty("--car-x", "50%");
+      $("#map-stage").style.setProperty("--car-y", "43%");
     }
     const d1 = Math.round(metres(c, state.badcat)),
       d2 = Math.round(metres(c, state.metro));
@@ -381,6 +398,8 @@
       `${(state.distance / 1000).toFixed(2)} km explored`;
   }
   function tick(dt) {
+    window.badCatVehicle.tick(dt);
+    window.badCatCharacters.tick(dt);
     window.badCatTargeting.tick(dt);
     window.badCatAdventure.tick(dt);
     if (
@@ -538,7 +557,7 @@
         $("#test-drive").classList.remove("selected");
         $("#pause").disabled = true;
         $("#speed").disabled = true;
-        if (map && state.follow)
+        if (map && state.follow && progress.vehicle === "car")
           map.setView(
             state.car,
             firstGPS && !state.lastGPSZoomed ? 20 : map.getZoom(),
@@ -565,12 +584,41 @@
   // Sound is synthesised locally. Never create/resume the audio context before a gesture.
   let audio,
     soundEnabled = false;
+  let lastSoundEffect = null;
   $("#volume").value = progress.volume;
-  function sound(kind) {
-    if (!soundEnabled) return;
+  function sound(kind, force = false) {
+    if (!soundEnabled && !force) return;
     try {
       audio ||= new (window.AudioContext || window.webkitAudioContext)();
       audio.resume().catch(() => {});
+      lastSoundEffect = kind;
+      if (kind === "victory") {
+        for (const [start, freq, duration] of [
+          [0, 523.25, 0.16],
+          [0, 659.25, 0.16],
+          [0, 783.99, 0.16],
+          [0.25, 523.25, 0.7],
+          [0.25, 659.25, 0.7],
+          [0.25, 1046.5, 0.7],
+        ]) {
+          const osc = audio.createOscillator(),
+            gain = audio.createGain(),
+            t = audio.currentTime + start;
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0, t);
+          gain.gain.linearRampToValueAtTime(
+            (progress.volume / 100) * 0.1,
+            t + 0.015,
+          );
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+          osc.connect(gain);
+          gain.connect(audio.destination);
+          osc.start(t);
+          osc.stop(t + duration + 0.03);
+        }
+        return;
+      }
       const notes =
         kind === "puppy"
           ? [440, 554, 659, 880]
@@ -695,6 +743,10 @@
     return true;
   }
   function vehicleSVG(type) {
+    if (type === "plane")
+      return '<img src="assets/doggy-plane.svg" alt="Doggy Plane">';
+    if (type === "submarine")
+      return '<img src="assets/family-sub.svg" alt="Odyssey submarine">';
     const base =
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140" role="img" aria-label="Original cartoon adventure vehicle">';
     if (type === "plane")
@@ -712,11 +764,12 @@
 
   function setVehicle(type, announce = true) {
     progress.vehicle = type;
+    window.badCatVehicle.change(type, announce);
     save();
     $("#vehicle-art").innerHTML = vehicleSVG(type);
     $("#vehicle-name").textContent = {
       car: "White Honda Odyssey",
-      plane: "Cloud Hopper",
+      plane: "Doggy Plane",
       submarine: "Bubble Voyager",
     }[type];
     $$("[data-vehicle]").forEach((b) => {
@@ -900,7 +953,7 @@
   $("#follow").addEventListener("click", () => {
     state.follow = !state.follow;
     updateFollow();
-    if (map && state.follow) map.panTo(state.car);
+    if (map && state.follow && progress.vehicle === "car") map.panTo(state.car);
   });
   $("#sound").addEventListener("click", () => {
     soundEnabled = !soundEnabled;
@@ -1022,20 +1075,65 @@
     story(message);
     toast(message);
   });
-  window.badCatSpelling.init({ sound, canSpeak: () => soundEnabled });
+  window.badCatSpelling.init({
+    sound,
+    canSpeak: () => soundEnabled,
+    celebrate: (wordAudio) => sound("victory", wordAudio),
+    started: () => window.badCatAdventure.deferSpelling(),
+    finished: () => window.badCatAdventure.deferSpelling(),
+  });
+  window.badCatVehicle.init({
+    canSpeak: () => soundEnabled,
+    active: () =>
+      state.view === "drive" &&
+      !state.paused &&
+      !window.badCatAdventure.isOpen(),
+    sound,
+    say: (message) => {
+      story(message);
+      toast(message);
+    },
+    changed: (type) => {
+      if (type === "car" && map) {
+        map.invalidateSize();
+        if (["gps", "test"].includes(state.mode)) {
+          map.setView(state.car, map.getZoom(), { animate: false });
+          startGameMap();
+        }
+      }
+    },
+  });
+  window.badCatCharacters.init({
+    active: () =>
+      state.view === "drive" &&
+      !state.paused &&
+      (["gps", "test"].includes(state.mode) ||
+        window.badCatVehicle.worldActive()) &&
+      !window.badCatAdventure.isOpen(),
+    plan: (kind) => window.badCatAdventure.enactPlan(kind),
+    sound,
+  });
   window.badCatTargeting.init({
     view: () => state.view,
     sound,
     story,
     result: (won, count) => window.badCatAdventure.raidResult(won, count),
     apply: (kind, target) => {
+      const retreat = state.retreatUntil,
+        ally = state.allyUntil;
       if (gadget(kind) === false) return false;
-      state.targetEffects ||= {};
-      state.targetEffects[target] = {
-        kind,
-        until: Date.now() + 9000 + window.badCatLoot.level(kind) * 3000,
-      };
-      return true;
+      state.retreatUntil = retreat;
+      state.allyUntil = ally;
+      const strike = window.badCatCharacters.hit(target, kind);
+      if (strike?.exposed) {
+        window.badCatVehicle.reactToHit(target);
+        state.targetEffects ||= {};
+        state.targetEffects[target] = {
+          kind,
+          until: Date.now() + 9000 + window.badCatLoot.level(kind) * 3000,
+        };
+      }
+      return strike;
     },
   });
   window.badCatAdventure.init({
@@ -1049,7 +1147,10 @@
     },
     view: () => state.view,
     startJourney: startGPS,
-    paused: () => state.paused || !["gps", "test"].includes(state.mode),
+    paused: () =>
+      state.paused ||
+      (!["gps", "test"].includes(state.mode) &&
+        !window.badCatVehicle.worldActive()),
     shielded: () => Date.now() < state.shieldUntil,
     setView,
     win: (reward = true) => {
@@ -1105,6 +1206,7 @@
     tilesLoaded: tileLoaded,
     soundEnabled,
     audioState: audio?.state || "not-started",
+    lastSoundEffect,
     inventions: progress.inventions.length,
     cacheSupported: "serviceWorker" in navigator,
     zoom: map?.getZoom() || null,
@@ -1114,5 +1216,8 @@
     targeting: window.badCatTargeting.diagnostics(),
     campaign: window.badCatCampaign.snapshot(),
     spelling: window.badCatSpelling.diagnostics(),
+    characters: window.badCatCharacters.diagnostics(),
+    theme: window.badCatTheme.mode(),
+    vehicleWorld: window.badCatVehicle.diagnostics(),
   });
 })();

@@ -11,7 +11,7 @@ root = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory() as temp:
     project = Path(temp) / 'bad-cat-adventures'
     project.mkdir()
-    for name in ['index.html','app.js','cinematics.js','word-bank.js','spelling.js','learning.css','loot.js','game-map.js','game-map-style.json','styles.css','sw.js','manifest.webmanifest','adventure.js','puppy-options.js','campaign.js','targeting.js','site-config.js','map-mode.css']:
+    for name in ['index.html','app.js','vehicle-world.js','characters.js','theme.js','character-style.css','cinematics.js','word-bank.js','spelling.js','learning.css','loot.js','game-map.js','game-map-style.json','styles.css','sw.js','manifest.webmanifest','adventure.js','puppy-options.js','campaign.js','targeting.js','site-config.js','map-mode.css']:
         shutil.copy(root / name, project / name)
     shutil.copytree(root / 'assets', project / 'assets')
     handler = partial(SimpleHTTPRequestHandler, directory=temp)

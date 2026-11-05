@@ -46,9 +46,10 @@
   }
   function impact(node, power) {
     if (!node) return;
-    node.classList.remove("target-impact");
-    void node.offsetWidth;
-    node.classList.add("target-impact");
+    const visual = node.querySelector("img") || node;
+    visual.classList.remove("target-impact");
+    void visual.offsetWidth;
+    visual.classList.add("target-impact");
     const rect = node.getBoundingClientRect(),
       fx = document.createElement("span");
     fx.className = "target-pop";
@@ -58,17 +59,19 @@
     document.body.append(fx);
     setTimeout(() => {
       fx.remove();
-      node.classList.remove("target-impact");
+      visual.classList.remove("target-impact");
     }, 1000);
   }
   function target(character, node) {
+    window.badCatCharacters.talk(character);
     if (!armed) {
       selected = character;
       update();
       return;
     }
     const power = armed;
-    if (hooks.apply(power, character) === false) return;
+    const strike = hooks.apply(power, character);
+    if (strike === false) return;
     impact(node, power);
     const line = {
       shield: "boings away from your shield",
@@ -77,7 +80,9 @@
       bubble: "floats away in a wobbly bubble",
       puppy: "is led away by the puppy squad",
     }[power];
-    hooks.story(`${character === "badcat" ? "BC" : "M"} ${line}!`);
+    hooks.story(
+      strike?.message || `${character === "badcat" ? "BC" : "M"} ${line}!`,
+    );
     selected = null;
     update();
   }
@@ -101,7 +106,7 @@
       b.dataset.kitten = String(i + 1);
       b.style.setProperty("--arrive-delay", `${i * 0.06}s`);
       b.style.setProperty("--kitten-hue", `${(i % 5) * 16}deg`);
-      b.innerHTML = `<span class="kitten-emoji" aria-hidden="true">${["🐱", "😺", "😸", "😼", "🙀"][i % 5]}</span><small>${i + 1}</small>`;
+      b.innerHTML = `<span class="kitten-emoji" aria-hidden="true"><img src="assets/kitten.png" alt=""></span><small>${i + 1}</small>`;
       b.addEventListener("click", () => {
         if (!raid || b.disabled) return;
         if (!armed) {
