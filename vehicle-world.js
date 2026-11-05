@@ -74,11 +74,20 @@
     const tools = document.querySelectorAll("[data-world-tool]");
     const labels =
       mode === "plane"
-        ? ["◈ Cloud shield", "🐶 Puppy autopilot", "ϟ Waffle boost"]
+        ? ["◈ Cloud shield", "Puppy autopilot", "ϟ Waffle boost"]
         : ["↔ Wipers", "◎ Sonar", "🫧 Bubble jets"];
-    tools.forEach((b, i) => (b.textContent = labels[i]));
+    tools.forEach((b, i) => {
+      b.textContent = labels[i];
+      if (mode === "plane" && i === 1) {
+        const img = document.createElement("img");
+        img.className = "crew-inline";
+        img.src = "assets/captain-biscuit.png";
+        img.alt = "";
+        b.prepend(img);
+      }
+    });
     document.querySelector("#world-vehicle").src =
-      mode === "plane" ? "assets/doggy-plane.svg" : "assets/family-sub.svg";
+      mode === "plane" ? "assets/doggy-plane.png" : "assets/family-sub.png";
     document.querySelector("#world-vehicle").alt =
       mode === "plane"
         ? "Doggy Plane flying through the clouds"

@@ -1,0 +1,873 @@
+/* Clean modern adventure-team UI: bright equipment, soft moulded shapes, clear labels. */
+:root {
+  --ink: #183c63;
+  --paper: #e6f5ff;
+  --border: #89cde6;
+  --mint: #3fc9ab;
+  --orange: #ff9c38;
+  --team-blue: #156cc6;
+  --team-navy: #153a68;
+  --team-cyan: #23c7e4;
+  --team-lime: #b5e63e;
+}
+body {
+  background: linear-gradient(160deg, #edfaff, #d8edff);
+  color: #183c63;
+  font-family: "Trebuchet MS", ui-rounded, system-ui, sans-serif;
+}
+h1,
+h2,
+h3,
+.brand {
+  font-weight: 900;
+}
+h1,
+h2 {
+  line-height: 1.12;
+}
+button {
+  font-weight: 800;
+}
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid #ffcc51;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #124b83;
+}
+:where(
+  .gadget,
+  .primary-button,
+  .garage-vehicles button,
+  .equipment-options button,
+  .puppy-roster button,
+  .invention-list button,
+  .recipe-choices button,
+  #encounter-actions button,
+  .world-controls button,
+  #target-bar button,
+  #spell-check-controls button,
+  #try-spelling-again,
+  .spell-tools button,
+  #spell-result-actions button,
+  #field-inventions button,
+  #build-more,
+  #preview-invention,
+  #arsenal-launch,
+  #carwash-launch,
+  #kitten-launch,
+  #spelling-launch,
+  #net-launch
+) {
+  border: 2px solid #0c5598;
+  border-radius: 16px;
+  background-image: linear-gradient(170deg, #ffffff45, transparent 55%);
+  box-shadow:
+    inset 0 2px #fff9,
+    0 4px 0 #114e8a,
+    0 7px 12px #18517a26;
+  color: #173c63;
+  min-height: 44px;
+}
+:where(
+  .primary-button,
+  #encounter-actions button,
+  #field-inventions button,
+  #build-more,
+  #preview-invention
+) {
+  background-color: #ffac42;
+  color: #173557;
+  min-height: 48px;
+  padding: 12px 18px;
+}
+:where(
+  .gadget,
+  .primary-button,
+  .recipe-choices button,
+  #encounter-actions button,
+  .puppy-roster button,
+  .garage-vehicles button
+):active {
+  translate: 0 3px;
+  box-shadow:
+    inset 0 2px #174f7b26,
+    0 1px #124d86;
+}
+button:disabled {
+  opacity: 0.5;
+  filter: saturate(0.5);
+}
+.topbar,
+.map-mode .topbar,
+.action-rail {
+  background: linear-gradient(140deg, #186fbb, #124579);
+  border: 3px solid #96e4ff;
+  border-radius: 22px;
+  box-shadow:
+    inset 0 2px #fff6,
+    0 5px #143e6b,
+    0 9px 20px #19487126;
+}
+.brand,
+.map-mode .brand {
+  color: white;
+  text-shadow: 0 2px #0e467b;
+}
+.brand-cat {
+  filter: drop-shadow(0 3px 2px #073a6155);
+}
+.map-mode .nav-tab.active,
+.nav-tab.active {
+  background: #2198d4;
+  color: white;
+  border-color: #a9ecff;
+}
+.nav-tab {
+  color: #d4f3ff;
+}
+.action-rail .gadget.mint {
+  background-color: #4bd6ad;
+}
+.action-rail .gadget.coral {
+  background-color: #ff9b53;
+}
+.action-rail .gadget.blue {
+  background-color: #54c6ef;
+}
+.action-rail .gadget.lilac {
+  background-color: #c29aef;
+}
+.action-rail .gadget.yellow {
+  background-color: #ffd45d;
+}
+.action-rail .gadget.peach {
+  background-color: #ffb965;
+}
+.action-rail .gadget b {
+  color: #143b62;
+  text-shadow: 0 1px #fff5;
+}
+.gadget-icon {
+  filter: drop-shadow(0 2px 1px #16476d33);
+}
+.panel.hq-card {
+  background: #f9fdff;
+  border: 3px solid #83cce8;
+  border-radius: 24px;
+  box-shadow:
+    inset 0 2px white,
+    0 5px #3b8fb933,
+    0 10px 22px #164b7310;
+  color: #173f66;
+  padding: 23px;
+}
+.hq-card h2 {
+  color: #145b96;
+}
+.hq-card > p {
+  color: #4f6d83;
+  line-height: 1.6;
+}
+.hq-card .hq-icon {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 2px solid #91e4fc;
+  border-radius: 18px;
+  background: linear-gradient(140deg, #43cfeb, #198fce);
+  box-shadow:
+    inset 0 2px #fff9,
+    0 4px #11518b;
+  color: white;
+  font-size: 30px;
+  margin-bottom: 16px;
+}
+.hq-banner {
+  background: linear-gradient(120deg, #157dc1, #13a9c8);
+  border: 3px solid #b1f3ff;
+  border-radius: 24px;
+  color: white;
+  box-shadow:
+    0 5px #14558c,
+    0 10px 20px #18517a22;
+  padding: 26px;
+}
+.hq-banner h2,
+.hq-banner p,
+.hq-banner > div > p {
+  color: #f6fdff;
+}
+.hq-intro h1 {
+  color: #15598d;
+}
+.hq-banner:after {
+  content: none;
+}
+.profile img {
+  width: 55px;
+  height: 60px;
+  object-fit: contain;
+}
+.hero-dylan {
+  width: 55px;
+  height: 60px;
+  object-fit: contain;
+  vertical-align: middle;
+  filter: drop-shadow(0 3px 2px #0e427633);
+}
+.recipe-step {
+  border: 2px solid #7ec9e4;
+  border-radius: 18px;
+  background: #e1f5ff;
+  color: #174875;
+  box-shadow: none;
+}
+.recipe-step summary {
+  padding: 12px 8px;
+  color: #16588d;
+  font-weight: 900;
+}
+.recipe-step small {
+  color: #496d86;
+}
+.recipe-choices button,
+#invention-form .recipe-choices button {
+  background: linear-gradient(#fff, #dcefff);
+  color: #17436a;
+  border-color: #7fbbdd;
+  box-shadow: 0 3px #9fc8e1;
+  border-radius: 14px;
+  min-height: 88px;
+}
+.recipe-choices button[aria-pressed="true"],
+#invention-form .recipe-choices button[aria-pressed="true"] {
+  border: 3px solid #138ccc;
+  background: linear-gradient(#c5f4ff, #92dcf3);
+  color: #0e436c;
+  box-shadow:
+    inset 0 0 0 2px #fff,
+    0 3px #1478ae;
+}
+.recipe-preview {
+  background: linear-gradient(135deg, #1b80c4, #165ca0);
+  border: 3px solid #a8edff;
+  border-radius: 21px;
+  box-shadow: 0 4px #12477c;
+  color: white;
+  padding: 18px;
+}
+.invention-list button {
+  background: #d1efff;
+  color: #164368;
+}
+.invention-recipe {
+  color: #426b86;
+}
+.hq-card input,
+.hq-card select {
+  background: #fff;
+  border: 2px solid #6fafd2;
+  border-radius: 12px;
+  color: #17436b;
+  min-height: 48px;
+}
+.garage-vehicles button,
+.equipment-options button,
+.puppy-roster button {
+  background: linear-gradient(#fff, #dfedff);
+  border-color: #72b7dc;
+  color: #184069;
+  box-shadow: 0 4px #357da8;
+}
+.garage-vehicles button.selected,
+.equipment-options button.selected {
+  background: linear-gradient(#bcf3ff, #62d4ef);
+  color: #123e67;
+  border-color: #158ccb;
+  box-shadow:
+    inset 0 0 0 2px white,
+    0 4px #135b93;
+}
+#npc-speech {
+  background: white;
+  color: #1a426a;
+  border: 3px solid #339fd7;
+  border-radius: 24px 24px 24px 6px;
+  box-shadow: 0 5px #134f8633;
+}
+#npc-speech b {
+  color: #176ab1;
+}
+.world-controls,
+.world-heading,
+#target-bar,
+.story-bar,
+#toast {
+  background: linear-gradient(135deg, #1669a6, #174a7a);
+  color: #f4fbff;
+  border: 2px solid #8edcf6;
+  border-radius: 20px;
+  box-shadow:
+    inset 0 2px #fff3,
+    0 4px #123e6d;
+}
+.world-controls p,
+.world-heading b,
+.world-controls summary {
+  color: #f6fcff;
+}
+.world-controls button {
+  background: #8bdef3;
+}
+.campaign-hud {
+  background: #174e7c;
+  border: 2px solid #7edaf4;
+  border-radius: 18px;
+  color: white;
+}
+.journey-settings {
+  background: #164e7e;
+  color: white;
+  border: 2px solid #8addf6;
+  border-radius: 20px;
+}
+.journey-settings :is(p, label, .place-status) {
+  color: #d6f4ff;
+}
+.story-copy {
+  background: linear-gradient(0deg, #153c65fa, #153c65df 70%, transparent);
+}
+#encounter-title {
+  color: white;
+  text-shadow: 0 3px #0c3b6b;
+}
+#encounter-text {
+  color: #e0f5ff;
+  line-height: 1.6;
+}
+#scene-eyebrow {
+  color: #b8ebff;
+  letter-spacing: 0.13em;
+}
+#encounter-dialog #encounter-actions button {
+  background: linear-gradient(#ffcf70, #ffae43);
+  color: #173d65;
+  border: 2px solid #f6faff;
+  box-shadow:
+    inset 0 2px #fff8,
+    0 5px #14578b;
+  border-radius: 16px;
+  padding: 14px 18px;
+}
+#encounter-dialog #encounter-actions button:nth-child(2) {
+  background: linear-gradient(#b5f4ff, #69d4ef);
+}
+.scene-character img,
+.world-family-vehicle,
+.scene-puppies img {
+  filter: drop-shadow(0 8px 5px #12466e33);
+}
+.puppy-prop svg {
+  filter: saturate(1.25) drop-shadow(0 5px 3px #13476733);
+}
+.rising-cloud,
+.world-cloud-stream > i {
+  box-shadow:
+    inset 0 -7px #a8d9ed55,
+    0 2px #b2e6ff66;
+}
+.spelling-dialog,
+#arsenal-dialog {
+  background: linear-gradient(145deg, #227db5, #164e7f);
+  border: 3px solid #93ddf7;
+  box-shadow: 0 15px 65px #07305e88;
+  border-radius: 26px;
+  color: #f2fbff;
+}
+.spell-header {
+  background: #144e80;
+  border-bottom: 3px solid #66cff0;
+  color: white;
+}
+.spell-header h2,
+.spell-header p {
+  color: #f2fbff;
+}
+.bee-backdrop {
+  background: radial-gradient(ellipse at 50% 45%, #82d4eb55, transparent 70%);
+  opacity: 0.7;
+}
+.spell-tools button,
+#spell-check-controls button,
+#try-spelling-again {
+  background: #ffca65;
+  color: #173c65;
+}
+.spell-tools #look-word {
+  background: #69cbe9;
+  color: #143d65;
+}
+.word-slot {
+  border: 2px solid #2d92c1;
+  background: #f7fdff;
+  color: #165380;
+  box-shadow: 0 4px #114b78;
+  border-radius: 12px;
+}
+.letter-bee {
+  filter: drop-shadow(0 4px 2px #12457733);
+}
+.letter-bee img {
+  object-fit: contain;
+}
+.letter-bee > b {
+  left: 69%;
+  top: 66%;
+  background: white;
+  color: #184c77;
+  border: 2px solid #ffb543;
+  border-radius: 10px;
+  box-shadow: 0 2px #17487433;
+}
+.spell-body :is(#spell-message, #speech-status) {
+  color: #edfaff;
+}
+.spell-body #correct-spelling {
+  color: #d4ff91;
+}
+.spell-body .fixed-letter {
+  background: #b9f1d8;
+}
+.spell-body #spell-attempt {
+  color: #f6fdff;
+}
+.spell-body #spell-reveal {
+  background: #104675;
+  border: 2px solid #76d4ed;
+  border-radius: 16px;
+}
+.puppy-roster button {
+  overflow: hidden;
+  padding-top: 8px;
+}
+.puppy-roster .puppy-portrait {
+  display: block;
+  width: 100%;
+  height: 120px;
+  object-fit: contain;
+  margin: auto;
+  filter: drop-shadow(0 5px 3px #1a649433);
+}
+.puppy-roster button:hover .puppy-portrait {
+  animation: crew-hop 0.65s ease-in-out;
+}
+.gadget-icon img,
+.target-pop img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.gadget-icon .crew-icon {
+  height: 42px;
+  width: 48px;
+  max-height: 100%;
+}
+.crew-inline {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+.scene-puppies {
+  display: flex;
+  align-items: end;
+  gap: 2px;
+  width: min(38%, 350px);
+  font-size: 0;
+}
+.scene-puppies img {
+  width: 34%;
+  height: 130px;
+  object-fit: contain;
+  animation: crew-hop 0.9s ease-in-out infinite alternate;
+}
+.scene-puppies img:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.scene-puppies img:nth-child(3) {
+  animation-delay: -0.6s;
+}
+.particle img {
+  width: 70px;
+  height: 76px;
+  object-fit: contain;
+}
+.actor.car-actor img[src*="dylan"],
+.leaflet-actor img[src*="dylan"],
+#vehicle-art img[src*="dylan"] {
+  animation: puppy-trot 0.55s ease-in-out infinite alternate;
+  transform-origin: 50% 85%;
+  filter: drop-shadow(0 4px 2px #124a7633);
+}
+.hq-squid-art {
+  display: block;
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  margin: auto;
+}
+.arrival-art img.arrival-squid {
+  width: 45%;
+  height: 250px;
+  object-fit: contain;
+}
+.windscreen-squid {
+  object-fit: contain;
+  filter: drop-shadow(0 9px 5px #164e7c44);
+  animation: squid-wobble 2.7s ease-in-out infinite alternate;
+}
+.squid-free .windscreen-squid {
+  animation: none;
+}
+.target-pop:has(img) {
+  width: 58px;
+  height: 70px;
+}
+.world-family-vehicle {
+  width: min(60vw, 650px);
+  object-fit: contain;
+}
+#launch-play {
+  border: 3px solid #c6f6ff;
+  background: linear-gradient(#ffc969, #ff9d3b);
+  box-shadow:
+    inset 0 3px #fff9,
+    0 7px #145c99,
+    0 12px 25px #0c3b6b55;
+  border-radius: 23px;
+  color: #123d67;
+}
+.launch-title {
+  color: white;
+  text-shadow: 0 4px #104a83;
+}
+.launch-info,
+.launch-subtitle {
+  color: #e1f5ff;
+}
+.launch-hero {
+  position: absolute;
+  width: 150px;
+  height: 180px;
+  object-fit: contain;
+  left: 8%;
+  bottom: 18%;
+  filter: drop-shadow(0 8px 3px #0c356655);
+}
+/* Workshop and handwriting controls belong to the same contemporary equipment set. */
+#pipeworks-dialog,
+#handwriting-dialog {
+  background: linear-gradient(145deg, #277fb6, #165183);
+  border: 3px solid #99e0f9;
+  border-radius: 25px;
+  box-shadow: 0 15px 70px #07315e88;
+  color: #f3fbff;
+}
+.pipe-header,
+.pencil-header {
+  background: #154c7c;
+  border-bottom: 3px solid #62d2ef;
+}
+.pipe-header h2,
+.pencil-header h2 {
+  color: white;
+}
+.pipe-header p,
+.pencil-header p,
+.pipe-controls label,
+#pipe-route-label,
+#pipe-status,
+#pencil-status,
+#pencil-step {
+  color: #e4f8ff;
+}
+.pipe-header > button,
+.pencil-header > button {
+  border-color: #a2e9ff;
+  background: #267eaf;
+  color: white;
+}
+.pipe-controls button,
+#pipe-result button,
+[data-pipeworks],
+#handwriting-dialog button:not(#pencil-close),
+[data-handwriting] {
+  border: 2px solid #9ee8fa;
+  border-radius: 14px;
+  background: linear-gradient(#ffd278, #ffad48);
+  box-shadow:
+    inset 0 2px #fff9,
+    0 4px #114979;
+  color: #153f68;
+}
+.pipe-controls select,
+#pencil-setup select {
+  background: #f7fdff;
+  border: 2px solid #68b4d9;
+  border-radius: 12px;
+  color: #17436b;
+}
+.pipe-gauges b {
+  color: #d1ff91;
+}
+#pipe-board {
+  background: #124675;
+  border: 3px solid #78d6f3;
+  box-shadow: 0 5px #123d69;
+  border-radius: 17px;
+}
+.pipe-tile {
+  background: linear-gradient(#3a8cb9, #246b98);
+  border: 2px solid #124b79;
+  border-radius: 9px;
+  box-shadow:
+    inset 0 2px #c4f1ff66,
+    0 2px #0d3b64;
+}
+.pipe-shadow {
+  stroke: #10456e;
+}
+.pipe-metal {
+  stroke: #d6f0fb;
+}
+.pipe-bore {
+  stroke: #507e9b;
+}
+.pipe-joint {
+  fill: #9fcce3;
+  stroke: #4b83a5;
+}
+.pipe-bolt {
+  fill: #e6f7ff;
+  stroke: #3f7ea4;
+}
+.pipe-wet .pipe-joint {
+  fill: #7de3ee;
+  stroke: #3da6cb;
+}
+.pipe-start {
+  outline-color: #80eaff;
+}
+.pipe-end {
+  outline-color: #ceff6e;
+}
+.pipe-start:after,
+.pipe-end:after {
+  background: #0e4c7b;
+  color: white;
+}
+.pipe-controls input {
+  accent-color: #47c7e5;
+}
+#pencil-note-text {
+  background: #144b7b;
+  border: 2px solid #8cdef3;
+  color: white;
+}
+.note-future {
+  color: #d0e8f6;
+}
+.note-current {
+  color: #164572;
+  background: #c8ff7a;
+  outline-color: #c8ff7a;
+}
+.note-inked {
+  color: #92f0d1;
+}
+.pencil-letter-heading b {
+  color: #c9ff86;
+}
+.pencil-letter-heading small {
+  color: #d3f0ff;
+}
+#writing-pad {
+  background: #f9fdff;
+  border: 3px solid #78cee9;
+  border-radius: 23px;
+  box-shadow:
+    inset 0 0 0 2px white,
+    0 5px #124876;
+}
+.writing-lines path {
+  stroke: #a4c6d7;
+}
+.writing-lines .writing-baseline {
+  stroke: #5d9dbe;
+}
+#pencil-star-halo {
+  fill: #dbff8977;
+  stroke: #7ba82b;
+}
+#pencil-star {
+  fill: #5b8c15;
+}
+#pencil-finished-art,
+#pencil-keepsakes details > div {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 35px, #abd8ec55 36px 37px),
+    #faffff;
+  border: 3px solid #8bd4ec;
+  box-shadow: 0 4px #124674;
+}
+#pencil-finished-text,
+#pencil-keepsakes summary {
+  color: #e8f9ff;
+}
+.recipe-caption {
+  background: #155b95f0;
+  color: white;
+  border-color: #96e5fb;
+}
+html[data-theme="night"] body {
+  background: linear-gradient(150deg, #163b62, #102944);
+  color: #e5f7ff;
+}
+html[data-theme="night"] .panel.hq-card {
+  background: #19416a;
+  border-color: #3e8bbb;
+  color: #edf8ff;
+}
+html[data-theme="night"] .hq-card :is(h2, p),
+html[data-theme="night"] .hq-intro h1 {
+  color: #e9f9ff;
+}
+html[data-theme="night"] .recipe-step {
+  background: #163e64;
+  border-color: #3c8ab4;
+}
+html[data-theme="night"] .recipe-step summary,
+html[data-theme="night"] .recipe-step small {
+  color: #d6f2ff;
+}
+html[data-theme="night"] #invention-form .recipe-choices button {
+  background: linear-gradient(#286893, #1e527d);
+  color: #e9f9ff;
+  border-color: #54b4d9;
+}
+html[data-theme="night"]
+  #invention-form
+  .recipe-choices
+  button[aria-pressed="true"] {
+  background: linear-gradient(#329abe, #1b7da8);
+  border-color: #a9f3ff;
+  color: white;
+}
+html[data-theme="night"] #npc-speech {
+  background: #1d507c;
+  color: #effaff;
+}
+html[data-theme="night"] #npc-speech b {
+  color: #9ce7ff;
+}
+@keyframes crew-hop {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(3deg);
+  }
+}
+@keyframes puppy-trot {
+  from {
+    transform: translateY(1px) rotate(-4deg);
+  }
+  to {
+    transform: translateY(-3px) rotate(4deg);
+  }
+}
+@keyframes squid-wobble {
+  from {
+    rotate: -3deg;
+  }
+  to {
+    rotate: 3deg;
+  }
+}
+@media (max-width: 600px) {
+  .panel.hq-card {
+    padding: 18px;
+  }
+  .puppy-roster .puppy-portrait {
+    height: 95px;
+  }
+  .scene-puppies img {
+    height: 85px;
+  }
+  .action-rail .gadget {
+    border-radius: 13px;
+  }
+  .recipe-choices {
+    grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+  }
+  .launch-hero {
+    width: 100px;
+    height: 120px;
+    left: 6%;
+    bottom: 24%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene-puppies img,
+  .puppy-roster button:hover .puppy-portrait,
+  .actor.car-actor img[src*="dylan"],
+  .leaflet-actor img[src*="dylan"],
+  #vehicle-art img[src*="dylan"],
+  .windscreen-squid {
+    animation: none;
+  }
+}
+
+.commander > span {
+  width: 65px;
+  height: 65px;
+  border: 2px solid #8bdcf2;
+  border-radius: 18px;
+  background: #f0fbff;
+  display: grid;
+  place-items: center;
+}
+.commander > span .hero-dylan {
+  height: 62px;
+  width: 60px;
+}
+.npc-character-badge {
+  background: #176bc0 !important;
+  border-color: #9eeeff !important;
+  color: white !important;
+  box-shadow: 0 2px #123f6b !important;
+}
+
+#crew-readout:before {
+  content: "";
+  display: inline-block;
+  width: 29px;
+  height: 33px;
+  background: url("assets/dylan.png") center/contain no-repeat;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.hq-card .primary-button {
+  background: linear-gradient(#ffd37c, #ffab40);
+  color: #173d65;
+  border: 2px solid #8bdbf2;
+  box-shadow:
+    inset 0 2px #fff8,
+    0 4px #14558c;
+  border-radius: 15px;
+}

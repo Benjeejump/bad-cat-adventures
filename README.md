@@ -1,4 +1,4 @@
-# Bad Cat Adventures v0.7
+# Bad Cat Adventures v0.8
 
 Dylan’s imagination-powered, child-friendly adventure console. A static web game with no accounts, advertising, purchases, backend, API keys or paid services.
 
@@ -135,7 +135,7 @@ Puppy **treats** are the shared currency (maximum 99). Existing saved supply bal
 
 On the tablet, check word pronunciation, repeat audio, duplicate letters (for example the three Ps in **puppy**), calm-bee controls, hints after mistakes, the displayed correct spelling, word collection and sentence-code typing. For offline speech, install an offline English voice if the tablet needs one; offline text practice still works.
 
-## v0.7 characters and worlds
+## v0.8 characters and worlds
 
 Bad Cat and Metro have speech bubbles, announced mischief plans and persistent forcefields. Attacks wear down the fields before affecting the cat; sonar reveals their remaining layers. Day, Night and Auto display choices save on this device. Story results return to play automatically. A completed kitten mission shows all twenty kittens together in a net.
 
@@ -145,4 +145,16 @@ Bad Cat and Metro have speech bubbles, announced mischief plans and persistent f
 
 Choose from 20 launchers, 40 pictured items and 24 special features (19,200 combinations), preview the launch, then save a name or accept an automatic name. Up to twenty recipes save locally. The item, launcher and feature are saved, and the chosen item actually flies when used against BC, Metro or kittens. Catapults use a high arc; waterslides use a low swoop. Features select a familiar bubble, shield, confetti or puppy effect; flames and sparks are pretend. The map’s My inventions button opens the saved arsenal. Existing named gadgets remain usable.
 
-Walking is a fourth travel choice: an animated puppy replaces the car on the heading-up GPS map. GPS remains real; only optional Test Drive movement slows to puppy pace. `inventions.js` owns the picture catalog, preview and projectile animation; `inventions.css` styles the builder and arsenal.
+Walking is a fourth travel choice: Dylan, an animated Dalmatian puppy, replaces the car on the heading-up GPS map. GPS remains real; only optional Test Drive movement slows to puppy pace. `inventions.js` owns the picture catalog, preview and projectile animation; `inventions.css` styles the builder and arsenal.
+
+## Illustrated adventure style
+
+Dylan is the Dalmatian puppy hero; Bad Cat and Metro remain the villains. The mechanic kittens, puppy crew, bees, squid and vehicles use bright contemporary 3D-style artwork. Plain collars and unbranded equipment avoid franchise-style tags and shield emblems. `team-style.css` gives controls a clean blue/cyan/orange equipment look with rounded moulded buttons and Day/Night palettes. Reduced-motion settings stop decorative motion. Artwork is bundled offline.
+
+## Metro’s Pipeworks
+
+An original optional pipe-rotation puzzle available from the map and HQ. Dylan stops Metro’s pipe prank, with help from Luna. Generated routes connect every tile from inlet to outlet. There is no countdown, failure state or treat penalty: water, slime, golden goo or sparkle juice visibly travels along the connected route at a gentle adjustable pace. Pause, unlimited Luna hints and a smaller-puzzle button support patient thinking. Repairs earn treats and save a local workshop record; no puzzle or location is sent to a server. Existing adventures pause while the workshop is open. `pipeworks.js` and `pipeworks.css` contain its original mechanics and SVG pipe art.
+
+## Magic Pencil notes
+
+Choose a friend and one of six two-sentence notes. Dylan traces original letter guides in stroke order with his finger, following a slow magic pencil and a glowing start point. The pad tolerates wobbles but requires tracing the path; tapping elsewhere does not complete a letter. There is no timer, score or failed attempt. Show Me demonstrates a stroke, and Save and Finish Later resumes at the current stroke. Finishing earns two treats and saves the actual finger-stroke note locally, with the last six completed notes available as keepsakes. Nothing is sent to a handwriting service or application server. `handwriting.js` and `handwriting.css` provide the workshop and original monoline guides.

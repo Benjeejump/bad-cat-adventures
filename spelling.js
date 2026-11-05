@@ -205,7 +205,7 @@
       bee.dataset.bee = String(i);
       bee.setAttribute("aria-label", `Choose letter ${pool[i]}`);
       const art = document.createElement("img");
-      art.src = "assets/spelling-bee.svg";
+      art.src = "assets/spelling-bee.png";
       art.alt = "";
       const label = document.createElement("b");
       label.textContent = pool[i];
@@ -534,6 +534,8 @@
     if (
       !hooks ||
       dialog.open ||
+      window.badCatHandwriting?.isOpen() ||
+      window.badCatPipes?.isOpen() ||
       window.badCatTargeting?.raidActive() ||
       (document.querySelector("#game-launch:not([hidden])") &&
         !document

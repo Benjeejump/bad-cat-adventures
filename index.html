@@ -39,6 +39,9 @@
     <link rel="stylesheet" href="character-style.css" />
     <script src="theme.js" defer></script>
     <link rel="stylesheet" href="inventions.css" />
+    <link rel="stylesheet" href="pipeworks.css" />
+    <link rel="stylesheet" href="handwriting.css" />
+    <link rel="stylesheet" href="team-style.css" />
   </head>
   <body class="map-mode launching">
     <header class="topbar">
@@ -47,7 +50,7 @@
           ><img src="assets/bad-cat.png" alt="BC"
         /></span>
         <span
-          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.7</b></span></span
+          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.8</b></span></span
         ></a
       >
       <nav aria-label="Game sections">
@@ -99,9 +102,14 @@
           <i></i><i></i><i></i><i></i><i></i><i></i>
         </div>
         <div class="launch-road"></div>
+        <img
+          class="launch-hero"
+          src="assets/dylan.png"
+          alt="Dylan, the Dalmatian puppy hero"
+        />
         <div class="launch-car">
           <img
-            src="assets/odyssey.svg"
+            src="assets/odyssey.png"
             alt="The family’s white Honda Odyssey"
           /><span>DYLAN’S CREW</span>
         </div>
@@ -135,7 +143,7 @@
           Starts with this tablet’s GPS. Allow location when asked.
         </p>
       </div>
-      <span class="launch-version">v0.7 · THE LAKELINE ADVENTURES</span
+      <span class="launch-version">v0.8 · THE LAKELINE ADVENTURES</span
       ><button id="launch-skip" aria-label="Skip opening and play quietly">
         Skip intro →
       </button>
@@ -148,7 +156,12 @@
           <h1>A little trouble. <em>A big adventure.</em></h1>
         </div>
         <div class="commander">
-          <span>🧑‍🚀</span>
+          <span
+            ><img
+              class="hero-dylan"
+              src="assets/dylan.png"
+              alt="Dylan, Dalmatian puppy hero"
+          /></span>
           <div>
             COMMANDER DYLAN<small id="rank">Imagination level: unlimited</small>
           </div>
@@ -241,7 +254,7 @@
                   Start the game to use this tablet’s GPS. Your real position
                   stays on this device.
                 </p>
-                <img src="assets/odyssey.svg" alt="White Honda Odyssey" />
+                <img src="assets/odyssey.png" alt="White Honda Odyssey" />
                 <div>
                   <button id="retry-gps">⌖ Retry GPS</button
                   ><button id="choose-hq">Visit HQ</button
@@ -279,8 +292,13 @@
               ><small>Trouble, meet bubbles</small><kbd>4</kbd>
             </button>
             <button class="gadget yellow" data-gadget="puppy">
-              <span class="gadget-icon">🐶</span><b>Deploy puppies</b
-              ><small>The goodest backup</small><kbd>5</kbd>
+              <span class="gadget-icon"
+                ><img
+                  class="crew-icon"
+                  src="assets/captain-biscuit.png"
+                  alt="" /></span
+              ><b>Deploy puppies</b><small>The goodest backup</small
+              ><kbd>5</kbd>
             </button>
             <button
               id="net-launch"
@@ -309,6 +327,12 @@
               </button>
             </div>
           </div>
+          <button id="pencil-launch" data-handwriting type="button">
+            ✏️<span>Magic Pencil</span>
+          </button>
+          <button id="pipe-launch" data-pipeworks type="button">
+            <img src="assets/metro.png" alt="" /><span>Pipeworks</span>
+          </button>
           <button id="arsenal-launch" class="gadget-button" type="button">
             🎒<span>My inventions</span>
           </button>
@@ -317,7 +341,11 @@
             class="carwash-launch"
             aria-label="Play the car wash squid game"
           >
-            🦑<span>Car wash</span>
+            <img
+              class="crew-inline"
+              src="assets/carwash-squid.png"
+              alt=""
+            /><span>Car wash</span>
           </button>
           <button
             id="spelling-launch"
@@ -405,6 +433,36 @@
         </div>
         <div class="hq-grid">
           <section class="panel hq-card">
+            <div class="handwriting-promo">
+              <img src="assets/luna.png" alt="Luna" />
+              <div>
+                <h2>Magic Pencil notes</h2>
+                <p>
+                  Write two little sentences with your finger. Follow the
+                  pencil, one letter at a time.
+                </p>
+              </div>
+            </div>
+            <button data-handwriting type="button">
+              Write a note to a friend
+            </button>
+          </section>
+          <section class="panel hq-card">
+            <div class="pipeworks-promo">
+              <img src="assets/metro.png" alt="Metro" />
+              <div>
+                <h2>Stop Metro’s Pipeworks</h2>
+                <p>
+                  Turn the pipes. Send water or slime all the way through. No
+                  time limit!
+                </p>
+              </div>
+            </div>
+            <button data-pipeworks type="button">
+              Stop Metro’s pipe prank
+            </button>
+          </section>
+          <section class="panel hq-card">
             <span class="hq-icon">⚗️</span>
             <h2>Gadget Laboratory</h2>
             <p>Pick the parts. Watch them fly. Name your invention!</p>
@@ -479,12 +537,24 @@
             <p>Tap a hero to play. Good dogs, very big ideas.</p>
             <div class="puppy-roster">
               <button data-puppy="Captain Biscuit">
-                🐶<b>Captain Biscuit</b
+                <img
+                  class="puppy-portrait"
+                  src="assets/captain-biscuit.png"
+                  alt="Captain Biscuit"
+                /><b>Captain Biscuit</b
                 ><small>Snack rescue specialist</small></button
               ><button data-puppy="Luna">
-                🐕<b>Luna</b><small>Forcefield engineer</small></button
+                <img
+                  class="puppy-portrait"
+                  src="assets/luna.png"
+                  alt="Luna"
+                /><b>Luna</b><small>Forcefield engineer</small></button
               ><button data-puppy="Giant Puppy">
-                🦮<b>Giant Puppy</b><small>Extra-large cuddles</small>
+                <img
+                  class="puppy-portrait"
+                  src="assets/giant-puppy.png"
+                  alt="Giant Puppy"
+                /><b>Giant Puppy</b><small>Extra-large cuddles</small>
               </button>
             </div>
             <p id="puppy-status" class="local-status">
@@ -502,7 +572,11 @@
               id="squid-target"
               aria-label="Tickle the giant squid with a bubble"
             >
-              🦑<span>Tap to bubble!</span></button
+              <img
+                class="hq-squid-art"
+                src="assets/carwash-squid.png"
+                alt="Friendly squid"
+              /><span>Tap to bubble!</span></button
             ><progress
               id="squid-progress"
               value="0"
@@ -562,6 +636,8 @@
     <script src="game-map.js" defer></script>
     <script src="loot.js" defer></script>
     <script src="inventions.js" defer></script>
+    <script src="pipeworks.js" defer></script>
+    <script src="handwriting.js" defer></script>
     <script src="app.js" defer></script>
   </body>
 </html>

@@ -346,8 +346,8 @@
   }
   function updateFollow() {
     $("#follow").textContent = state.follow
-      ? "⌖ Following car"
-      : "⌖ Follow car";
+      ? "⌖ Following Dylan"
+      : "⌖ Follow Dylan";
     $("#follow").setAttribute("aria-pressed", state.follow);
   }
   function updateActors() {
@@ -405,7 +405,7 @@
     $("#metro-distance").textContent = `${d2} m`;
     const ally = Date.now() < state.allyUntil;
     $("#badcat-mood").textContent = ally
-      ? "Your unexpected ally!"
+      ? "Distracted by the puppy squad!"
       : d1 < 100
         ? "Getting very curious…"
         : "Plotting something…";
@@ -703,7 +703,12 @@
     for (let i = 0; i < count; i++) {
       const node = document.createElement("span");
       node.className = "particle";
-      node.textContent = emoji;
+      if (emoji === "🐶") {
+        const img = document.createElement("img");
+        img.src = i % 2 ? "assets/luna.png" : "assets/captain-biscuit.png";
+        img.alt = "";
+        node.append(img);
+      } else node.textContent = emoji;
       node.style.left = `${40 + Math.random() * 20}%`;
       node.style.top = `${40 + Math.random() * 20}%`;
       node.style.setProperty("--dx", `${(Math.random() - 0.5) * 600}px`);
@@ -776,20 +781,20 @@
       progress.puppies++;
       save();
       story(
-        "Giant Puppy bounds in! Bad Cat decides to help the puppies. Metro pretends this was the plan all along.",
+        "Giant Puppy bounds in! Bad Cat runs from the puppy squad. Metro hides his latest invention.",
       );
-      toast("Puppy squad deployed. Bad Cat is on your team!");
+      toast("Puppy squad deployed. Bad Cat’s plan is interrupted!");
     }
     $("#gadget-count").textContent = `${progress.gadgets} big ideas unleashed`;
     return true;
   }
   function vehicleSVG(type) {
     if (type === "walking")
-      return '<img src="assets/walking-puppy.svg" alt="Walking puppy">';
+      return '<img src="assets/dylan.png" alt="Dylan, Dalmatian puppy hero walking">';
     if (type === "plane")
-      return '<img src="assets/doggy-plane.svg" alt="Doggy Plane">';
+      return '<img src="assets/doggy-plane.png" alt="Doggy Plane">';
     if (type === "submarine")
-      return '<img src="assets/family-sub.svg" alt="Odyssey submarine">';
+      return '<img src="assets/family-sub.png" alt="Odyssey submarine">';
     const base =
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140" role="img" aria-label="Original cartoon adventure vehicle">';
     if (type === "plane")
@@ -802,7 +807,7 @@
         base +
         '<ellipse cx="120" cy="117" rx="77" ry="7" fill="#bed2c3"/><path d="M52 55h130q40 28 0 57H52q-35-28 0-57Z" fill="#d8ae64" stroke="#284952" stroke-width="4"/><path d="M109 55V28h25v12h-11v15" fill="#76aaa5" stroke="#284952" stroke-width="4"/><path d="m37 72-20-15v48l21-13m167-21 19-16v49l-18-12" fill="#6da59e" stroke="#284952" stroke-width="4"/><g fill="#c8e5e1" stroke="#284952" stroke-width="4"><circle cx="80" cy="83" r="16"/><circle cx="127" cy="83" r="16"/><circle cx="174" cy="83" r="16"/></g><g fill="#c6e4df"><circle cx="209" cy="35" r="8"/><circle cx="226" cy="18" r="5"/></g></svg>'
       );
-    return '<img src="assets/odyssey.svg" alt="White Honda Odyssey" class="odyssey-art">';
+    return '<img src="assets/odyssey.png" alt="White Honda Odyssey" class="odyssey-art">';
   }
 
   function setVehicle(type, announce = true) {
@@ -812,7 +817,7 @@
     $("#vehicle-art").innerHTML = vehicleSVG(type);
     $("#vehicle-name").textContent = {
       car: "White Honda Odyssey",
-      walking: "Puppy on paws",
+      walking: "Dylan · Dalmatian puppy hero",
       plane: "Doggy Plane",
       submarine: "Bubble Voyager",
     }[type];
@@ -825,9 +830,9 @@
     ];
     const markerArt =
       type === "walking"
-        ? '<img src="assets/walking-puppy.svg" alt="Walking puppy">'
+        ? '<img src="assets/dylan.png" alt="Dylan, Dalmatian puppy hero walking">'
         : type === "car"
-          ? '<img src="assets/odyssey.svg" alt="White Honda Odyssey">'
+          ? '<img src="assets/odyssey.png" alt="White Honda Odyssey">'
           : emoji;
     $("#actor-car").innerHTML = markerArt;
     if (markers.car)
@@ -849,7 +854,7 @@
         pick(
           {
             walking: [
-              "Paws down! Your puppy is walking along. Sniff out Bad Cat’s next invention!",
+              "Paws down! Dylan the Dalmatian is on patrol. Sniff out Bad Cat and Metro’s next trick!",
             ],
             car: [
               "Wheels down. The white Honda Odyssey is ready for whatever Dylan dreams up.",
@@ -881,7 +886,7 @@
     "The Mega House Vacuum is sucking up cartoon houses! Invent a way to make it sneeze them back.",
     "Giant Puppy is stuck in a very small hat. Bad Cat has a plan. Do you trust it?",
     "The car wash squid wants to be a drummer. Can the bubble blaster build it a drum kit?",
-    "Bad Cat has become an ally! Rescue Metro from a tornado made entirely of kittens.",
+    "Bad Cat and Metro released a kitten tornado! Help Dylan protect Puppy Base.",
     "Puppy Headquarters is floating away on a giant bubble. Choose a vehicle and bring snacks.",
     "A biscuit-shaped island appears on the sonar. Is it a trap, or is it lunchtime?",
     "All the cartoon houses have swapped front doors. Can your newest invention sort them out?",
@@ -975,7 +980,7 @@
       save();
       sound("puppy");
       $("#puppy-status").textContent =
-        `${b.dataset.puppy} ${pick(["brings you an emergency biscuit.", "does a heroic somersault.", "offers Bad Cat a friendship paw.", "is ready for your next mission!"])}`;
+        `${b.dataset.puppy} ${pick(["brings you an emergency biscuit.", "does a heroic somersault.", "practises a gadget drill with Dylan.", "is ready for your next mission!"])}`;
       b.animate(
         [
           { transform: "rotate(-5deg)" },
@@ -1222,6 +1227,14 @@
       progress.squidWins++;
       save();
     },
+  });
+  window.badCatHandwriting.init({
+    sound,
+    closed: () => window.badCatAdventure.deferSpelling(),
+  });
+  window.badCatPipes.init({
+    sound,
+    closed: () => window.badCatAdventure.deferSpelling(),
   });
   initFallback();
   setVehicle(progress.vehicle, false);

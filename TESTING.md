@@ -47,3 +47,17 @@ GPS map checks include eastbound rotation, matching vector-road/overlay bearings
 ## v0.7 picture recipes and walking
 
 `inventions_smoke.py` checks the 20/40/24 option catalog, selected preview, saved recipe/name, custom targeted projectile and shield damage, map arsenal and reload persistence, walking puppy, road-world selection and responsive HQ layouts. Browser, Pages, installed-update, GPS, targeting and world regressions also cover the changed integrations.
+
+## v0.8 illustrated game interface
+
+`style_smoke.py` checks illustrated walking and all three HQ puppy portraits, loaded assets, phone/tablet fit, car-wash character replacement and available spelling controls. Screenshots cover HQ, Night, walking, car wash and spelling. Gameplay, targeting, GPS, invention, installed-update, project-path and cinematic suites check the shared visual changes.
+
+## Relaxed Metro pipe puzzle
+
+`pipeworks_smoke.py` independently solves generated small and 25-tile boards, verifies no time limit, pauses random encounters, checks gradual slime travel before victory, paused flow, complete end-to-end filling, treat rewards, hints, responsive boards and saved offline records. The game has no countdown or loss branch.
+
+## Finger-traced notes
+
+`handwriting_smoke.py` uses Chromium touch input for the first letter, checks stroke order and refusal to count arbitrary taps, resumes after reload, checks phone/tablet fit, traces both sentences, verifies actual stroke paths and treat reward, and reopens saved keepsakes offline. Physical tablet testing should confirm comfortable finger tolerance and the displayed letter size for Dylan.
+
+Modern artwork review confirms Dylan is the Dalmatian hero, BC and Metro remain villains, and active puppy/vehicle artwork has plain equipment without franchise-style tags. Walking tests now identify Dylan’s sprite.

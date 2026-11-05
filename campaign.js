@@ -245,7 +245,7 @@
     const hud = document.createElement("details");
     hud.className = "campaign-hud";
     hud.innerHTML =
-      '<summary id="crew-readout" aria-label="Crew condition, puppy treats and cats advantage"></summary><p id="crew-detail" role="status"></p><span>Repairs and resupply: Mission HQ</span>';
+      '<summary id="crew-readout" aria-label="Dylan, Dalmatian puppy hero: crew condition, puppy treats and cats advantage"></summary><p id="crew-detail" role="status"></p><span>Repairs and resupply: Mission HQ</span>';
     document.body.append(hud);
     const card = document.createElement("section");
     card.className = "panel hq-card workshop-card";

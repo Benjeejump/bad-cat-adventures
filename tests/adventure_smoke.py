@@ -25,7 +25,7 @@ with sync_playwright() as p:
  check(page.evaluate('badCatDiagnostics().zoom')==20,'Default map is zoomed in to 20')
  check(page.locator('.carwash-pin').count()==2,'Exactly two fixed site pins: car wash and Puppy Base')
  check(page.locator('.radar-ring').is_hidden(),'Radar clutter removed')
- check(page.locator('#actor-car img').get_attribute('src').endswith('odyssey.svg'),'White Honda Odyssey map marker')
+ check(page.locator('#actor-car img').get_attribute('src').endswith('odyssey.png'),'White Honda Odyssey map marker')
  # Both cats actively affect gameplay; all decisions show lasting result scenes.
  for event,power in [('trap','laser'),('heist','sonar'),('tunnel','bubble')]:
   page.evaluate('(kind)=>badCatAdventure.encounter(kind)',event)

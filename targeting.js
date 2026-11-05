@@ -55,7 +55,12 @@
     const rect = node.getBoundingClientRect(),
       fx = document.createElement("span");
     fx.className = "target-pop";
-    fx.textContent = emoji[power];
+    if (power === "puppy") {
+      const img = document.createElement("img");
+      img.src = "assets/captain-biscuit.png";
+      img.alt = "";
+      fx.append(img);
+    } else fx.textContent = emoji[power];
     fx.style.left = `${rect.x + rect.width / 2}px`;
     fx.style.top = `${rect.y}px`;
     document.body.append(fx);

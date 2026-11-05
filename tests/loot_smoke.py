@@ -22,8 +22,8 @@ with sync_playwright() as p:
  page.reload(wait_until='domcontentloaded');page.locator('#launch-silent').click();page.wait_for_function('badCatDiagnostics().mode==="gps" && badCatDiagnostics().mapReady')
  check(page.evaluate('badCatLoot.level("net")')==1,'Net upgrade survives reload')
  # Move the in-memory game source sufficiently to reveal a later drop, then approach it.
- page.evaluate('window.lootRoll=[.2,.8];Math.random=()=>lootRoll.shift()??.2;badCatLoot.update(7,[30.478,-97.81],"gps",8,0)')
- context.set_geolocation({'latitude':30.479,'longitude':-97.81,'accuracy':8});page.wait_for_timeout(400)
+ # Keep the seeded spawn in one browser turn so unrelated animation rolls cannot consume it.
+ page.evaluate('window.lootRoll=[.2,.8];Math.random=()=>lootRoll.shift()??.2;badCatLoot.update(7,[30.478,-97.81],"gps",8,0);badCatLoot.update(.1,[30.479,-97.81],"gps",8,0);badCatLoot.update(.1,[30.480,-97.81],"gps",8,0)')
  context.set_geolocation({'latitude':30.480,'longitude':-97.81,'accuracy':8});page.wait_for_timeout(400)
  page.wait_for_function('badCatLoot.diagnostics().drop !== null')
  check(page.evaluate('badCatLoot.diagnostics().drop.type')=='bubble','Travel reveals another random upgrade type')

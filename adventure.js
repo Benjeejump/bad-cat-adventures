@@ -134,10 +134,10 @@
           "PING! The booster was in Bad Cat’s hat. Dylan’s sonar finds it and BC returns it with a sheepish grin.",
         ],
         [
-          "Offer a puppy friendship",
+          "Send the puppy squad",
           "puppy",
           "ally",
-          "Giant Puppy offers a friendship paw. Bad Cat brings back the booster and joins your crew!",
+          "Giant Puppy distracts Bad Cat. Dylan grabs the booster while BC slips away to plot again!",
         ],
       ],
     },
@@ -174,10 +174,10 @@
           "BOING! Giant Puppy bounces into a soft bubble and gives everyone a slobbery thank-you.",
         ],
         [
-          "Ask Bad Cat to guide it",
+          "Ask Luna to guide it",
           "puppy",
           "ally",
-          "Bad Cat becomes your co-pilot. Together, you guide Giant Puppy into a perfect fluffy landing!",
+          "Luna guides Dylan to a clear landing spot. Giant Puppy lands safely while Bad Cat grumbles!",
         ],
       ],
     },
@@ -227,7 +227,7 @@
     if (cinematic) return cinematic;
     const houses =
       '<g class="scene-houses"><g transform="translate(100 230)"><path d="m0 0 55-45 55 45v90H0Z" fill="#f3c276"/><path d="m-10 0 65-55 65 55" fill="none" stroke="#b25e5f" stroke-width="15"/><path d="M45 90V45h30v45" fill="#518da2"/></g><g transform="translate(690 240) scale(.8)"><path d="m0 0 55-45 55 45v90H0Z" fill="#b3d7be"/><path d="m-10 0 65-55 65 55" fill="none" stroke="#557b90" stroke-width="15"/></g></g>';
-    return `<div class="story-world ${which}"><svg viewBox="0 0 900 430" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="900" height="430" fill="#c3e1e4"/><circle cx="730" cy="78" r="40" fill="#fff0ac"/><path d="M0 290Q150 230 300 290T600 280T900 270V430H0Z" fill="#9abea5"/><path d="M0 410Q450 290 900 410" fill="none" stroke="#e8dfc6" stroke-width="95"/>${houses}<g class="vacuum-machine"><path d="M390 175h105l18 140H370Z" fill="#cf8b76" stroke="#314d60" stroke-width="7"/><path d="M405 175v-40q0-65 73-55t30 87" fill="none" stroke="#536f84" stroke-width="23"/><circle cx="395" cy="320" r="20" fill="#314d60"/><circle cx="490" cy="320" r="20" fill="#314d60"/><circle cx="437" cy="225" r="23" fill="#fce8ad"/><path d="m427 224 10 9 15-21" fill="none" stroke="#314d60" stroke-width="5"/></g></svg><div class="scene-character">${which === "puppy" ? '<img src="assets/giant-puppy.png" alt="Giant Puppy falling from the sky">' : `<img src="assets/${which === "amy" ? "amy" : ["vacuum", "trap"].includes(which) ? "metro" : "bad-cat"}.${which === "amy" ? "svg" : "png"}" alt="${which === "amy" ? "Amy’s imaginary cameo" : ["vacuum", "trap"].includes(which) ? "M, Metro" : "BC, Bad Cat"}">`}</div><img class="scene-car" src="assets/odyssey.svg" alt="White Honda Odyssey"><div class="scene-pipes"><i></i><i></i><span>BC + M · SECRET PIPE</span></div><div class="scene-puppies">🐶 🐕 🦮</div><div class="scene-magic">✦ 🫧 ✦ 🌈 ✦</div></div>`;
+    return `<div class="story-world ${which}"><svg viewBox="0 0 900 430" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="900" height="430" fill="#c3e1e4"/><circle cx="730" cy="78" r="40" fill="#fff0ac"/><path d="M0 290Q150 230 300 290T600 280T900 270V430H0Z" fill="#9abea5"/><path d="M0 410Q450 290 900 410" fill="none" stroke="#e8dfc6" stroke-width="95"/>${houses}<g class="vacuum-machine"><path d="M390 175h105l18 140H370Z" fill="#cf8b76" stroke="#314d60" stroke-width="7"/><path d="M405 175v-40q0-65 73-55t30 87" fill="none" stroke="#536f84" stroke-width="23"/><circle cx="395" cy="320" r="20" fill="#314d60"/><circle cx="490" cy="320" r="20" fill="#314d60"/><circle cx="437" cy="225" r="23" fill="#fce8ad"/><path d="m427 224 10 9 15-21" fill="none" stroke="#314d60" stroke-width="5"/></g></svg><div class="scene-character">${which === "puppy" ? '<img src="assets/giant-puppy.png" alt="Giant Puppy falling from the sky">' : `<img src="assets/${which === "amy" ? "amy" : ["vacuum", "trap"].includes(which) ? "metro" : "bad-cat"}.${which === "amy" ? "svg" : "png"}" alt="${which === "amy" ? "Amy’s imaginary cameo" : ["vacuum", "trap"].includes(which) ? "M, Metro" : "BC, Bad Cat"}">`}</div><img class="scene-car" src="assets/odyssey.png" alt="White Honda Odyssey"><div class="scene-pipes"><i></i><i></i><span>BC + M · SECRET PIPE</span></div><div class="scene-puppies"><img src="assets/captain-biscuit.png" alt="Captain Biscuit"><img src="assets/luna.png" alt="Luna"><img src="assets/giant-puppy.png" alt="Giant Puppy"></div><div class="scene-magic">✦ 🫧 ✦ 🌈 ✦</div></div>`;
   }
   function open() {
     clearTimeout(autoCloseTimer);
@@ -399,7 +399,8 @@
     open();
     hooks.sound("sonar");
   }
-  const squidSVG = `<svg class="windscreen-squid" viewBox="0 0 700 500" aria-label="Friendly giant squid stuck to the windscreen"><g class="tentacles" fill="none" stroke="#bc6595" stroke-width="34" stroke-linecap="round"><path d="M240 270Q40 160 100 370T25 450"/><path d="M260 300Q80 330 180 450"/><path d="M300 305Q270 490 220 460"/><path d="M335 315Q350 480 310 480"/><path d="M370 315Q430 490 460 470"/><path d="M405 300Q600 400 530 465"/><path d="M440 275Q670 195 610 375T680 460"/><path d="M460 240Q570 100 660 250"/></g><g class="squid-body"><path d="M220 265Q195 175 350 45q155 130 130 220Q360 360 220 265Z" fill="#df91ba" stroke="#9c527e" stroke-width="5"/><path d="m230 220-80-35 75 83m245-48 80-35-75 83" fill="#bc6595"/><g fill="#fff"><ellipse cx="299" cy="231" rx="33" ry="41"/><ellipse cx="397" cy="231" rx="33" ry="41"/></g><g fill="#283e56"><ellipse cx="307" cy="238" rx="14" ry="21"/><ellipse cx="389" cy="238" rx="14" ry="21"/></g><path d="M324 282q25 24 49 0" fill="none" stroke="#8c426a" stroke-width="7" stroke-linecap="round"/><g fill="#f4c3d9"><circle cx="262" cy="272" r="13"/><circle cx="436" cy="272" r="13"/></g></g></svg>`;
+  const squidSVG =
+    '<img class="windscreen-squid" src="assets/carwash-squid.png" alt="Friendly giant squid stuck to the windscreen">';
   function carwash() {
     if (dialog.open || launching || window.badCatSpelling.isOpen()) return;
     round = { wipers: 0, bubbles: 0, boosters: 0, won: false };
@@ -539,12 +540,16 @@
     }
   }
   function offerArrival() {
-    if (!pendingArrival || launching || dialog.open || hooks.view() !== "drive")
+    if (
+      !pendingArrival ||
+      window.badCatAdventure.isOpen() ||
+      hooks.view() !== "drive"
+    )
       return;
     pendingArrival = false;
     dialog.className = "arrival-dialog";
     $("#scene-stage").innerHTML =
-      '<div class="arrival-art">🦑<img src="assets/odyssey.svg" alt="White Honda Odyssey"></div>';
+      '<div class="arrival-art"><img class="arrival-squid" src="assets/carwash-squid.png" alt="Friendly squid"><img src="assets/odyssey.png" alt="White Honda Odyssey"></div>';
     $("#scene-eyebrow").textContent = "YOU’RE AT GO CAR WASH";
     $("#encounter-title").textContent = "Ready for the squid wash, Dylan?";
     $("#encounter-text").textContent =
@@ -626,7 +631,12 @@
   }
   function tick(dt) {
     if (!hooks) return;
-    if (window.badCatTargeting?.raidActive() || window.badCatSpelling.isOpen())
+    if (
+      window.badCatHandwriting?.isOpen() ||
+      window.badCatPipes?.isOpen() ||
+      window.badCatTargeting?.raidActive() ||
+      window.badCatSpelling.isOpen()
+    )
       return;
     if (
       arrivalArmed &&
@@ -785,6 +795,8 @@
     isOpen: () =>
       dialog.open ||
       launching ||
+      !!window.badCatHandwriting?.isOpen() ||
+      !!window.badCatPipes?.isOpen() ||
       !!window.badCatTargeting?.raidActive() ||
       window.badCatSpelling.isOpen(),
     diagnostics: () => ({

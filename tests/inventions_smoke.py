@@ -22,7 +22,7 @@ with sync_playwright() as p:
  check(page.evaluate('badCatCharacters.diagnostics().badcat.shield')==2,'Custom invention wears down the enemy forcefield')
  page.locator('#cancel-target').click();page.locator('[data-vehicle=walking]').first.click()
  check(page.evaluate('badCatVehicle.mode()')=='walking' and not page.evaluate('badCatVehicle.worldActive()'),'Walking stays in the GPS road world')
- check('walking-puppy.svg' in page.locator('#actor-car img').get_attribute('src'),'Walking replaces the car with an animated puppy')
+ check('dylan.png' in page.locator('#actor-car img').get_attribute('src'),'Walking replaces the car with an animated puppy')
  page.reload();page.locator('#launch-silent').click();page.locator('#test-drive').evaluate('(n)=>n.click()');page.locator('#arsenal-launch').click()
  check('Dylan’s Acorn Surprise' in page.locator('#field-inventions').inner_text(),'Saved recipe remains accessible from the map after reload')
  page.locator('#field-inventions button').first.click();check('Dylan’s Acorn Surprise' in page.locator('#target-instruction').inner_text(),'Map arsenal arms the named invention')

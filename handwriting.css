@@ -1,0 +1,356 @@
+#handwriting-dialog {
+  width: min(920px, 96vw);
+  max-height: 96dvh;
+  overflow: auto;
+  padding: 0;
+  border: 4px solid #142c3b;
+  border-radius: 25px 16px;
+  background:
+    radial-gradient(ellipse at 20% 0, #3c7180, transparent 70%), #173d52;
+  color: #ffedc5;
+  box-shadow:
+    inset 0 0 0 3px #d7ad63,
+    0 20px 80px #07152d99;
+}
+#handwriting-dialog::backdrop {
+  background: #071b30d9;
+}
+.pencil-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 22px;
+  background: #122e43;
+  border-bottom: 3px solid #c9a25e;
+}
+.pencil-header img {
+  width: 75px;
+  height: 80px;
+  object-fit: contain;
+}
+.pencil-header p {
+  font-size: 10px;
+  letter-spacing: 1.7px;
+  color: #bad9d1;
+  margin: 0;
+}
+.pencil-header h2 {
+  font-size: 25px;
+  margin: 7px 0;
+  color: #ffe1a0;
+}
+.pencil-header > button {
+  margin-left: auto;
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 25px;
+  background: #34586a;
+  border: 2px solid #d2ae6d;
+  border-radius: 12px;
+  color: #fff0cb;
+}
+#pencil-status {
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 0 24px;
+  margin: 14px 0;
+  min-height: 40px;
+}
+#pencil-setup,
+#pencil-finished {
+  padding: 0 24px 24px;
+}
+#pencil-setup label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 16px 0;
+  font-weight: 800;
+}
+#pencil-setup select {
+  background: #ffefc8;
+  color: #223b4b;
+  border: 2px solid #122c3f;
+  border-radius: 12px;
+  padding: 12px;
+  font: inherit;
+  width: 100%;
+  min-height: 48px;
+}
+#handwriting-dialog section[hidden] {
+  display: none;
+}
+#handwriting-dialog button:not(#pencil-close),
+[data-handwriting] {
+  border: 3px solid #142e3f;
+  border-radius: 14px 9px;
+  background: linear-gradient(135deg, #ffe19d, #cc994b);
+  color: #23384a;
+  box-shadow:
+    inset 0 2px #fff9,
+    0 4px #112a3d;
+  padding: 12px 16px;
+  font-weight: 800;
+  min-height: 46px;
+}
+#pencil-work {
+  padding: 0 22px 20px;
+}
+#pencil-note-text {
+  padding: 12px 16px;
+  margin: 0;
+  border: 2px solid #d4b36e;
+  border-radius: 13px;
+  background: #102f43;
+  font-size: clamp(17px, 2.3vw, 24px);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+.note-inked {
+  color: #a7e4d0;
+}
+.note-future {
+  color: #c8cebf;
+}
+.note-current {
+  color: #173c50;
+  background: #ffdc8d;
+  border-radius: 4px;
+  outline: 3px solid #ffdc8d;
+  font-weight: 900;
+}
+.pencil-letter-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+}
+.pencil-letter-heading b {
+  font-size: 36px;
+  line-height: 1;
+  color: #ffe2a0;
+}
+.pencil-letter-heading small {
+  margin-left: auto;
+  color: #d9dbbc;
+  font-size: 11px;
+}
+#pencil-step {
+  margin: 4px 0 8px;
+  font-size: 13px;
+  color: #ffdf9b;
+}
+#writing-pad {
+  display: block;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  width: min(100%, 42dvh);
+  height: auto;
+  max-height: 44dvh;
+  margin: auto;
+  background:
+    radial-gradient(ellipse at 30% 10%, #fff8de, transparent 80%), #ecd8aa;
+  border: 4px solid #122b3d;
+  border-radius: 22px 14px;
+  box-shadow:
+    inset 0 0 0 2px #ddbb73,
+    0 6px #10283a;
+  cursor: crosshair;
+  overflow: visible;
+}
+.writing-lines path {
+  stroke: #a6b8b4;
+  stroke-width: 0.5;
+  stroke-dasharray: 3 2;
+}
+.writing-lines .writing-baseline {
+  stroke: #6e9299;
+  stroke-width: 0.8;
+  stroke-dasharray: none;
+}
+#letter-guides path,
+#pencil-trace {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 5;
+}
+.letter-future {
+  stroke: #bba983;
+  stroke-dasharray: 1 4;
+}
+.letter-active {
+  stroke: #6c9ea5;
+  stroke-width: 6 !important;
+  stroke-dasharray: 1 3;
+}
+.letter-complete {
+  stroke: #28788b;
+}
+#pencil-trace {
+  stroke: url(#pencil-ink);
+  stroke-width: 5.5;
+}
+#pencil-star-halo {
+  fill: #ffe6a078;
+  stroke: #a77736;
+  stroke-width: 0.4;
+}
+#pencil-star {
+  fill: #b47f2d;
+  font-size: 11px;
+  pointer-events: none;
+}
+#magic-pencil {
+  pointer-events: none;
+  filter: drop-shadow(1px 1px 0.5px #4d392966);
+}
+.pencil-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+#pencil-finished-art,
+#pencil-keepsakes details > div {
+  border: 3px solid #ab8a54;
+  border-radius: 15px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 35px, #acc3c044 36px 37px),
+    #fff0ce;
+  margin: 12px 0;
+  box-shadow: 0 5px #102b3c;
+}
+#pencil-finished-art svg,
+#pencil-keepsakes svg {
+  width: 100%;
+  display: block;
+  max-height: 340px;
+}
+#pencil-finished-art path,
+#pencil-keepsakes path {
+  fill: none;
+  stroke: #255b76;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#pencil-finished-text {
+  font-size: 20px;
+  line-height: 1.6;
+  color: #ffe4a7;
+}
+#pencil-keepsakes summary {
+  cursor: pointer;
+  padding: 10px;
+  border-bottom: 1px solid #77918b;
+  color: #ffdf9d;
+  line-height: 1.5;
+}
+.handwriting-promo {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.handwriting-promo img {
+  width: 85px;
+  height: 110px;
+  object-fit: contain;
+}
+#pencil-launch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px;
+  font-size: 11px;
+}
+@media (max-height: 650px) and (min-width: 650px) {
+  .pencil-header {
+    padding: 7px 18px;
+  }
+  .pencil-header img {
+    height: 50px;
+  }
+  .pencil-header h2 {
+    font-size: 23px;
+  }
+  #pencil-status {
+    margin: 8px 0;
+    min-height: 22px;
+    font-size: 12px;
+  }
+  #pencil-note-text {
+    font-size: 17px;
+    padding: 6px 12px;
+  }
+  .pencil-letter-heading {
+    margin: 5px 0;
+  }
+  .pencil-letter-heading b {
+    font-size: 27px;
+  }
+  #writing-pad {
+    width: 32dvh;
+    max-height: 34dvh;
+  }
+  .pencil-controls button {
+    font-size: 12px;
+    padding: 8px !important;
+  }
+  .pencil-controls {
+    margin-top: 8px;
+  }
+}
+@media (max-width: 500px) {
+  .pencil-header {
+    padding: 10px;
+    gap: 8px;
+  }
+  .pencil-header img {
+    height: 60px;
+    width: 50px;
+  }
+  .pencil-header h2 {
+    font-size: 21px;
+  }
+  .pencil-header p {
+    font-size: 9px;
+  }
+  #pencil-status {
+    padding-inline: 14px;
+    font-size: 12px;
+    margin: 10px 0;
+  }
+  #pencil-work {
+    padding: 0 12px 16px;
+  }
+  #pencil-setup,
+  #pencil-finished {
+    padding: 0 14px 20px;
+  }
+  #writing-pad {
+    width: min(100%, 38dvh);
+  }
+  .pencil-controls {
+    gap: 8px;
+  }
+  .pencil-controls button {
+    font-size: 11px;
+    padding: 10px !important;
+  }
+  .pencil-letter-heading {
+    gap: 8px;
+  }
+  #pencil-word {
+    font-size: 13px;
+  }
+  .pencil-letter-heading small {
+    font-size: 10px;
+  }
+  #pencil-step {
+    font-size: 11px;
+  }
+}
