@@ -221,16 +221,8 @@
       L.divIcon({
         className: `leaflet-actor ${extra}`,
         html: `<div>${emoji}</div>`,
-        iconSize: extra.includes("badcat-marker")
-          ? [82, 82]
-          : extra.includes("metro-marker")
-            ? [68, 68]
-            : [44, 44],
-        iconAnchor: extra.includes("badcat-marker")
-          ? [41, 41]
-          : extra.includes("metro-marker")
-            ? [34, 34]
-            : [22, 22],
+        iconSize: [80, 80],
+        iconAnchor: [40, 40],
       });
     markers.car = L.marker(state.car, {
       icon: icon("🚙"),
@@ -838,10 +830,10 @@
     if (markers.car)
       markers.car.setIcon(
         L.divIcon({
-          className: "leaflet-actor",
+          className: "leaflet-actor player-marker",
           html: `<div>${markerArt}</div>`,
-          iconSize: [44, 44],
-          iconAnchor: [22, 22],
+          iconSize: [80, 80],
+          iconAnchor: [40, 40],
         }),
       );
     if (announce) {

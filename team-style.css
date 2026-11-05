@@ -871,3 +871,326 @@ html[data-theme="night"] #npc-speech b {
     0 4px #14558c;
   border-radius: 15px;
 }
+
+/* Equal-size crew sprites in each environment. */
+#actor-car.actor,
+#actor-badcat.actor,
+#actor-metro.actor {
+  width: 80px;
+  height: 80px;
+}
+.leaflet-actor.player-marker > div {
+  width: 80px;
+  height: 80px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  display: grid;
+  place-items: center;
+}
+.leaflet-actor.player-marker img,
+.leaflet-actor:not(.enemy-icon).player-marker img {
+  width: 80px;
+  height: 80px;
+  max-width: 80px;
+  object-fit: contain;
+}
+#vehicle-world .world-family-vehicle {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 3px #12467544);
+}
+#vehicle-world .world-enemy,
+#vehicle-world .world-badcat,
+#vehicle-world .world-metro {
+  width: 80px;
+  height: 80px;
+}
+.plane-world .world-scenery {
+  background: #66bde5 url("assets/sky-world.png") center/cover no-repeat;
+}
+.submarine-world .world-scenery {
+  background: #139bb8 url("assets/sea-world.png") center/cover no-repeat;
+}
+html[data-theme="night"] .plane-world .world-scenery {
+  background:
+    linear-gradient(#102c5c55, #102c5c66),
+    url("assets/sky-world.png") center/cover;
+}
+html[data-theme="night"] .submarine-world .world-scenery {
+  background:
+    linear-gradient(#052a5455, #052a5477),
+    url("assets/sea-world.png") center/cover;
+}
+.submarine-world .sea-floor,
+.submarine-world .sea-fish {
+  display: none;
+}
+.story-world:not(.puppy) {
+  background: #71cae8 url("assets/surprise-world.png") center/cover no-repeat;
+}
+.story-world:not(.cinematic-world) > svg > rect:first-child,
+.story-world:not(.cinematic-world) > svg > circle,
+.story-world:not(.cinematic-world) > svg > path,
+.story-world > svg > .scene-houses {
+  opacity: 0;
+}
+.story-world .tornado-sky,
+.story-world .net-result-sky {
+  background:
+    linear-gradient(#1964a645, #216c8a22),
+    url("assets/surprise-world.png") center/cover no-repeat;
+}
+.story-world .falling-sky {
+  background: #55b5e2 url("assets/sky-world.png") center/cover no-repeat;
+}
+.windscreen {
+  background:
+    linear-gradient(#13658940, #07456250),
+    url("assets/sea-world.png") center/cover no-repeat;
+}
+.windscreen .fish {
+  display: none;
+}
+#encounter-dialog .windscreen-squid {
+  height: 105%;
+  width: 96%;
+  left: 2%;
+  top: -5%;
+  object-fit: contain;
+  filter: drop-shadow(0 9px 4px #10345366);
+}
+/* Pipes sit down in the crawlspace between lifted boards. */
+#pipeworks-dialog .pipe-content {
+  background: linear-gradient(#163b4bf5, #153743f5);
+  border-top: 1px solid #8caba8;
+}
+#pipeworks-dialog #pipe-board {
+  background: #102d36 url("assets/underfloor-world.png") center/100% 100%
+    no-repeat;
+  border: 0;
+  border-radius: 8px;
+  padding: clamp(24px, 4vw, 42px);
+  gap: 1px;
+  box-shadow:
+    0 7px 0 #091f2b,
+    0 11px 18px #071c3366;
+}
+#pipeworks-dialog .pipe-tile {
+  background: #102c34c9;
+  border: 1px solid #27424a;
+  border-radius: 2px;
+  box-shadow: inset 0 0 10px #061d2488;
+}
+#pipeworks-dialog .pipe-shadow {
+  stroke: #071b25;
+  stroke-width: 38;
+}
+#pipeworks-dialog .pipe-metal {
+  stroke: #b5c8d1;
+  stroke-width: 31;
+}
+#pipeworks-dialog .pipe-bore {
+  stroke: #526c7b;
+  stroke-width: 20;
+}
+#pipeworks-dialog .pipe-joint {
+  fill: #a1bac8;
+  stroke: #425e70;
+}
+#pipeworks-dialog .pipe-wet .pipe-joint {
+  fill: #84ddeb;
+  stroke: #5aaec3;
+}
+/* The note stays a complete two-line page, with print labels and curved guides. */
+#handwriting-dialog {
+  width: min(1100px, 98vw);
+}
+#pencil-note-text,
+#pencil-letter {
+  display: none;
+}
+#pencil-work .pencil-letter-heading {
+  margin: 5px 0;
+  min-height: 18px;
+}
+#pencil-word {
+  font-size: 12px;
+}
+#pencil-page-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 5px 0 9px;
+  scrollbar-width: auto;
+  scrollbar-color: #208cb6 #cce8f4;
+  overscroll-behavior-x: contain;
+}
+#writing-pad {
+  width: 100%;
+  min-width: 880px;
+  max-height: none;
+  height: auto;
+  max-width: none;
+  view-transition-name: none;
+  border-radius: 15px;
+  overflow: hidden;
+  margin: 0;
+  touch-action: none;
+  background: #faffff;
+}
+#pencil-page-scroll.page-fit #writing-pad {
+  min-width: 0;
+  width: 100%;
+}
+#writing-pad .note-print-label,
+#pencil-finished-art .note-print-label,
+#pencil-keepsakes .note-print-label {
+  fill: #214d6c;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 23px;
+  font-weight: 700;
+  stroke: none;
+}
+.page-writing-lines {
+  stroke: #9bbdce;
+  stroke-width: 1;
+  stroke-dasharray: 7 5;
+  fill: none;
+}
+.cursive-glyph > path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3.5;
+}
+.cursive-glyph .letter-future {
+  stroke: #92b8c6;
+  stroke-width: 3;
+  stroke-dasharray: 2 5;
+  opacity: 0.58;
+}
+.cursive-glyph .letter-active {
+  stroke: #61a9ba;
+  stroke-width: 4 !important;
+  stroke-dasharray: 2 4;
+}
+.cursive-glyph .letter-complete {
+  stroke: #216a8f;
+  stroke-width: 4;
+  stroke-dasharray: none;
+}
+#pencil-finished-art svg,
+#pencil-keepsakes svg {
+  max-height: none;
+}
+#pencil-finished-art .page-writing-lines,
+#pencil-keepsakes .page-writing-lines {
+  stroke: #9bbdce;
+  stroke-width: 1;
+  stroke-dasharray: 7 5;
+}
+#pencil-finished-art .cursive-glyph > path,
+#pencil-keepsakes .cursive-glyph > path {
+  stroke: #216a8f;
+  stroke-width: 4;
+}
+@media (max-height: 650px) and (min-width: 650px) {
+  #pencil-page-scroll {
+    max-width: 750px;
+    margin: auto;
+  }
+  #writing-pad {
+    min-width: 720px;
+    width: 100%;
+    max-height: none;
+  }
+  #pencil-work {
+    padding-bottom: 12px;
+  }
+  .pencil-controls {
+    margin-top: 4px;
+  }
+  #pencil-status {
+    min-height: 0;
+    margin: 5px 0;
+  }
+  .pencil-header {
+    padding: 5px 16px;
+  }
+  .pencil-header img {
+    height: 44px;
+  }
+  #pencil-step {
+    margin: 3px 0;
+  }
+}
+@media (max-width: 600px) {
+  #writing-pad {
+    min-width: 880px;
+    width: 880px;
+    max-height: none;
+  }
+  #pencil-page-scroll.page-fit #writing-pad {
+    min-width: 0;
+    width: 100%;
+  }
+  .pencil-controls button {
+    font-size: 11px !important;
+    min-height: 42px !important;
+  }
+  #pencil-step {
+    font-size: 11px;
+  }
+}
+.pencil-alphabet {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 5px;
+  margin: 10px 0 20px;
+}
+.pencil-alphabet span {
+  display: grid;
+  place-items: center;
+  min-height: 32px;
+  border-radius: 8px;
+  font-weight: 900;
+  font-size: 13px;
+}
+.letter-practised {
+  background: #a6e6c6;
+  color: #124b58;
+  border: 2px solid #dbfff0;
+}
+.letter-to-explore {
+  background: #1e4e7c;
+  color: #b9dceb;
+  border: 1px solid #78b8d1;
+}
+#pencil-course > p {
+  color: #e4f8ff;
+  font-weight: 800;
+  margin: 20px 0 5px;
+}
+.leaflet-actor.enemy-icon > div {
+  width: 80px;
+  height: 80px;
+}
+#pipe-result[hidden] {
+  display: none;
+}
+.rising-cloud,
+.world-cloud-stream > i {
+  background: transparent url("assets/cloud.png") center/contain no-repeat;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  filter: drop-shadow(0 4px 4px #2075a522);
+}
+.rising-cloud:before,
+.rising-cloud:after,
+.world-cloud-stream > i:before,
+.world-cloud-stream > i:after {
+  display: none;
+}

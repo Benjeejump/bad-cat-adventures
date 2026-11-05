@@ -40,6 +40,7 @@ with sync_playwright() as p:
  page=c.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
  page.goto('http://127.0.0.1:8000/');page.locator('#launch-silent').click();page.locator('#test-drive').evaluate('(n)=>n.click()');page.locator('#pipe-launch').click()
  d=page.evaluate('badCatPipes.diagnostics()');solution=solve(d)
+ check(not page.locator('#pipe-result').is_visible(),'Replay and next-puzzle controls stay hidden until the flow finishes')
  check(d['hasTimeLimit']==False and d['practice'],'Default workshop has no deadline and slow visible flow')
  before=page.evaluate('badCatAdventure.diagnostics().nextSpellingSeconds');page.evaluate('badCatAdventure.tick(500)')
  check(page.evaluate('badCatAdventure.diagnostics().nextSpellingSeconds')==before,'Random encounters pause during Metro’s workshop')

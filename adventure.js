@@ -23,6 +23,12 @@
     arrivalReceivedAt = 0;
   const events = [
     {
+      id: "pipeworks",
+      title: "Metro scrambled the pipes!",
+      text: "Help Dylan guide the flow safely under the floorboards.",
+      choices: [],
+    },
+    {
       id: "spelling",
       title: "Bad Cat’s spelling bees!",
       text: "Crack the word code to escape.",
@@ -274,6 +280,12 @@
       events.find((e) => e.id === kind) ||
       candidates[Math.floor(Math.random() * candidates.length)];
     lastEvent = active.id;
+    if (active.id === "pipeworks") {
+      sequence++;
+      active = null;
+      window.badCatPipes.open();
+      return;
+    }
     if (active.id === "spelling") {
       sequence++;
       window.badCatSpelling.open();
@@ -803,6 +815,9 @@
       launching,
       round: round ? { ...round } : null,
       nextEventSeconds: Math.ceil(nextEvent),
+      surprisePool: events
+        .filter((e) => e.id !== lastEvent && e.id !== "puppybase")
+        .map((e) => e.id),
       nextSpellingSeconds: Math.ceil(nextSpelling),
       arrivalArmed,
       siteConfigured: !!window.BAD_CAT_SITE?.coordinates,

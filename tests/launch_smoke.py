@@ -26,7 +26,9 @@ with sync_playwright() as p:
  page.evaluate('badCatAdventure.tick(20)')
  check(page.evaluate('badCatAdventure.diagnostics().hazard') in ['trap','heist','tunnel'],'Cats autonomously cause actual mischief')
  page.evaluate('badCatAdventure.tick(30)')
- if page.evaluate('badCatSpelling.isOpen()'):
+ if page.evaluate('badCatPipes.isOpen()'):
+  check(True,'Metro Pipeworks can deploy as a random surprise');page.locator('#pipe-close').click()
+ elif page.evaluate('badCatSpelling.isOpen()'):
   check(True,'A random spelling trap appears automatically')
   info=page.evaluate('badCatSpelling.diagnostics()')
   for letter in info['word'].upper():page.locator(f'.letter-bee[data-letter="{letter}"]:not([disabled])').first.evaluate('(n)=>n.click()')

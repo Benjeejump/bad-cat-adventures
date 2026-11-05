@@ -1,4 +1,4 @@
-# Bad Cat Adventures v0.8
+# Bad Cat Adventures v0.9
 
 Dylan’s imagination-powered, child-friendly adventure console. A static web game with no accounts, advertising, purchases, backend, API keys or paid services.
 
@@ -135,7 +135,7 @@ Puppy **treats** are the shared currency (maximum 99). Existing saved supply bal
 
 On the tablet, check word pronunciation, repeat audio, duplicate letters (for example the three Ps in **puppy**), calm-bee controls, hints after mistakes, the displayed correct spelling, word collection and sentence-code typing. For offline speech, install an offline English voice if the tablet needs one; offline text practice still works.
 
-## v0.8 characters and worlds
+## v0.9 characters and worlds
 
 Bad Cat and Metro have speech bubbles, announced mischief plans and persistent forcefields. Attacks wear down the fields before affecting the cat; sonar reveals their remaining layers. Day, Night and Auto display choices save on this device. Story results return to play automatically. A completed kitten mission shows all twenty kittens together in a net.
 
@@ -153,8 +153,12 @@ Dylan is the Dalmatian puppy hero; Bad Cat and Metro remain the villains. The me
 
 ## Metro’s Pipeworks
 
-An original optional pipe-rotation puzzle available from the map and HQ. Dylan stops Metro’s pipe prank, with help from Luna. Generated routes connect every tile from inlet to outlet. There is no countdown, failure state or treat penalty: water, slime, golden goo or sparkle juice visibly travels along the connected route at a gentle adjustable pace. Pause, unlimited Luna hints and a smaller-puzzle button support patient thinking. Repairs earn treats and save a local workshop record; no puzzle or location is sent to a server. Existing adventures pause while the workshop is open. `pipeworks.js` and `pipeworks.css` contain its original mechanics and SVG pipe art.
+An original optional pipe-rotation puzzle available from the map, HQ and the random surprise pool. Dylan stops Metro’s pipe prank, with help from Luna. Generated routes connect every tile from inlet to outlet. There is no countdown, failure state or treat penalty: water, slime, golden goo or sparkle juice visibly travels along the connected route at a gentle adjustable pace. Pause, unlimited Luna hints and a smaller-puzzle button support patient thinking. Repairs earn treats and save a local workshop record; no puzzle or location is sent to a server. Existing adventures pause while the workshop is open. `pipeworks.js` and `pipeworks.css` contain its original mechanics and SVG pipe art.
 
 ## Magic Pencil notes
 
-Choose a friend and one of six two-sentence notes. Dylan traces original letter guides in stroke order with his finger, following a slow magic pencil and a glowing start point. The pad tolerates wobbles but requires tracing the path; tapping elsewhere does not complete a letter. There is no timer, score or failed attempt. Show Me demonstrates a stroke, and Save and Finish Later resumes at the current stroke. Finishing earns two treats and saves the actual finger-stroke note locally, with the last six completed notes available as keepsakes. Nothing is sent to a handwriting service or application server. `handwriting.js` and `handwriting.css` provide the workshop and original monoline guides.
+Choose a teammate and one of fifteen two-sentence notes covering all A–Z. Both sentences stay on a two-line writing page: prompts are printed, while original curved cursive guides show the tracing route. As Dylan follows the pencil, neat connected cursive ink appears. Joined one-stroke letters support continuous finger tracing; dots and cross strokes prompt a lift. The page scrolls automatically and offers a whole-page/tracing-size toggle. There is no timer or failed attempt. Notes resume after reload, completed cursive pages become keepsakes, and a saved alphabet tracker recommends notes with unexplored letters. `cursive.js` supplies original formation paths; `handwriting.js` manages touch practice and local progress. No writing goes to an application server.
+
+## v0.9 environments and scale
+
+Bees are bee-shaped insects; the windscreen squid has a mantle, arms and long tentacles. Sky, sea, town surprises and the exposed-floorboard pipe game use original full-scene backgrounds. Dylan, BC, Metro and flight/dive player sprites use a consistent 80 px frame. Real GPS roads remain unchanged.

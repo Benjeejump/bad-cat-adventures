@@ -61,3 +61,7 @@ GPS map checks include eastbound rotation, matching vector-road/overlay bearings
 `handwriting_smoke.py` uses Chromium touch input for the first letter, checks stroke order and refusal to count arbitrary taps, resumes after reload, checks phone/tablet fit, traces both sentences, verifies actual stroke paths and treat reward, and reopens saved keepsakes offline. Physical tablet testing should confirm comfortable finger tolerance and the displayed letter size for Dylan.
 
 Modern artwork review confirms Dylan is the Dalmatian hero, BC and Metro remain villains, and active puppy/vehicle artwork has plain equipment without franchise-style tags. Walking tests now identify Dylan’s sprite.
+
+## v0.9 two-line cursive and environments
+
+The handwriting suite checks two full printed prompts with cursive guide glyphs, A–Z coverage across fifteen notes, actual touch input, continuous joined-letter tracing, saved position, scrolling phone/tablet fit, neat completed cursive and offline progress. `scene_scale_smoke.py` checks surprise Pipeworks, equal sprite frames, scene background delivery and the floorboard setting. Earlier monoline-note coverage describes the previous version.

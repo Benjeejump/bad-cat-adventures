@@ -68,6 +68,7 @@
     ",": ["M54 82 L49 94"],
     "'": ["M53 24 L49 36"],
   };
+  Object.assign(letters, window.badCatCursive.letters);
   const notes = [
     "You are kind. I like your hugs.",
     "We can help. You are my pal.",
@@ -75,6 +76,15 @@
     "I see a cat. The cat is big.",
     "You make me smile. I like our walks.",
     "You make fun things. We can fix pipes.",
+    "Jack can jump. We can jump too.",
+    "Try a quick quiz. You can do it.",
+    "Max can fix a box. I can help him.",
+    "Five pups wave. We can wave back.",
+    "Zoe has a kite. We can fly it.",
+    "Buzz is a bee. He can zip and zoom.",
+    "This quilt is soft. I like it on my bed.",
+    "We share some jam. It is very sweet.",
+    "Please bring a drum. We can make music.",
   ];
   const recipients = [
     ["Luna", "assets/luna.png"],
@@ -96,12 +106,28 @@
     doneTimer,
     tracingReady = false;
   let demoUntil = 0;
-  let book = { pending: null, notes: [] };
+  let book = { pending: null, notes: [], alphabet: [], completedNotes: [] };
   try {
     const saved = JSON.parse(localStorage.getItem("bad-cat-pencil-v1"));
     if (saved && Array.isArray(saved.notes))
       book = {
         notes: saved.notes.filter((n) => notes.includes(n.text)).slice(-6),
+        alphabet: [
+          ...new Set(
+            (Array.isArray(saved.alphabet)
+              ? saved.alphabet
+              : saved.notes.flatMap((n) => [...n.text.toLowerCase()])
+            ).filter((ch) => /^[a-z]$/.test(ch)),
+          ),
+        ],
+        completedNotes: [
+          ...new Set(
+            (Array.isArray(saved.completedNotes)
+              ? saved.completedNotes
+              : saved.notes.map((n) => n.text)
+            ).filter((t) => notes.includes(t)),
+          ),
+        ],
         pending:
           saved.pending && notes.includes(saved.pending.text)
             ? saved.pending
@@ -123,6 +149,7 @@
       stroke: round.stroke,
       completed: round.completed,
       letterInk: round.letterInk,
+      guideVersion: 2,
     };
     save();
   }
@@ -176,26 +203,10 @@
     $("#pencil-step").textContent =
       `Stroke ${round.stroke + 1} of ${strokes.length} · start at the glowing star`;
     $("#pencil-status").textContent =
-      "Follow the magic pencil with your finger. Lift your finger between strokes. There is no rush.";
-    svg.innerHTML =
-      '<defs><linearGradient id="pencil-ink"><stop stop-color="#2a7c91"/><stop offset="1" stop-color="#20516d"/></linearGradient></defs><g class="writing-lines"><path d="M8 20H112M8 45H112M8 85H112M8 110H112"/><path class="writing-baseline" d="M8 85H112"/></g><g id="letter-guides"></g><path id="pencil-trace" fill="none"/><circle id="pencil-star-halo" r="7"/><text id="pencil-star" text-anchor="middle" dominant-baseline="central">★</text><g id="magic-pencil"><path d="m0 0 3-14 5 2-6 13Z" fill="#ffd477" stroke="#573d2c" stroke-width=".8"/><path d="m0 0 2-5 2 1Z" fill="#233a4d"/><path d="m3-14 1-3 5 2-1 3Z" fill="#ce7a98" stroke="#573d2c" stroke-width=".6"/></g>';
-    const root = $("#letter-guides");
-    strokes.forEach((d, i) => {
-      const path = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "path",
-      );
-      path.setAttribute("d", d);
-      path.setAttribute(
-        "class",
-        i < round.stroke
-          ? "letter-complete"
-          : i === round.stroke
-            ? "letter-active"
-            : "letter-future",
-      );
-      root.append(path);
-    });
+      "Follow the curved cursive trail across the page. The printed sentences show what it says. There is no rush.";
+    buildPage(svg, round.text, round.index, round.stroke);
+    const root = svg.querySelector(`[data-letter-index="${round.index}"]`);
+    root.id = "letter-guides";
     currentPath = root.children[round.stroke];
     total = currentPath.getTotalLength();
     samples = [];
@@ -204,6 +215,10 @@
       samples.push({ x: p.x, y: p.y });
     }
     samples.push(currentPath.getPointAtLength(total));
+    const extra = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    extra.innerHTML =
+      '<path id="pencil-trace" fill="none"/><circle id="pencil-star-halo" r="7"/><text id="pencil-star" text-anchor="middle" dominant-baseline="central">★</text><g id="magic-pencil"><path d="m0 0 3-14 5 2-6 13Z" fill="#ffd477" stroke="#573d2c" stroke-width=".8"/><path d="m0 0 2-5 2 1Z" fill="#233a4d"/><path d="m3-14 1-3 5 2-1 3Z" fill="#ce7a98" stroke="#573d2c" stroke-width=".6"/></g>';
+    root.append(extra);
     const trace = $("#pencil-trace");
     trace.setAttribute("d", strokes[round.stroke]);
     trace.style.strokeDasharray = total;
@@ -217,6 +232,11 @@
     tracingReady = true;
     frame = requestAnimationFrame(animate);
     persist();
+    const scroller = $("#pencil-page-scroll"),
+      bounds = root.getBoundingClientRect(),
+      view = scroller.getBoundingClientRect();
+    if (bounds.left < view.left || bounds.right > view.right)
+      scroller.scrollLeft += bounds.left - view.left - 30;
   }
   function animate(now) {
     if (!dialog.open || round.done) return;
@@ -234,9 +254,10 @@
     const p = svg.createSVGPoint();
     p.x = e.clientX;
     p.y = e.clientY;
-    return p.matrixTransform(svg.getScreenCTM().inverse());
+    return p.matrixTransform(currentPath.getScreenCTM().inverse());
   }
   function moveAlong(point) {
+    const generation = `${round.index}:${round.stroke}`;
     const start = lastPoint || point,
       length = dists(start, point),
       steps = Math.max(1, Math.ceil(length / 2));
@@ -246,14 +267,14 @@
         y: start.y + ((point.y - start.y) * i) / steps,
       };
       const needed = samples[round.progress];
-      if (dists(p, needed) > 11) continue;
+      if (dists(p, needed) > 20) continue;
       let best = round.progress;
       for (
         let j = round.progress;
         j < Math.min(samples.length, round.progress + 9);
         j++
       )
-        if (dists(p, samples[j]) <= 9) best = j;
+        if (dists(p, samples[j]) <= 16) best = j;
       round.progress = best;
       const star = samples[best];
       $("#pencil-star-halo").setAttribute("cx", star.x);
@@ -271,9 +292,11 @@
         break;
       }
     }
-    lastPoint = point;
+    lastPoint = generation === `${round.index}:${round.stroke}` ? point : null;
   }
   function completeStroke() {
+    const carryPointer = pointer,
+      singleStroke = letters[round.text[round.index]].length === 1;
     tracingReady = false;
     active = false;
     pointer = null;
@@ -282,6 +305,9 @@
     );
     round.stroke++;
     if (round.stroke >= letters[round.text[round.index]].length) {
+      const learnt = round.text[round.index].toLowerCase();
+      if (/^[a-z]$/.test(learnt) && !book.alphabet.includes(learnt))
+        book.alphabet.push(learnt);
       round.completed.push({
         ch: round.text[round.index],
         ink: round.letterInk,
@@ -291,8 +317,13 @@
       round.letterInk = [];
       persist();
       $("#pencil-status").textContent =
-        "Lovely tracing! The next letter is coming.";
-      doneTimer = setTimeout(renderLetter, 450);
+        "Lovely tracing! Keep following the sentence.";
+      if (singleStroke && /^[a-z]$/.test(round.text[round.index] || "")) {
+        renderLetter();
+        active = true;
+        pointer = carryPointer;
+        lastPoint = null;
+      } else doneTimer = setTimeout(renderLetter, 450);
     } else {
       persist();
       $("#pencil-status").textContent =
@@ -300,50 +331,70 @@
       doneTimer = setTimeout(renderLetter, 450);
     }
   }
-  function drawFinished(root, completed, text) {
+  function buildPage(sheet, text, index, stroke) {
     const ns = "http://www.w3.org/2000/svg";
+    sheet.replaceChildren();
+    sheet.setAttribute("viewBox", "0 0 1000 380");
+    const defs = document.createElementNS(ns, "defs");
+    defs.innerHTML =
+      '<linearGradient id="pencil-ink"><stop stop-color="#287b9c"/><stop offset="1" stop-color="#205477"/></linearGradient>';
+    sheet.append(defs);
+    const { lines, positions } = window.badCatCursive.layout(text);
+    lines.forEach((line, row) => {
+      const label = document.createElementNS(ns, "text");
+      label.setAttribute("x", 40);
+      label.setAttribute("y", 28 + row * 180);
+      label.setAttribute("class", "note-print-label");
+      label.textContent = line;
+      sheet.append(label);
+      const guide = document.createElementNS(ns, "path");
+      const top = 53 + row * 180;
+      guide.setAttribute("class", "page-writing-lines");
+      guide.setAttribute(
+        "d",
+        `M24 ${top + 19}H976M24 ${top + 43}H976M24 ${top + 81}H976M24 ${top + 105}H976`,
+      );
+      sheet.append(guide);
+    });
+    for (const pos of positions) {
+      const g = document.createElementNS(ns, "g");
+      g.dataset.letterIndex = pos.index;
+      g.dataset.row = pos.y > 200 ? "2" : "1";
+      g.setAttribute(
+        "transform",
+        `translate(${pos.x} ${pos.y}) scale(${pos.sx} ${pos.sy})`,
+      );
+      g.setAttribute("class", "cursive-glyph");
+      (letters[pos.ch] || []).forEach((d, i) => {
+        const path = document.createElementNS(ns, "path");
+        path.setAttribute("d", d);
+        path.setAttribute(
+          "class",
+          pos.index < index || (pos.index === index && i < stroke)
+            ? "letter-complete"
+            : pos.index === index && i === stroke
+              ? "letter-active"
+              : "letter-future",
+        );
+        g.append(path);
+      });
+      sheet.append(g);
+    }
+  }
+  function drawFinished(root, completed, text) {
     root.replaceChildren();
-    const sheet = document.createElementNS(ns, "svg");
-    sheet.setAttribute("viewBox", "0 0 720 360");
+    const sheet = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     sheet.setAttribute("role", "img");
     sheet.setAttribute("aria-label", text);
-    let x = 18,
-      y = 20,
-      i = 0;
-    for (const word of text.split(" ")) {
-      if (x + word.length * 26 > 690) {
-        x = 18;
-        y += 75;
-      }
-      for (const ch of word) {
-        const record = completed[i++];
-        if (!record) break;
-        const g = document.createElementNS(ns, "g");
-        g.setAttribute("transform", `translate(${x} ${y}) scale(.25 .5)`);
-        for (const line of record.ink) {
-          if (!line.length) continue;
-          const path = document.createElementNS(ns, "path");
-          const inkLine =
-            line.length === 1
-              ? [line[0], { x: line[0].x + 0.5, y: line[0].y + 0.5 }]
-              : line;
-          path.setAttribute(
-            "d",
-            inkLine.map((p, j) => `${j ? "L" : "M"}${p.x} ${p.y}`).join(" "),
-          );
-          g.append(path);
-        }
-        sheet.append(g);
-        x += 26;
-      }
-      x += 14;
-    }
+    buildPage(sheet, text, text.length, 0);
     root.append(sheet);
   }
   function finish() {
     round.done = true;
     cancelAnimationFrame(frame);
     book.pending = null;
+    if (!book.completedNotes.includes(round.text))
+      book.completedNotes.push(round.text);
     book.notes.push({
       text: round.text,
       to: round.to,
@@ -359,12 +410,19 @@
     $("#pencil-finished-text").textContent = round.text;
     drawFinished($("#pencil-finished-art"), round.completed, round.text);
     $("#pencil-status").textContent =
-      "You wrote two sentences! Your note is saved on this device. +2 puppy treats.";
+      "You wrote two sentences! Your neat cursive note is saved on this device. +2 puppy treats.";
   }
   function begin(pending) {
     clearTimeout(doneTimer);
     round = pending
-      ? { ...pending, done: false, progress: 0, points: [] }
+      ? {
+          ...pending,
+          stroke: pending.guideVersion === 2 ? pending.stroke : 0,
+          letterInk: pending.guideVersion === 2 ? pending.letterInk : [],
+          done: false,
+          progress: 0,
+          points: [],
+        }
       : {
           text: $("#pencil-message").value,
           to: $("#pencil-recipient").value,
@@ -404,7 +462,7 @@
     dialog.id = "handwriting-dialog";
     dialog.setAttribute("aria-labelledby", "pencil-title");
     dialog.innerHTML =
-      '<header class="pencil-header"><img src="assets/luna.png" alt="Luna"><div><p>MAGIC PENCIL · YOUR OWN HANDWRITING</p><h2 id="pencil-title"></h2></div><button id="pencil-close" aria-label="Save and finish later">×</button></header><p id="pencil-status" role="status"></p><section id="pencil-setup"><label>To a teammate <select id="pencil-recipient"></select></label><label>Your two-sentence note <select id="pencil-message"></select></label><p>Start at the star. Follow the pencil. Lift your finger for the next stroke. Take as long as you like.</p><button id="pencil-begin">Let’s write a note</button><div id="pencil-keepsakes"></div></section><section id="pencil-work" hidden><p id="pencil-note-text" aria-label="Your note"></p><div class="pencil-letter-heading"><b id="pencil-letter"></b><span id="pencil-word"></span><small id="pencil-count"></small></div><p id="pencil-step"></p><svg id="writing-pad" viewBox="0 0 120 125" aria-label="Finger tracing pad"></svg><div class="pencil-controls"><button id="pencil-demo">Show me the stroke again</button><button id="pencil-later">Save and finish later</button></div></section><section id="pencil-finished" hidden><div id="pencil-finished-art"></div><p id="pencil-finished-text"></p><button id="pencil-new">Write another note</button></section>';
+      '<header class="pencil-header"><img src="assets/luna.png" alt="Luna"><div><p>MAGIC PENCIL · YOUR OWN HANDWRITING</p><h2 id="pencil-title"></h2></div><button id="pencil-close" aria-label="Save and finish later">×</button></header><p id="pencil-status" role="status"></p><section id="pencil-setup"><label>To a teammate <select id="pencil-recipient"></select></label><label>Your two-sentence note <select id="pencil-message"></select></label><p>Start at the star. Follow the pencil. Lift your finger for the next stroke. Take as long as you like.</p><button id="pencil-begin">Let’s write a note</button><div id="pencil-course"></div><div id="pencil-keepsakes"></div></section><section id="pencil-work" hidden><p id="pencil-note-text" aria-label="Your note"></p><div class="pencil-letter-heading"><b id="pencil-letter"></b><span id="pencil-word"></span><small id="pencil-count"></small></div><p id="pencil-step"></p><div id="pencil-page-scroll"><svg id="writing-pad" viewBox="0 0 1000 380" aria-label="Two-line cursive tracing page"></svg></div><div class="pencil-controls"><button id="pencil-demo">Show me the stroke again</button><button id="pencil-zoom">Whole page / tracing size</button><button id="pencil-later">Save and finish later</button></div></section><section id="pencil-finished" hidden><div id="pencil-finished-art"></div><p id="pencil-finished-text"></p><button id="pencil-new">Write another note</button></section>';
     document.body.append(dialog);
     svg = $("#writing-pad");
     for (const [name] of recipients) {
@@ -415,10 +473,13 @@
     }
     for (const text of notes) {
       const o = document.createElement("option");
+      o.value = text;
       o.textContent = text;
       $("#pencil-message").append(o);
     }
     $("#pencil-begin").onclick = () => begin();
+    $("#pencil-zoom").onclick = () =>
+      $("#pencil-page-scroll").classList.toggle("page-fit");
     $("#pencil-demo").onclick = () => {
       animationStart = performance.now();
       demoUntil = animationStart + 5500;
@@ -448,7 +509,7 @@
       if (!round || round.done || !tracingReady || !samples.length) return;
       e.preventDefault();
       const p = local(e);
-      if (dists(p, samples[round.progress]) > 14) {
+      if (dists(p, samples[round.progress]) > 22) {
         $("#pencil-status").textContent =
           "Find the glowing star, then follow the trail. You can try as often as you like.";
         return;
@@ -481,7 +542,44 @@
       }),
     );
   }
+  function renderCourse() {
+    const root = $("#pencil-course");
+    root.replaceChildren();
+    const label = document.createElement("p");
+    label.textContent =
+      book.alphabet.length === 26
+        ? "You have practised all 26 letters!"
+        : `${book.alphabet.length} of 26 letters explored · ${book.completedNotes.length} of ${notes.length} notes completed`;
+    root.append(label);
+    const grid = document.createElement("div");
+    grid.className = "pencil-alphabet";
+    for (const ch of "abcdefghijklmnopqrstuvwxyz") {
+      const badge = document.createElement("span");
+      badge.textContent = ch.toUpperCase();
+      badge.className = book.alphabet.includes(ch)
+        ? "letter-practised"
+        : "letter-to-explore";
+      badge.title = book.alphabet.includes(ch)
+        ? `${ch}: practised`
+        : `${ch}: still to explore`;
+      grid.append(badge);
+    }
+    root.append(grid);
+    const candidates = notes.filter((t) => !book.completedNotes.includes(t));
+    const ranked = (candidates.length ? candidates : notes)
+      .map((text) => ({
+        text,
+        newLetters: new Set(
+          [...text.toLowerCase()].filter(
+            (ch) => /^[a-z]$/.test(ch) && !book.alphabet.includes(ch),
+          ),
+        ).size,
+      }))
+      .sort((a, b) => b.newLetters - a.newLetters);
+    $("#pencil-message").value = ranked[0].text;
+  }
   function renderKeepsakes() {
+    renderCourse();
     const root = $("#pencil-keepsakes");
     root.replaceChildren();
     if (!book.notes.length) return;
@@ -511,6 +609,10 @@
       done: !!round?.done,
       saved: book.notes.length,
       pending: !!book.pending,
+      alphabet: [...book.alphabet],
+      completedNotes: book.completedNotes.length,
+      curriculum: [...notes],
+      guideStyle: "cursive",
     }),
   };
 })();

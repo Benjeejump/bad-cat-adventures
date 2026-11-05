@@ -1,4 +1,4 @@
-const CACHE = "bad-cat-shell-v10";
+const CACHE = "bad-cat-shell-v11";
 const SHELL = [
   "./",
   "./index.html",
@@ -6,6 +6,13 @@ const SHELL = [
   "./team-style.css",
   "./pipeworks.js",
   "./handwriting.js",
+  "./cursive.js",
+  "./assets/underfloor-world.png",
+  "./assets/sky-world.png",
+  "./assets/cloud.png",
+  "./assets/sea-world.png",
+  "./assets/surprise-world.png",
+
   "./handwriting.css",
   "./pipeworks.css",
   "./assets/odyssey.png",
