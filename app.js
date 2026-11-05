@@ -70,6 +70,7 @@
     paused: false,
     follow: true,
     speed: 1,
+    heading: 0,
     elapsed: 0,
     distance: 0,
     car: [0, 0],
@@ -200,6 +201,11 @@
   function initMap() {
     if (!window.L) return;
     map = L.map("map", {
+      rotate: true,
+      rotateControl: false,
+      touchRotate: false,
+      shiftKeyRotate: false,
+      zoomAnimation: false,
       zoomControl: false,
       attributionControl: true,
       maxZoom: 21,
@@ -342,6 +348,13 @@
   }
   function updateActors() {
     const c = state.car;
+    if (map && progress.vehicle === "car" && Number.isFinite(state.heading)) {
+      const desired = (-state.heading * 180) / Math.PI;
+      const delta =
+        ((((desired - (map.getBearing?.() || 0) + 540) % 360) + 360) % 360) -
+        180;
+      if (Math.abs(delta) > 0.5) map.setBearing?.(desired);
+    }
     for (const key of ["car", "badcat", "metro"]) {
       if (markers[key]) markers[key].setLatLng(state[key]);
       const node = $(`#actor-${key}`);
@@ -415,6 +428,11 @@
         window.badCatCampaign.motionScale();
       state.car = routePoint(state.elapsed / 200);
       state.distance += metres(prev, state.car);
+      if (metres(prev, state.car) > 0.01)
+        state.heading = Math.atan2(
+          (state.car[1] - prev[1]) * Math.cos((state.car[0] * Math.PI) / 180),
+          state.car[0] - prev[0],
+        );
     }
     if (!state.paused || state.mode === "gps") {
       const t = state.elapsed / 200;
@@ -530,13 +548,23 @@
         locationGate(false);
         const previous = state.lastGPS;
         state.gpsAccuracy = fix.coords.accuracy;
-        if (Number.isFinite(fix.coords.heading))
+        const next = [fix.coords.latitude, fix.coords.longitude];
+        const moving =
+          !Number.isFinite(fix.coords.speed) || fix.coords.speed > 0.8;
+        if (
+          moving &&
+          Number.isFinite(fix.coords.heading) &&
+          fix.coords.heading >= 0
+        )
           state.heading = (fix.coords.heading * Math.PI) / 180;
-        else if (previous)
+        else if (
+          previous &&
+          fix.coords.accuracy <= 50 &&
+          metres(previous, next) >= Math.max(8, fix.coords.accuracy)
+        )
           state.heading = Math.atan2(
-            (fix.coords.longitude - previous[1]) *
-              Math.cos((fix.coords.latitude * Math.PI) / 180),
-            fix.coords.latitude - previous[0],
+            (next[1] - previous[1]) * Math.cos((next[0] * Math.PI) / 180),
+            next[0] - previous[0],
           );
         state.mode = "gps";
         state.gpsStarting = false;

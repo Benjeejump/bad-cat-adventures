@@ -39,3 +39,7 @@ Tunnels/pipes, cat attacks, houses, Amy’s homes and underwater scenes are fict
 ## v0.6 worlds and celebration coverage
 
 `worlds_smoke.py` checks character speech, Night mode, all three vehicle views, mode-specific hazards and tools, the flight welcome, contextual ribbon speech, automatic word completion, speech cancellation, flying bees, automatic return, and twenty illustrated kittens in the completion net. Speech requests are mocked; real tablet voices still need a device check. Targeting and cinematic regressions cover shields, replay, moving kittens and landing animations.
+
+## Heading-up navigation
+
+GPS map checks include eastbound rotation, matching vector-road/overlay bearings, holding direction while stopped, and deriving heading from movement when GPS course is absent. MapLibre renders in screen coordinates while Leaflet rotates geographic overlays and fallback tiles. Real tablet GPS course availability and turns still need a road check.

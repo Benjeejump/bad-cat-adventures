@@ -14,6 +14,8 @@ Open the local server in Chrome. No dependency installation or build step is req
 
 ## The game
 
+- **Heading-up navigation:** roads turn with the direction of travel, like sat-nav. GPS course takes priority while moving; sufficiently clear movement supplies a missing course. Stopping holds the last direction. Zoom and geographic targets stay aligned. The bundled leaflet-rotate 0.5.3 dependency is distributed with its GPL-3.0 license in `assets/leaflet/ROTATE-LICENSE`.
+
 - **GPS-first, map-first cockpit:** the game starts at the tablet’s real position, at close zoom 20. Chrome must allow location. While waiting for a fix, it shows a location screen—not a made-up position or a running demo. If location fails, choose Retry GPS, HQ or Test Drive explicitly. New fixes preserve a manual zoom adjustment. The simulation remains an optional Journey-controls button.
 - **Illustrated roads:** a custom vector style draws real roads as broad cream lanes over soft green terrain and blue water, with no road-name labels, business icons, building footprints, transit clutter or text. OpenFreeMap treats the underlying OpenStreetMap geometry; MapLibre renders it locally under Leaflet’s character overlays. On devices that cannot render WebGL, a muted CARTO map without labels is the fallback; that fallback can retain building outlines. If map data is unavailable, the labelled imaginary terrain still supports GPS-relative characters and offline games.
 

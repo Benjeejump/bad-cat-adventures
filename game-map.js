@@ -26,8 +26,8 @@
       css.rel = "stylesheet";
       css.href = "assets/maplibre/maplibre-gl.css";
       document.head.append(css);
+      await script("assets/leaflet/leaflet-rotate.js");
       await script("assets/maplibre/maplibre-gl.js");
-      await script("assets/maplibre/leaflet-maplibre-gl.js");
     } catch {
       /* Label-free raster fallback also works without WebGL. */
     }
@@ -106,21 +106,62 @@
     try {
       if (
         !window.maplibregl ||
-        !L.maplibreGL ||
         (typeof maplibregl.supported === "function" && !maplibregl.supported())
       )
         throw Error("WebGL unavailable");
       renderer = "game-vector";
-      layer = L.maplibreGL({
-        style: "./game-map-style.json",
-        interactive: false,
-        attributionControl: false,
-        padding: 0,
-        preserveDrawingBuffer: false,
-        prefetchZoomDelta: 0,
+      // Keep the native renderer in screen coordinates. Leaflet rotates its
+      // geographic overlays; MapLibre rotates roads with the same bearing.
+      const Roads = L.Layer.extend({
+        onAdd(map) {
+          this.node = L.DomUtil.create(
+            "div",
+            "heading-road-canvas",
+            map.getContainer(),
+          );
+          Object.assign(this.node.style, {
+            position: "absolute",
+            inset: "0",
+            zIndex: "100",
+            pointerEvents: "none",
+          });
+          const center = map.getCenter();
+          gl = new maplibregl.Map({
+            container: this.node,
+            style: "./game-map-style.json",
+            interactive: false,
+            attributionControl: false,
+            center: [center.lng, center.lat],
+            zoom: map.getZoom() - 1,
+            bearing: -(map.getBearing?.() || 0),
+            prefetchZoomDelta: 0,
+          });
+        },
+        getEvents() {
+          return {
+            move: this.sync,
+            zoom: this.sync,
+            resize: this.sync,
+            rotate: this.sync,
+          };
+        },
+        sync() {
+          if (!gl) return;
+          const center = this._map.getCenter();
+          gl.resize();
+          gl.jumpTo({
+            center: [center.lng, center.lat],
+            zoom: this._map.getZoom() - 1,
+            bearing: -(this._map.getBearing?.() || 0),
+          });
+        },
+        onRemove() {
+          gl?.remove();
+          gl = null;
+          this.node.remove();
+        },
       });
-      layer.addTo(map);
-      gl = layer.getMaplibreMap();
+      layer = new Roads().addTo(map);
       gl.on("style.load", applyPalette);
       gl.on("sourcedata", (e) => {
         if (e.sourceId === "terrain" && e.isSourceLoaded) success();
@@ -155,6 +196,9 @@
       ready,
       labels: false,
       buildings: renderer === "simple-raster",
+      headingUp: true,
+      bearing: ((-(leafletMap?.getBearing?.() || 0) % 360) + 360) % 360,
+      roadBearing: gl ? ((gl.getBearing() % 360) + 360) % 360 : null,
     }),
     getRenderedStyle: () => gl?.getStyle() || null,
   };

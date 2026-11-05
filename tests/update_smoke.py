@@ -28,7 +28,7 @@ with tempfile.TemporaryDirectory() as temp:
   shutil.copytree(root/'assets',Path(temp)/'assets',dirs_exist_ok=True)
   page.reload(wait_until='domcontentloaded')
   page.wait_for_function('typeof badCatDiagnostics === "function" && !!badCatDiagnostics().adventure',timeout=30000)
-  page.wait_for_function('caches.keys().then(keys=>keys.includes("bad-cat-shell-v7"))')
+  page.wait_for_function('caches.keys().then(keys=>keys.includes("bad-cat-shell-v8"))')
   page.locator('#launch-silent').click(); page.locator('#test-drive').evaluate('(el)=>el.click()');page.wait_for_timeout(600)
   assert page.evaluate('!badCatDiagnostics().adventure.launching')
   print('PASS Existing installation upgrades and its launch button works',flush=True)
