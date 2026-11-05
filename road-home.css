@@ -986,8 +986,7 @@
   pointer-events: none;
   font-size: 46px;
 }
-dialog .dialog-close,
-#spell-close {
+dialog .dialog-close {
   margin-right: 52px;
 }
 #target-bar {
@@ -996,12 +995,24 @@ dialog .dialog-close,
 #target-bar button {
   pointer-events: auto;
 }
-#pipe-close,
-#pencil-close,
-#house-close {
-  margin-right: 52px;
+
+/* A reserved parent area, rather than a badge laid over game controls. */
+body.map-mode .action-rail {
+  top: max(74px, calc(env(safe-area-inset-top, 0px) + 64px));
+}
+body:not(.map-mode) {
+  padding-right: 70px;
+}
+dialog:has(> .parent-logo) {
+  padding-top: 74px !important;
+}
+dialog > .parent-logo {
+  position: absolute !important;
 }
 .action-rail .rail-label {
-  padding-right: 46px;
-  min-height: 30px;
+  padding-right: 0;
+  min-height: 0;
+}
+#launch-skip {
+  right: 76px;
 }

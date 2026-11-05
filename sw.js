@@ -1,4 +1,4 @@
-const CACHE = "bad-cat-shell-v13";
+const CACHE = "bad-cat-shell-v14";
 const SHELL = [
   "./",
   "./index.html",
