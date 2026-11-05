@@ -38,6 +38,7 @@
     <link rel="stylesheet" href="learning.css" />
     <link rel="stylesheet" href="character-style.css" />
     <script src="theme.js" defer></script>
+    <link rel="stylesheet" href="inventions.css" />
   </head>
   <body class="map-mode launching">
     <header class="topbar">
@@ -46,7 +47,7 @@
           ><img src="assets/bad-cat.png" alt="BC"
         /></span>
         <span
-          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.6</b></span></span
+          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.7</b></span></span
         ></a
       >
       <nav aria-label="Game sections">
@@ -134,7 +135,7 @@
           Starts with this tablet’s GPS. Allow location when asked.
         </p>
       </div>
-      <span class="launch-version">v0.6 · THE LAKELINE ADVENTURES</span
+      <span class="launch-version">v0.7 · THE LAKELINE ADVENTURES</span
       ><button id="launch-skip" aria-label="Skip opening and play quietly">
         Skip intro →
       </button>
@@ -302,10 +303,15 @@
               ><button data-vehicle="plane" aria-pressed="false">
                 ✈️<span>Plane</span></button
               ><button data-vehicle="submarine" aria-pressed="false">
-                🤿<span>Submarine</span>
+                🤿<span>Submarine</span></button
+              ><button data-vehicle="walking" aria-pressed="false">
+                🐾<span>Walk</span>
               </button>
             </div>
           </div>
+          <button id="arsenal-launch" class="gadget-button" type="button">
+            🎒<span>My inventions</span>
+          </button>
           <button
             id="carwash-launch"
             class="carwash-launch"
@@ -401,22 +407,51 @@
           <section class="panel hq-card">
             <span class="hq-icon">⚗️</span>
             <h2>Gadget Laboratory</h2>
-            <p>Dream it. Name it. Take it on an adventure.</p>
+            <p>Pick the parts. Watch them fly. Name your invention!</p>
             <form id="invention-form">
-              <label for="invention-name">Your invention's name</label
+              <details class="recipe-step" open>
+                <summary>1 · Choose a launcher · 20 choices</summary>
+                <div
+                  id="invention-launcher-choices"
+                  class="recipe-choices"
+                ></div>
+              </details>
+              <details class="recipe-step" open>
+                <summary>2 · Choose what flies · 40 choices</summary>
+                <div id="invention-item-choices" class="recipe-choices"></div>
+              </details>
+              <details class="recipe-step" open>
+                <summary>3 · Add a special feature · 24 choices</summary>
+                <small
+                  >All flames and sparks are pretend cartoon effects.</small
+                >
+                <div
+                  id="invention-feature-choices"
+                  class="recipe-choices"
+                ></div>
+              </details>
+              <div
+                id="invention-preview"
+                class="recipe-preview"
+                aria-live="polite"
+              ></div>
+              <button id="preview-invention" type="button">
+                ▶ Test my invention
+              </button>
+              <label for="invention-name">4 · Give it a saved name</label
               ><input
                 id="invention-name"
                 maxlength="40"
-                placeholder="The Super Wobbly Waffle Ray"
-                required
-              /><label for="invention-power">Its amazing power</label
-              ><select id="invention-power">
-                <option value="bubble">Makes enormous bubbles</option>
-                <option value="shield">Builds a cosy forcefield</option>
-                <option value="puppy">Summons heroic puppies</option>
-                <option value="laser">Launches rainbow confetti</option></select
-              ><button class="primary-button" type="submit">
-                ✦ Invent gadget
+                placeholder="Choose a name, or we’ll make one!"
+              />
+              <select id="invention-power" hidden aria-hidden="true">
+                <option value="bubble">Bubble</option>
+                <option value="shield">Shield</option>
+                <option value="puppy">Puppy</option>
+                <option value="laser">Confetti</option>
+              </select>
+              <button class="primary-button" type="submit">
+                ✦ Save to my arsenal
               </button>
             </form>
             <ul id="inventions" class="invention-list"></ul>
@@ -434,7 +469,8 @@
             <div class="garage-vehicles">
               <button data-vehicle="car">🚙 Car</button
               ><button data-vehicle="plane">✈️ Plane</button
-              ><button data-vehicle="submarine">🤿 Submarine</button>
+              ><button data-vehicle="submarine">🤿 Submarine</button
+              ><button data-vehicle="walking">🐾 Walking puppy</button>
             </div>
           </section>
           <section class="panel hq-card">
@@ -525,6 +561,7 @@
     <script src="targeting.js" defer></script>
     <script src="game-map.js" defer></script>
     <script src="loot.js" defer></script>
+    <script src="inventions.js" defer></script>
     <script src="app.js" defer></script>
   </body>
 </html>

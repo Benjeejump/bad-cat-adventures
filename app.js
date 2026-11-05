@@ -30,11 +30,15 @@
             (i) => i && typeof i.name === "string" && powers.includes(i.power),
           )
           .slice(0, 20)
-          .map((i) => ({ name: i.name.slice(0, 40), power: i.power }))
+          .map((i) => ({
+            name: i.name.slice(0, 40),
+            power: i.power,
+            ...window.badCatInventions.normalize(i),
+          }))
       : [],
   };
   if (equipment.includes(saved.equipment)) progress.equipment = saved.equipment;
-  if (["car", "plane", "submarine"].includes(saved.vehicle))
+  if (["car", "plane", "submarine", "walking"].includes(saved.vehicle))
     progress.vehicle = saved.vehicle;
   for (const key of ["puppies", "squidWins", "gadgets", "missions"])
     if (Number.isSafeInteger(saved[key]) && saved[key] >= 0)
@@ -301,7 +305,7 @@
     if (state.view === "hq") setTimeout(() => map.invalidateSize(), 0);
   }
   function startGameMap() {
-    if (!map || progress.vehicle !== "car") return;
+    if (!map || !["car", "walking"].includes(progress.vehicle)) return;
     window.badCatGameMap.mount(map, {
       ready: () => {
         tileLoaded = true;
@@ -348,7 +352,11 @@
   }
   function updateActors() {
     const c = state.car;
-    if (map && progress.vehicle === "car" && Number.isFinite(state.heading)) {
+    if (
+      map &&
+      ["car", "walking"].includes(progress.vehicle) &&
+      Number.isFinite(state.heading)
+    ) {
       const desired = (-state.heading * 180) / Math.PI;
       const delta =
         ((((desired - (map.getBearing?.() || 0) + 540) % 360) + 360) % 360) -
@@ -379,15 +387,15 @@
       map &&
       state.follow &&
       state.view === "drive" &&
-      progress.vehicle === "car"
+      ["car", "walking"].includes(progress.vehicle)
     )
       map.panTo(c, { animate: false });
-    if (map && tileLoaded && progress.vehicle === "car") {
+    if (map && tileLoaded && ["car", "walking"].includes(progress.vehicle)) {
       const p = map.latLngToContainerPoint(c);
       $("#map-stage").style.setProperty("--car-x", `${p.x}px`);
       $("#map-stage").style.setProperty("--car-y", `${p.y}px`);
     }
-    if (progress.vehicle !== "car") {
+    if (!["car", "walking"].includes(progress.vehicle)) {
       $("#map-stage").style.setProperty("--car-x", "50%");
       $("#map-stage").style.setProperty("--car-y", "43%");
     }
@@ -424,6 +432,7 @@
       state.elapsed +=
         dt *
         state.speed *
+        (progress.vehicle === "walking" ? 0.45 : 1) *
         window.badCatAdventure.motionScale() *
         window.badCatCampaign.motionScale();
       state.car = routePoint(state.elapsed / 200);
@@ -585,7 +594,11 @@
         $("#test-drive").classList.remove("selected");
         $("#pause").disabled = true;
         $("#speed").disabled = true;
-        if (map && state.follow && progress.vehicle === "car")
+        if (
+          map &&
+          state.follow &&
+          ["car", "walking"].includes(progress.vehicle)
+        )
           map.setView(
             state.car,
             firstGPS && !state.lastGPSZoomed ? 20 : map.getZoom(),
@@ -771,6 +784,8 @@
     return true;
   }
   function vehicleSVG(type) {
+    if (type === "walking")
+      return '<img src="assets/walking-puppy.svg" alt="Walking puppy">';
     if (type === "plane")
       return '<img src="assets/doggy-plane.svg" alt="Doggy Plane">';
     if (type === "submarine")
@@ -797,6 +812,7 @@
     $("#vehicle-art").innerHTML = vehicleSVG(type);
     $("#vehicle-name").textContent = {
       car: "White Honda Odyssey",
+      walking: "Puppy on paws",
       plane: "Doggy Plane",
       submarine: "Bubble Voyager",
     }[type];
@@ -804,11 +820,15 @@
       b.classList.toggle("selected", b.dataset.vehicle === type);
       b.setAttribute("aria-pressed", b.dataset.vehicle === type);
     });
-    const emoji = { car: "🚙", plane: "✈️", submarine: "🤿" }[type];
+    const emoji = { car: "🚙", plane: "✈️", submarine: "🤿", walking: "🐾" }[
+      type
+    ];
     const markerArt =
-      type === "car"
-        ? '<img src="assets/odyssey.svg" alt="White Honda Odyssey">'
-        : emoji;
+      type === "walking"
+        ? '<img src="assets/walking-puppy.svg" alt="Walking puppy">'
+        : type === "car"
+          ? '<img src="assets/odyssey.svg" alt="White Honda Odyssey">'
+          : emoji;
     $("#actor-car").innerHTML = markerArt;
     if (markers.car)
       markers.car.setIcon(
@@ -828,6 +848,9 @@
       story(
         pick(
           {
+            walking: [
+              "Paws down! Your puppy is walking along. Sniff out Bad Cat’s next invention!",
+            ],
             car: [
               "Wheels down. The white Honda Odyssey is ready for whatever Dylan dreams up.",
             ],
@@ -884,14 +907,13 @@
         use = document.createElement("button"),
         remove = document.createElement("button");
       use.className = "use-invention";
-      use.textContent = `✦ ${inv.name}`;
+      use.textContent = `${window.badCatInventions.recipe(inv)?.item.picture || "✦"} ${inv.name}`;
+      const details = document.createElement("small");
+      details.className = "invention-recipe";
+      details.textContent = window.badCatInventions.describe(inv);
+      use.append(details);
       use.title = "Deploy this invention";
-      use.addEventListener("click", () => {
-        gadget(inv.power);
-        toast(`${inv.name} activated!`);
-        $("#puppy-status").textContent =
-          `Your invention, ${inv.name}, is ready for adventure.`;
-      });
+      use.addEventListener("click", () => window.badCatInventions.deploy(inv));
       remove.textContent = "×";
       remove.setAttribute("aria-label", `Delete ${inv.name}`);
       remove.addEventListener("click", () => {
@@ -981,7 +1003,8 @@
   $("#follow").addEventListener("click", () => {
     state.follow = !state.follow;
     updateFollow();
-    if (map && state.follow && progress.vehicle === "car") map.panTo(state.car);
+    if (map && state.follow && ["car", "walking"].includes(progress.vehicle))
+      map.panTo(state.car);
   });
   $("#sound").addEventListener("click", () => {
     soundEnabled = !soundEnabled;
@@ -1017,24 +1040,32 @@
 
   $("#invention-form").addEventListener("submit", (event) => {
     event.preventDefault();
-    const name = $("#invention-name").value.trim();
-    if (!name) {
-      toast("Give your invention a name first.");
-      return;
-    }
+    const parts = window.badCatInventions.selection();
+    const name =
+      $("#invention-name").value.trim() ||
+      window.badCatInventions.describe(parts).slice(0, 40);
     if (progress.inventions.length >= 20) {
       toast("The lab has 20 inventions. Retire one to make room.");
       return;
     }
     progress.inventions.unshift({
       name: name.slice(0, 40),
-      power: $("#invention-power").value,
+      ...parts,
     });
     save();
     renderInventions();
     $("#invention-name").value = "";
     sound("shield");
-    toast(`${name} is ready! Tap it to test its power.`);
+    toast(`${name} saved! Choose it from My inventions, then tap a character.`);
+  });
+  window.badCatInventions.init({
+    list: () => progress.inventions,
+    hq: () => setView("hq"),
+    deploy: (inv) => {
+      setView("drive");
+      window.badCatTargeting.arm(inv.power, inv);
+      toast(`${inv.name} ready! Tap BC, Metro or a kitten.`);
+    },
   });
   let tickles = 0;
   $("#squid-target").addEventListener("click", () => {
@@ -1122,7 +1153,7 @@
       toast(message);
     },
     changed: (type) => {
-      if (type === "car" && map) {
+      if (["car", "walking"].includes(type) && map) {
         map.invalidateSize();
         if (["gps", "test"].includes(state.mode)) {
           map.setView(state.car, map.getZoom(), { animate: false });
@@ -1146,13 +1177,18 @@
     sound,
     story,
     result: (won, count) => window.badCatAdventure.raidResult(won, count),
-    apply: (kind, target) => {
+    apply: (kind, target, invention) => {
       const retreat = state.retreatUntil,
         ally = state.allyUntil;
       if (gadget(kind) === false) return false;
       state.retreatUntil = retreat;
       state.allyUntil = ally;
       const strike = window.badCatCharacters.hit(target, kind);
+      if (invention)
+        window.badCatInventions.launch(
+          invention,
+          window.badCatTargeting.targetNode(target),
+        );
       if (strike?.exposed) {
         window.badCatVehicle.reactToHit(target);
         state.targetEffects ||= {};

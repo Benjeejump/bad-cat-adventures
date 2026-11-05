@@ -46,7 +46,7 @@
   function render() {
     const root = document.querySelector("#vehicle-world");
     if (!root) return;
-    root.hidden = mode === "car";
+    root.hidden = ["car", "walking"].includes(mode);
     const transient = [...root.classList].filter((c) =>
       ["world-wiping", "world-pinging"].includes(c),
     );
@@ -54,7 +54,7 @@
     transient.forEach((c) => root.classList.add(c));
     document.body.classList.toggle("mode-plane", mode === "plane");
     document.body.classList.toggle("mode-submarine", mode === "submarine");
-    if (mode === "car") return;
+    if (["car", "walking"].includes(mode)) return;
     document.querySelector("#world-title").textContent = titles[mode];
     document.querySelector("#world-stability").textContent =
       `${mode === "plane" ? "Flight" : "Dive"} stability ${stability}%`;
@@ -104,7 +104,7 @@
           ? "Dive crew ready. Captain Dylan, sonar is listening. Watch out for Metro’s pipes and that very large squid."
           : "";
     render();
-    if (announce && mode !== "car") speak();
+    if (announce && !["car", "walking"].includes(mode)) speak();
     hooks.changed(type);
   }
   function clearHazard(message) {
@@ -185,7 +185,7 @@
     render();
   }
   function tick(dt) {
-    if (mode === "car" || !hooks.active()) return;
+    if (["car", "walking"].includes(mode) || !hooks.active()) return;
     protectedFor = Math.max(0, protectedFor - dt);
     nextHazard -= dt;
     if (!hazard && nextHazard <= 0) {
@@ -218,7 +218,7 @@
     }
   }
   function reactToHit(key) {
-    if (mode === "car") return;
+    if (["car", "walking"].includes(mode)) return;
     const node = document.querySelector(`.world-${key}`);
     node.classList.remove("world-enemy-hit");
     void node.offsetWidth;
@@ -257,7 +257,7 @@
     change,
     tick,
     reactToHit,
-    worldActive: () => mode !== "car",
+    worldActive: () => !["car", "walking"].includes(mode),
     mode: () => mode,
     diagnostics: () => ({
       mode,

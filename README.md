@@ -1,4 +1,4 @@
-# Bad Cat Adventures v0.6
+# Bad Cat Adventures v0.7
 
 Dylan’s imagination-powered, child-friendly adventure console. A static web game with no accounts, advertising, purchases, backend, API keys or paid services.
 
@@ -135,8 +135,14 @@ Puppy **treats** are the shared currency (maximum 99). Existing saved supply bal
 
 On the tablet, check word pronunciation, repeat audio, duplicate letters (for example the three Ps in **puppy**), calm-bee controls, hints after mistakes, the displayed correct spelling, word collection and sentence-code typing. For offline speech, install an offline English voice if the tablet needs one; offline text practice still works.
 
-## v0.6 characters and worlds
+## v0.7 characters and worlds
 
 Bad Cat and Metro have speech bubbles, announced mischief plans and persistent forcefields. Attacks wear down the fields before affecting the cat; sonar reveals their remaining layers. Day, Night and Auto display choices save on this device. Story results return to play automatically. A completed kitten mission shows all twenty kittens together in a net.
 
 `characters.js` manages cat personalities and shields; `theme.js` manages display preferences; `vehicle-world.js` provides sky and underwater play. `character-style.css` styles the illustrated cast and worlds.
+
+## Picture invention laboratory and puppy walks
+
+Choose from 20 launchers, 40 pictured items and 24 special features (19,200 combinations), preview the launch, then save a name or accept an automatic name. Up to twenty recipes save locally. The item, launcher and feature are saved, and the chosen item actually flies when used against BC, Metro or kittens. Catapults use a high arc; waterslides use a low swoop. Features select a familiar bubble, shield, confetti or puppy effect; flames and sparks are pretend. The map’s My inventions button opens the saved arsenal. Existing named gadgets remain usable.
+
+Walking is a fourth travel choice: an animated puppy replaces the car on the heading-up GPS map. GPS remains real; only optional Test Drive movement slows to puppy pace. `inventions.js` owns the picture catalog, preview and projectile animation; `inventions.css` styles the builder and arsenal.

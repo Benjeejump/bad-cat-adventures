@@ -11,7 +11,7 @@ root = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory() as temp:
     project = Path(temp) / 'bad-cat-adventures'
     project.mkdir()
-    for name in ['index.html','app.js','vehicle-world.js','characters.js','theme.js','character-style.css','cinematics.js','word-bank.js','spelling.js','learning.css','loot.js','game-map.js','game-map-style.json','styles.css','sw.js','manifest.webmanifest','adventure.js','puppy-options.js','campaign.js','targeting.js','site-config.js','map-mode.css']:
+    for name in ['index.html','app.js','inventions.js','inventions.css','vehicle-world.js','characters.js','theme.js','character-style.css','cinematics.js','word-bank.js','spelling.js','learning.css','loot.js','game-map.js','game-map-style.json','styles.css','sw.js','manifest.webmanifest','adventure.js','puppy-options.js','campaign.js','targeting.js','site-config.js','map-mode.css']:
         shutil.copy(root / name, project / name)
     shutil.copytree(root / 'assets', project / 'assets')
     handler = partial(SimpleHTTPRequestHandler, directory=temp)
@@ -37,7 +37,7 @@ with tempfile.TemporaryDirectory() as temp:
         page.locator('#launch-silent').click(); page.locator('#test-drive').evaluate('(el)=>el.click()')
         page.locator('[data-view="hq"]').click()
         page.locator('#invention-name').fill('Subpath Super Gadget')
-        page.locator('#invention-form button').click()
+        page.locator('#invention-form button[type=submit]').click()
         assert page.locator('.use-invention').count()==1
         print('PASS Offline HQ and invention creation at project subpath')
         assert not errors, errors

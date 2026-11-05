@@ -43,3 +43,7 @@ Tunnels/pipes, cat attacks, houses, Amy’s homes and underwater scenes are fict
 ## Heading-up navigation
 
 GPS map checks include eastbound rotation, matching vector-road/overlay bearings, holding direction while stopped, and deriving heading from movement when GPS course is absent. MapLibre renders in screen coordinates while Leaflet rotates geographic overlays and fallback tiles. Real tablet GPS course availability and turns still need a road check.
+
+## v0.7 picture recipes and walking
+
+`inventions_smoke.py` checks the 20/40/24 option catalog, selected preview, saved recipe/name, custom targeted projectile and shield damage, map arsenal and reload persistence, walking puppy, road-world selection and responsive HQ layouts. Browser, Pages, installed-update, GPS, targeting and world regressions also cover the changed integrations.

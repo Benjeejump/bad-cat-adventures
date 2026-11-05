@@ -18,6 +18,7 @@
   };
   let hooks,
     armed = null,
+    armedInvention = null,
     selected = null,
     raid = null;
   let movers = [],
@@ -27,14 +28,15 @@
     const bar = $("#target-bar");
     bar.hidden = !armed && !selected;
     $("#target-instruction").textContent = armed
-      ? `${names[armed]} ready — tap ${raid ? "a kitten" : "BC or M"}!`
+      ? `${armedInvention?.name || names[armed]} ready — tap ${raid ? "a kitten" : "BC or M"}!`
       : `${selected === "badcat" ? "BC" : "M"} selected — choose a gadget.`;
     document.querySelectorAll("[data-gadget]").forEach((b) => {
       b.classList.toggle("aiming", b.dataset.gadget === armed);
       b.setAttribute("aria-pressed", b.dataset.gadget === armed);
     });
   }
-  function arm(power) {
+  function arm(power, invention = null) {
+    armedInvention = invention;
     if (!names[power]) return;
     window.badCatLoot?.cancel();
     armed = power;
@@ -70,7 +72,7 @@
       return;
     }
     const power = armed;
-    const strike = hooks.apply(power, character);
+    const strike = hooks.apply(power, character, armedInvention);
     if (strike === false) return;
     impact(node, power);
     const line = {
@@ -90,6 +92,7 @@
     if (raid) return;
     selected = null;
     armed = null;
+    armedInvention = null;
     raid = {
       remaining: 20,
       seconds: window.badCatCampaign.raidSeconds(),
@@ -117,6 +120,7 @@
         if (!window.badCatCampaign.raidUse(armed, raid.cleared)) return;
         b.disabled = true;
         impact(b, armed);
+        if (armedInvention) window.badCatInventions.launch(armedInvention, b);
         b.classList.add("kitten-cleared");
         hooks.sound(armed);
         raid.remaining--;
@@ -209,6 +213,7 @@
     $("#kitten-raid").hidden = true;
     document.body.classList.remove("raid-active");
     armed = null;
+    armedInvention = null;
     selected = null;
     update();
     hooks.result(won, cleared);
@@ -230,6 +235,7 @@
     document.body.append(bar);
     $("#cancel-target").addEventListener("click", () => {
       armed = null;
+      armedInvention = null;
       selected = null;
       update();
     });
@@ -246,17 +252,34 @@
     );
   }
   window.badCatTargeting = {
+    targetNode: (key) =>
+      [
+        ...document.querySelectorAll(
+          `.world-${key},.${key}-marker,#actor-${key}`,
+        ),
+      ].find(
+        (n) =>
+          n.getBoundingClientRect().width &&
+          n.getBoundingClientRect().height &&
+          getComputedStyle(n).visibility !== "hidden",
+      ),
     init,
     arm,
     target,
     cancel: () => {
       armed = null;
+      armedInvention = null;
       selected = null;
       update();
     },
     startRaid,
     tick,
     raidActive: () => !!raid,
-    diagnostics: () => ({ armed, selected, raid: raid ? { ...raid } : null }),
+    diagnostics: () => ({
+      armed,
+      invention: armedInvention?.name || null,
+      selected,
+      raid: raid ? { ...raid } : null,
+    }),
   };
 })();
