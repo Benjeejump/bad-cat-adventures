@@ -57,7 +57,7 @@ with sync_playwright() as p:
     for gadget in ['laser','sonar','bubble','puppy']:
         page.locator(f'[data-gadget="{gadget}"]').click()
         page.locator('#actor-metro').click()
-        check(page.locator('#effect-layer').evaluate('(el)=>el.childElementCount')>0, f'{gadget} visible effect')
+        check(page.locator('.free-shot, .target-pop').count()>0, f'{gadget} visible targeted shot effect')
     for kind in ["vacuum","trap"]:
         page.evaluate("(kind)=>badCatAdventure.encounter(kind)",kind)
         check(page.locator('#encounter-dialog').evaluate('(el)=>el.open'), 'Encounter opens')
@@ -93,7 +93,7 @@ with sync_playwright() as p:
     page.evaluate('navigator.serviceWorker.ready')
     page.wait_for_function('navigator.serviceWorker.controller !== null')
     cached = page.evaluate('caches.keys()')
-    check('bad-cat-shell-v12' in cached, 'Offline shell cached')
+    check('bad-cat-shell-v13' in cached, 'Offline shell cached')
     context.set_offline(True)
     page.reload(wait_until='domcontentloaded')
     page.locator('#launch-silent').click(); page.locator('#test-drive').evaluate('(el)=>el.click()')

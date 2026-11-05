@@ -761,6 +761,35 @@
     $("#effect-layer").append(node);
     setTimeout(() => node.remove(), 2000);
   }
+  function shotVisual(kind, invention, point) {
+    if (invention) window.badCatInventions.launch(invention, point);
+    else {
+      const shot = document.createElement("span");
+      shot.className = "free-shot";
+      shot.textContent = {
+        shield: "◈",
+        laser: "✦",
+        sonar: "◎",
+        bubble: "🫧",
+        puppy: "🐾",
+      }[kind];
+      document.body.append(shot);
+      const player = window.badCatTargeting.targetNode("car");
+      const r = player?.getBoundingClientRect();
+      const x = r ? r.x + r.width / 2 : innerWidth / 2;
+      const y = r ? r.y + r.height / 2 : innerHeight * 0.82;
+      shot.animate(
+        [
+          { transform: `translate(${x}px,${y}px) scale(.4)` },
+          {
+            transform: `translate(${point.x}px,${point.y}px) scale(1.4)`,
+            opacity: 0,
+          },
+        ],
+        { duration: 650, easing: "ease-out" },
+      ).onfinish = () => shot.remove();
+    }
+  }
   function gadget(kind) {
     if (kind === "encounter") {
       encounter();
@@ -1108,7 +1137,9 @@
     renderInventions();
     $("#invention-name").value = "";
     sound("shield");
-    toast(`${name} saved! Choose it from My inventions, then tap a character.`);
+    toast(
+      `${name} saved! Equip it in your arsenal, then tap anywhere to shoot.`,
+    );
   });
   window.badCatInventions.init({
     list: () => progress.inventions,
@@ -1116,7 +1147,7 @@
     deploy: (inv) => {
       setView("drive");
       window.badCatTargeting.arm(inv.power, inv);
-      toast(`${inv.name} ready! Tap BC, Metro or a kitten.`);
+      story(`${inv.name} ready — tap anywhere to shoot.`);
     },
   });
   let tickles = 0;
@@ -1229,18 +1260,36 @@
     sound,
     story,
     result: (won, count) => window.badCatAdventure.raidResult(won, count),
+    miss: (kind, invention, point) => {
+      if (!window.badCatCampaign.use(kind)) return false;
+      progress.gadgets++;
+      save();
+      sound(kind);
+      shotVisual(kind, invention, point);
+    },
     apply: (kind, target, invention) => {
       const retreat = state.retreatUntil,
         ally = state.allyUntil;
-      if (gadget(kind) === false) return false;
+      if (!window.badCatCampaign.use(kind)) return false;
+      progress.gadgets++;
+      save();
+      sound(kind);
+      window.badCatAdventure.onGadget(kind);
+      if (kind === "shield") {
+        state.shieldUntil =
+          Date.now() + 12000 + window.badCatLoot.level("shield") * 5000;
+        $("#map-stage").classList.add("shielded");
+      }
       state.retreatUntil = retreat;
       state.allyUntil = ally;
       const strike = window.badCatCharacters.hit(target, kind);
-      if (invention)
-        window.badCatInventions.launch(
-          invention,
-          window.badCatTargeting.targetNode(target),
-        );
+      const node = window.badCatTargeting.targetNode(target);
+      const rect = node?.getBoundingClientRect();
+      if (rect)
+        shotVisual(kind, invention, {
+          x: rect.x + rect.width / 2,
+          y: rect.y + rect.height / 2,
+        });
       if (strike?.exposed) {
         window.badCatVehicle.reactToHit(target);
         state.targetEffects ||= {};

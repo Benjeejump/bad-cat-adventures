@@ -228,10 +228,12 @@
   function launch(inv, target, previewOnly = false) {
     const r = recipe(inv);
     if (!r) return;
-    const bounds = target?.getBoundingClientRect();
+    const bounds = target?.getBoundingClientRect?.();
     const end = {
-      x: bounds ? bounds.x + bounds.width / 2 : innerWidth / 2,
-      y: bounds ? bounds.y + bounds.height / 2 : innerHeight * 0.4,
+      x: bounds ? bounds.x + bounds.width / 2 : (target?.x ?? innerWidth / 2),
+      y: bounds
+        ? bounds.y + bounds.height / 2
+        : (target?.y ?? innerHeight * 0.4),
     };
     const start = previewOnly
       ? { x: end.x - 160, y: end.y + 60 }
@@ -297,7 +299,7 @@
     caption.textContent = `${inv.name}: ${describe(inv)}!`;
     stage.append(caption);
     // Keep previews above the native HQ/arsenal dialog top layer when applicable.
-    const dialog = target?.closest("dialog[open]");
+    const dialog = target?.closest?.("dialog[open]");
     (dialog || document.body).append(stage);
     setTimeout(() => stage.remove(), 2400);
   }

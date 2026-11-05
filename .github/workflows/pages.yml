@@ -21,7 +21,7 @@ jobs:
       - name: Stage only public game files
         run: |
           mkdir public
-          cp index.html road.js arsenal.js puppy-house.js road-home.css styles.css team-style.css cursive.js handwriting.js handwriting.css pipeworks.js pipeworks.css inventions.js inventions.css app.js vehicle-world.js characters.js theme.js character-style.css cinematics.js word-bank.js spelling.js learning.css loot.js game-map.js game-map-style.json puppy-options.js campaign.js targeting.js adventure.js site-config.js map-mode.css sw.js manifest.webmanifest public/
+          cp index.html parents.js road.js arsenal.js puppy-house.js road-home.css styles.css team-style.css cursive.js handwriting.js handwriting.css pipeworks.js pipeworks.css inventions.js inventions.css app.js vehicle-world.js characters.js theme.js character-style.css cinematics.js word-bank.js spelling.js learning.css loot.js game-map.js game-map-style.json puppy-options.js campaign.js targeting.js adventure.js site-config.js map-mode.css sw.js manifest.webmanifest public/
           cp -r assets public/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

@@ -748,6 +748,17 @@
   window.badCatSpelling = {
     init,
     open,
+    parentExit: () => {
+      book.pending = null;
+      save();
+      speechToken++;
+      window.speechSynthesis?.cancel();
+      clearTimeout(resultTimer);
+      cancelAnimationFrame(frame);
+      round = null;
+      dialog.close();
+      hooks.finished?.();
+    },
     isOpen: () => !!dialog?.open,
     resume: () => {
       if (book.pending) open();

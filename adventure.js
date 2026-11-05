@@ -784,6 +784,7 @@
       });
     },
     encounter,
+    parentExit: close,
     deferSpelling: () => {
       nextSpelling = 120 + Math.random() * 90;
       nextEvent = Math.max(nextEvent, 35);
@@ -817,6 +818,7 @@
     motionScale: () => (hazard ? 0.45 : 1),
     isOpen: () =>
       dialog.open ||
+      !!window.badCatParents?.isOpen() ||
       launching ||
       !!window.badCatHouse?.isOpen() ||
       !!window.badCatArsenal?.isOpen() ||
