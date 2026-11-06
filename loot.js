@@ -81,9 +81,17 @@
     document.querySelector("#net-hint").hidden = !armed;
     if (!drop)
       document.querySelector("#net-hint-text").textContent =
-        "Net ready · explore for a supply drop";
+        window.badCatRoad?.diagnostics().enabled
+          ? "Net ready · catch a floating message bottle"
+          : "Net ready · explore for a supply drop";
   }
   function select() {
+    if (window.badCatRoad?.diagnostics().enabled) {
+      armed = !armed;
+      if (armed) window.badCatTargeting.cancel();
+      render();
+      return;
+    }
     if (!car || !["gps", "test"].includes(mode)) {
       hooks.say(
         "Find your tablet’s GPS position or explicitly choose Test Drive before catching map drops.",

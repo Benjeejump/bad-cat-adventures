@@ -43,7 +43,7 @@ with sync_playwright() as p:
   trace(page)
  check(page.evaluate('badCatHandwriting.diagnostics().done'),'Finger tracing completes both short sentences without a timer')
  check(page.locator('#pencil-finished-art path').count()>25,'Finished note forms neat cursive paths on both writing lines')
- check(page.evaluate('badCatCampaign.snapshot().supplies')==min(99,before+2),'Finished note earns puppy treats')
+ check(page.evaluate('badCatCampaign.snapshot().supplies')==min(99,before+8),'Finished note earns puppy treats')
  check(page.evaluate('badCatHandwriting.diagnostics().saved')==1,'Finished note is saved locally')
  page.screenshot(path='/tmp/magic-pencil-note.png');page.locator('#pencil-close').click()
  page.evaluate('navigator.serviceWorker.ready');page.wait_for_function('navigator.serviceWorker.controller!==null');c.set_offline(True);page.reload();page.locator('#launch-silent').click();tap_tool(page, '#pencil-launch')

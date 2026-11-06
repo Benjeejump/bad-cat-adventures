@@ -65,12 +65,12 @@
       }
       return false;
     }
-    visit(first);
+    if (rows * cols <= 20) visit(first);
     if (!route) {
       route = [];
-      for (let r = 0; r < rows; r++)
-        for (let c = 0; c < cols; c++)
-          route.push(r * cols + (r % 2 ? cols - 1 - c : c));
+      for (let c = 0; c < cols; c++)
+        for (let r = 0; r < rows; r++)
+          route.push((c % 2 ? rows - 1 - r : r) * cols + c);
     }
     const solution = Array(rows * cols).fill(0);
     solution[route[0]] |= 8;
@@ -146,7 +146,7 @@
     for (const [, , bit] of directions)
       if (mask & bit)
         d += `M50 50L${bit === 2 ? 100 : bit === 8 ? 0 : 50} ${bit === 1 ? 0 : bit === 4 ? 100 : 50}`;
-    return `<svg viewBox="0 0 100 100" aria-hidden="true"><path class="pipe-shadow" d="${d}"/><path class="pipe-metal" d="${d}"/><path class="pipe-bore" d="${d}"/><path class="pipe-water" d="${d}"/><circle class="pipe-joint" cx="50" cy="50" r="12"/><circle class="pipe-bolt" cx="14" cy="14" r="3"/><circle class="pipe-bolt" cx="86" cy="86" r="3"/></svg>`;
+    return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path class="pipe-shadow" d="${d}"/><path class="pipe-metal" d="${d}"/><path class="pipe-bore" d="${d}"/><path class="pipe-water" d="${d}"/><circle class="pipe-joint" cx="50" cy="50" r="12"/><circle class="pipe-bolt" cx="14" cy="14" r="3"/><circle class="pipe-bolt" cx="86" cy="86" r="3"/></svg>`;
   }
   function connections() {
     const { tiles, start, end, cols, rows } = round,
@@ -255,8 +255,9 @@
   function start(level = record.level) {
     cancelAnimationFrame(frame);
     last = 0;
-    const rows = level >= 5 ? 5 : 3,
-      cols = level >= 3 ? 5 : 4;
+    const portrait = innerHeight > innerWidth,
+      rows = portrait ? (level >= 5 ? 8 : 6) : level >= 5 ? 6 : 4,
+      cols = portrait ? 4 : level >= 5 ? 8 : 6;
     round = {
       ...(level >= 3
         ? placementPuzzle(rows, cols, level)
@@ -340,7 +341,7 @@
     record.wins++;
     record.level = Math.min(12, Math.max(record.level, round.level + 1));
     save();
-    const treats = window.badCatCampaign.awardTreats(2);
+    const treats = window.badCatCampaign.awardTreats(5);
     const fluid = $("#pipe-fluid").selectedOptions[0].textContent;
     $("#pipe-status").textContent =
       `WHOOSH! ${fluid} reached the end through every pipe. Dylan outsmarted Metro’s pipe prank! +${treats} puppy treat${treats === 1 ? "" : "s"}.`;

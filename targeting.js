@@ -112,6 +112,11 @@
       window.badCatAdventure.isOpen()
     )
       return;
+    if (window.badCatEncounters?.findHit(x, y)) {
+      if (hooks.miss(armed, armedInvention, { x, y }) !== false)
+        window.badCatEncounters.hitAt(x, y);
+      return;
+    }
     const nearby = Object.keys(targetNames)
       .map((key) => {
         const node = window.badCatTargeting.targetNode(key);

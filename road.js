@@ -5,6 +5,7 @@
     root,
     enabled = false,
     x = 50,
+    y = 74,
     elapsed = 0,
     nextSpawn = 3,
     nextTreat = 5,
@@ -59,13 +60,22 @@
       cast.forEach((k) => (root.querySelector(".road-" + k).hidden = true));
       activeEnemy = null;
       x = 50;
+      y = 74;
       render();
       animationFrame = requestAnimationFrame(animate);
     }
   }
   function render() {
+    const walking = window.badCatVehicle.mode() === "walking";
+    const playerImage = root.querySelector("#road-player img");
+    const image = walking ? "assets/dylan.png" : "assets/road-odyssey.png";
+    if (!playerImage.src.endsWith(image)) playerImage.src = image;
+    playerImage.alt = walking
+      ? "Dylan the Dalmatian puppy"
+      : "White Honda Odyssey";
     root.hidden = !visible();
     root.style.setProperty("--road-x", x + "%");
+    root.style.setProperty("--road-y", y + "%");
     root.style.setProperty("--road-scroll", ((elapsed * 140) % 1880) + "px");
     root
       .querySelectorAll(".road-trees span")
@@ -74,7 +84,7 @@
       );
     root.classList.toggle("road-paused", !hooks.active());
     root.querySelector("#road-distance").textContent =
-      `${Math.floor(elapsed * 12)} adventure metres · GPS off`;
+      `${Math.floor(elapsed * 12)} adventure metres`;
   }
   function spawn() {
     const key = cast[spawnIndex++ % cast.length];
@@ -107,7 +117,7 @@
     node.className = "road-shot";
     node.textContent = "✦";
     root.querySelector(".road-playfield").append(node);
-    bullets.push({ x, y: 68, node });
+    bullets.push({ x, y: y - 6, node });
     hooks.sound("laser");
   }
   function move(value) {
@@ -124,9 +134,13 @@
       nextSpawn = 4;
     }
     wasBusy = busy;
-    if (busy) keys = { left: false, right: false, fire: false };
+    if (busy) {
+      keys = { left: false, right: false, fire: false };
+      bullets.forEach((b) => b.node.remove());
+      bullets = [];
+    }
     if (!visible() || !hooks.active()) return;
-    elapsed += dt;
+    elapsed += dt * window.badCatCampaign.motionScale();
     if (keys.fire) fire();
     cooldown = Math.max(0, cooldown - dt);
     nextSpawn -= dt;
@@ -153,6 +167,18 @@
       shot.y -= dt * 62;
       shot.node.style.left = shot.x + "%";
       shot.node.style.top = shot.y + "%";
+      const bounds = root.getBoundingClientRect();
+      const point = {
+        x: bounds.x + (shot.x / 100) * bounds.width,
+        y: bounds.y + (shot.y / 100) * bounds.height,
+      };
+      if (window.badCatEncounters?.findHit(point.x, point.y)) {
+        if (!window.badCatTargeting.diagnostics().armed)
+          window.badCatArsenal.arm(1);
+        window.badCatTargeting.shootAt(point.x, point.y);
+        shot.y = -10;
+        continue;
+      }
       for (const key of cast) {
         const b = root.querySelector(".road-" + key);
         if (b.hidden) continue;
@@ -176,7 +202,7 @@
       t.y += dt * 21;
       t.node.style.left = t.x + "%";
       t.node.style.top = t.y + "%";
-      if (t.y > 68 && t.y < 81 && Math.abs(t.x - x) < 8) {
+      if (Math.abs(t.y - y) < 7 && Math.abs(t.x - x) < 8) {
         window.badCatCampaign.awardTreats(1);
         t.y = 110;
         root.querySelector("#road-radio").textContent =
@@ -252,14 +278,6 @@
         e.target.closest("input,select,textarea,dialog")
       )
         return;
-      if (["ArrowLeft", "a", "A"].includes(e.key)) {
-        keys.left = true;
-        e.preventDefault();
-      }
-      if (["ArrowRight", "d", "D"].includes(e.key)) {
-        keys.right = true;
-        e.preventDefault();
-      }
       if (e.code === "Space") {
         e.preventDefault();
         fire();
@@ -281,10 +299,21 @@
     deploy,
     fire,
     visible,
+    dismiss: (key) => {
+      root.querySelector(".road-" + key)?.setAttribute("hidden", "");
+      activeEnemy = null;
+      nextSpawn = 8;
+    },
+    steer: (dx, dy) => {
+      move(x + dx);
+      y = Math.max(25, Math.min(84, y + dy));
+      render();
+    },
     diagnostics: () => ({
       enabled,
       visible: visible(),
       x,
+      y,
       elapsed,
       activeEnemy,
       shots: bullets.length,

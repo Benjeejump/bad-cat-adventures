@@ -176,6 +176,26 @@
     $("#pencil-count").textContent =
       `${round.completed.length} of ${round.text.replace(/ /g, "").length} letters and marks`;
   }
+  function focusPage() {
+    if (!round || round.done) return;
+    svg.classList.toggle("large-tracing", !round.wholePage);
+    if (round.wholePage) {
+      svg.setAttribute("viewBox", "0 0 1000 380");
+      return;
+    }
+    const root = svg.querySelector(`[data-letter-index="${round.index}"]`);
+    if (!root) return;
+    const box = root.getBBox(),
+      m = root.transform.baseVal.consolidate().matrix;
+    const x = box.x * m.a + m.e,
+      y = box.y * m.d + m.f;
+    const width = box.width * m.a,
+      height = box.height * m.d;
+    svg.setAttribute(
+      "viewBox",
+      `${x - 24} ${y - 20} ${Math.max(width + 48, 150)} ${Math.max(height + 40, 160)}`,
+    );
+  }
   function renderLetter() {
     tracingReady = false;
     clearTimeout(doneTimer);
@@ -208,6 +228,7 @@
     const root = svg.querySelector(`[data-letter-index="${round.index}"]`);
     root.id = "letter-guides";
     currentPath = root.children[round.stroke];
+    focusPage();
     total = currentPath.getTotalLength();
     samples = [];
     for (let n = 0; n <= total; n += 1.5) {
@@ -402,7 +423,7 @@
     });
     book.notes = book.notes.slice(-6);
     save();
-    window.badCatCampaign.awardTreats(2);
+    window.badCatCampaign.awardTreats(8);
     hooks.sound("victory");
     $("#pencil-work").hidden = true;
     $("#pencil-finished").hidden = false;
@@ -410,7 +431,7 @@
     $("#pencil-finished-text").textContent = round.text;
     drawFinished($("#pencil-finished-art"), round.completed, round.text);
     $("#pencil-status").textContent =
-      "You wrote two sentences! Your neat cursive note is saved on this device. +2 puppy treats.";
+      "You wrote two sentences! Your neat cursive note is saved on this device. +8 puppy treats.";
   }
   function begin(pending) {
     clearTimeout(doneTimer);
@@ -478,8 +499,14 @@
       $("#pencil-message").append(o);
     }
     $("#pencil-begin").onclick = () => begin();
-    $("#pencil-zoom").onclick = () =>
-      $("#pencil-page-scroll").classList.toggle("page-fit");
+    $("#pencil-zoom").onclick = () => {
+      if (!round) return;
+      round.wholePage = !round.wholePage;
+      $("#pencil-zoom").textContent = round.wholePage
+        ? "Large tracing"
+        : "Whole note";
+      focusPage();
+    };
     $("#pencil-demo").onclick = () => {
       animationStart = performance.now();
       demoUntil = animationStart + 5500;

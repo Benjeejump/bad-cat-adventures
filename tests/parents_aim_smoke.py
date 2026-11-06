@@ -5,14 +5,14 @@ with sync_playwright() as p:
  c=b.new_context(viewport={'width':1280,'height':800},reduced_motion='reduce')
  page=c.new_page(); errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
  page.goto('http://127.0.0.1:8000/',wait_until='domcontentloaded')
- page.locator('#launch-silent').click();page.locator('#test-drive').evaluate('(n)=>n.click()');page.wait_for_timeout(600)
+ page.locator('#launch-silent').click();page.wait_for_timeout(600)
  page.locator('[data-gadget="laser"]').click()
  before=page.evaluate('badCatCharacters.diagnostics()')
  page.mouse.click(200,500)
  assert page.locator('.free-shot').count()==1
  assert page.evaluate('badCatCharacters.diagnostics()')==before
  assert page.evaluate('badCatTargeting.diagnostics().armed')=='laser'
- page.locator('#actor-metro').click()
+ page.evaluate('badCatTargeting.target("metro",badCatTargeting.targetNode("metro"))')
  assert page.evaluate('badCatCharacters.diagnostics().metro.shield')==2
  print('PASS Free shot can miss; a cat hit damages its forcefield; launcher stays armed')
  page.evaluate('badCatAdventure.encounter("spelling")')

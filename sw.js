@@ -1,4 +1,4 @@
-const CACHE = "bad-cat-shell-v15";
+const CACHE = "bad-cat-shell-v16";
 const SHELL = [
   "./",
   "./index.html",
@@ -25,6 +25,7 @@ const SHELL = [
   "./assets/carwash-squid.png",
   "./app.js",
   "./parents.js",
+  "./field-adventure.js",
   "./road.js",
   "./arsenal.js",
   "./puppy-house.js",

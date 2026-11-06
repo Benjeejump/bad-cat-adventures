@@ -42,32 +42,6 @@
       choices: [],
     },
     {
-      id: "tunnel",
-      title: "BC and Metro found a secret pipe!",
-      text: "They’ve ducked underground and are trying to pop up ahead of the Odyssey. Dylan, what’s the plan?",
-      icon: "metro",
-      choices: [
-        [
-          "Sonar: find their tunnel",
-          "sonar",
-          "scan",
-          "PING! Their pretend pipe lights up. BC and M pop out, surprised that Dylan found them!",
-        ],
-        [
-          "Fill the pipe with bubbles",
-          "bubble",
-          "pipe",
-          "Bubbles WHOOSH through the pipe. Both cats slide out on a giant bubble raft!",
-        ],
-        [
-          "Follow in submarine mode",
-          "submarine",
-          "submerge",
-          "Dive! The Odyssey follows the pipe in submarine mode. Metro was hiding behind a tiny rubber duck.",
-        ],
-      ],
-    },
-    {
       id: "amy",
       title: "Wait… does Amy live THERE?!",
       text: "Dylan spots a very suspicious building. Could it be Amy’s newest imaginary house?",
@@ -264,6 +238,7 @@
     }
   }
   function encounter(kind) {
+    if (kind === "tunnel") return false;
     if (dialog.open || launching || window.badCatSpelling.isOpen()) return;
     if (kind === "spelling") {
       window.badCatSpelling.open();
@@ -292,7 +267,7 @@
       return;
     }
     sequence++;
-    if (["trap", "heist", "tunnel"].includes(active.id)) setHazard(active.id);
+    if (["trap", "heist"].includes(active.id)) setHazard(active.id);
     $("#scene-stage").innerHTML = art(active.id);
     if (active.id === "amy") {
       const homes = [
@@ -579,6 +554,7 @@
     open();
   }
   function setHazard(kind) {
+    if (kind === "tunnel") return;
     if (hooks.shielded()) {
       hooks.story(
         "Your forcefield bounces Metro’s mischief away. BC applauds!",
@@ -596,26 +572,13 @@
       $("#map-stage").append(layer);
     }
     layer.innerHTML =
-      kind === "tunnel"
-        ? '<div class="pipe-mouth pipe-entry">BC ↓</div><div class="pipe-mouth pipe-exit">M ↑</div><div class="pipe-link"></div><div class="hazard-label">BC + M are using a pretend tunnel. Sonar can find them!</div>'
-        : kind === "trap"
-          ? '<div class="hazard-bubble"></div><div class="hazard-label">M fired a bubble trap! Try bubbles or confetti.</div>'
-          : '<div class="hazard-rocket">🚀</div><div class="hazard-label">BC borrowed the booster! Try sonar or puppies.</div>';
-    document
-      .querySelectorAll(
-        kind === "tunnel"
-          ? ".enemy-icon,.actor.enemy-actor"
-          : kind === "trap"
-            ? ".metro-marker,#actor-metro"
-            : ".badcat-marker,#actor-badcat",
-      )
-      .forEach((n) => n.classList.add("is-acting"));
+      kind === "trap"
+        ? '<div class="hazard-bubble"></div><div class="hazard-label">Metro’s bubble trap!</div>'
+        : '<div class="hazard-rocket">🚀</div><div class="hazard-label">Bad Cat borrowed the booster!</div>';
     hooks.story(
-      kind === "tunnel"
-        ? "BC and Metro duck into a pipe! Their pretend tunnel is heading under the Odyssey. Try sonar, bubbles or a forcefield."
-        : kind === "trap"
-          ? "Metro fires his bubble cannon! The Odyssey slows to a gentle wobble. Bubbles, confetti or a shield can help."
-          : "Bad Cat swipes the booster! Cruise gently while sonar or puppies bring it back.",
+      kind === "trap"
+        ? "Metro’s bubble cannon wobbles!"
+        : "Bad Cat swiped the booster!",
     );
     hooks.sound("sonar");
   }
@@ -630,11 +593,7 @@
     if (message) hooks.story(message);
   }
   function onGadget(kind) {
-    if (hazard === "tunnel" && ["sonar", "bubble", "shield"].includes(kind))
-      clearHazard(
-        "Dylan found their secret pipe! BC and M pop out in a cloud of bubbles.",
-      );
-    else if (hazard === "trap" && ["bubble", "laser", "shield"].includes(kind))
+    if (hazard === "trap" && ["bubble", "laser", "shield"].includes(kind))
       clearHazard("POP! Dylan freed the Odyssey from Metro’s bubble trap.");
     else if (hazard === "heist" && ["sonar", "puppy", "shield"].includes(kind))
       clearHazard(
@@ -676,25 +635,8 @@
       hazardSeconds -= dt;
       if (hazardSeconds <= 0)
         clearHazard("The cats get distracted by a biscuit. Full speed ahead!");
-    } else {
-      actionCountdown -= dt;
-      if (actionCountdown <= 0) {
-        actionCountdown =
-          32 + Math.random() * 15 - window.badCatCampaign.pressure() * 3;
-        setHazard(["trap", "heist", "tunnel"][Math.floor(Math.random() * 3)]);
-      }
     }
-    nextSpelling -= dt;
-    if (nextSpelling <= 0) {
-      encounter("spelling");
-      return;
-    }
-    nextEvent -= dt;
-    if (nextEvent <= 0) {
-      nextEvent =
-        55 + Math.random() * 35 - window.badCatCampaign.pressure() * 4;
-      encounter();
-    }
+    // Ambient games come from bee contact, bottle pickups and villain defeats.
   }
   dialog.addEventListener("close", () => {
     if (dialog.open) return;
@@ -808,13 +750,6 @@
       arrivalArmed = true;
     },
     onGadget,
-    tunnelState: () =>
-      hazard === "tunnel"
-        ? {
-            hidden: hazardSeconds < 33 && hazardSeconds > 28,
-            exiting: hazardSeconds <= 28,
-          }
-        : null,
     motionScale: () => (hazard ? 0.45 : 1),
     isOpen: () =>
       dialog.open ||

@@ -1,12 +1,12 @@
-/* Five homes, twenty unique furnishings each. Treats are earned only in game. */
+/* Five homes with 10, 20, 30, 40 and 50 furnishings. Treats are earned only in game. */
 "use strict";
 (() => {
   const homes = [
-    { name: "Dog house", upgrade: 8, rooms: 1 },
-    { name: "Dog apartment", upgrade: 15, rooms: 2 },
-    { name: "House", upgrade: 25, rooms: 3 },
-    { name: "Big house", upgrade: 35, rooms: 4 },
-    { name: "Mansion", upgrade: 0, rooms: 6 },
+    { name: "Dog house", upgrade: 8, rooms: 1, items: 10 },
+    { name: "Dog apartment", upgrade: 15, rooms: 2, items: 20 },
+    { name: "House", upgrade: 25, rooms: 3, items: 30 },
+    { name: "Big house", upgrade: 35, rooms: 4, items: 40 },
+    { name: "Mansion", upgrade: 0, rooms: 6, items: 50 },
   ];
   const lists = [
     [
@@ -120,6 +120,55 @@
       ["Moonlight dome", "🌙"],
     ],
   ];
+  const legacyDogHouse = lists[0]
+    .slice(10)
+    .map(([name, icon], i) => ({
+      id: `home-0-${i + 10}`,
+      tier: 0,
+      index: i + 10,
+      name,
+      icon,
+      price: 0,
+    }));
+  const extras = [
+    ["Puppy hammock", "🏖️"],
+    ["Climbing ladder", "🪜"],
+    ["Telescope", "🔭"],
+    ["Drawing desk", "🎨"],
+    ["Mini greenhouse", "🌱"],
+    ["Toy sailboat", "⛵"],
+    ["Bubble fountain", "🫧"],
+    ["Rocket lamp", "🚀"],
+    ["Reading tent", "⛺"],
+    ["Music box", "🎵"],
+    ["Model railway", "🚂"],
+    ["Skate ramp", "🛹"],
+    ["Puzzle chest", "🧩"],
+    ["Puppy portrait", "🖼️"],
+    ["Garden swing", "🛝"],
+    ["Baking station", "🧁"],
+    ["Dinosaur display", "🦕"],
+    ["Chess table", "♟️"],
+    ["Lego corner", "🧱"],
+    ["Butterfly garden", "🦋"],
+    ["Mini planetarium", "🌌"],
+    ["Robot helper", "🤖"],
+    ["Puppy carousel", "🎠"],
+    ["Indoor lagoon", "🐠"],
+    ["Crystal chandelier", "💡"],
+    ["Magic mirror", "🪞"],
+    ["Lemonade stand", "🍋"],
+    ["Treasure map rug", "🗺️"],
+    ["Rainbow art wall", "🌈"],
+    ["Star projector", "⭐"],
+  ];
+  lists.forEach((rows, tier) => {
+    if (tier === 0) rows.splice(10);
+    while (rows.length < homes[tier].items) {
+      const [name, icon] = extras[rows.length - 20];
+      rows.push([`${homes[tier].name} ${name.toLowerCase()}`, icon]);
+    }
+  });
   const catalog = lists.flatMap((rows, tier) =>
     rows.map(([name, icon], index) => ({
       id: `home-${tier}-${index}`,
@@ -130,6 +179,7 @@
       price: [1, 3, 5, 8, 12][tier] + (index % 6) * [1, 1, 2, 2, 4][tier],
     })),
   );
+  const knownItems = [...catalog, ...legacyDogHouse];
   let data = { tier: 0, owned: [], placed: [], positions: {} },
     dialog,
     hooks,
@@ -141,7 +191,7 @@
       data.tier = Math.max(0, Math.min(4, Math.floor(v.tier) || 0));
       data.owned = [
         ...new Set(
-          (v.owned || []).filter((id) => catalog.some((i) => i.id === id)),
+          (v.owned || []).filter((id) => knownItems.some((i) => i.id === id)),
         ),
       ];
       data.placed = [
@@ -197,7 +247,11 @@
     return true;
   }
   function upgrade() {
-    if (view !== data.tier || data.tier === 4 || count(data.tier) !== 20)
+    if (
+      view !== data.tier ||
+      data.tier === 4 ||
+      count(data.tier) !== homes[data.tier].items
+    )
       return false;
     const price = homes[data.tier].upgrade;
     if (!window.badCatCampaign.spendTreats(price)) {
@@ -245,20 +299,25 @@
     const home = homes[view],
       room = $("#house-building");
     room.className = `home-tier-${view}`;
+    room.style.minHeight = `${Math.max(350, Math.ceil(home.items / (innerWidth < 600 ? 4 : 6)) * 62)}px`;
     room.style.setProperty("--home-rooms", home.rooms);
     room.replaceChildren();
-    $("#house-title").textContent = `Your ${home.name}`;
+    $("#house-title").textContent = dialog.classList.contains(
+      "house-store-mode",
+    )
+      ? `Furniture store · ${home.name}`
+      : `Your ${home.name}`;
     $("#house-balance").textContent =
       `🍪 ${window.badCatCampaign.snapshot().supplies} treats`;
     $("#house-progress").textContent =
-      `${count(view)} / 20 furnishings placed${view < data.tier ? " · saved previous home" : ""}`;
+      `${count(view)} / ${home.items} furnishings placed${view < data.tier ? " · saved previous home" : ""}`;
     for (let r = 0; r < home.rooms; r++) {
       const node = document.createElement("div");
       node.className = "house-room";
       node.dataset.room = r;
       room.append(node);
     }
-    const owned = catalog.filter(
+    const owned = knownItems.filter(
       (i) => i.tier === view && data.placed.includes(i.id),
     );
     owned.forEach((item) => {
@@ -274,19 +333,13 @@
         b.style.top = Math.max(3, Math.min(90, pos.y)) + "%";
       } else {
         const n = item.index,
-          cols =
-            home.rooms === 1
-              ? 5
-              : home.rooms === 2
-                ? 5
-                : home.rooms === 3
-                  ? 6
-                  : home.rooms === 4
-                    ? 5
-                    : 6;
+          cols = innerWidth < 600 ? 4 : 6;
         b.style.left = 7 + (n % cols) * (85 / cols) + "%";
         b.style.top =
-          25 + Math.floor(n / cols) * (58 / Math.ceil(20 / cols)) + "%";
+          25 +
+          Math.floor(n / cols) *
+            (58 / Math.ceil(Math.max(home.items, owned.length) / cols)) +
+          "%";
       }
       b.onclick = (e) => {
         e.stopPropagation();
@@ -299,6 +352,8 @@
     pup.src = "assets/dylan.png";
     pup.alt = "Dylan, your Dalmatian puppy";
     room.append(pup);
+    $("#house-shop-heading").textContent =
+      `Furniture store · ${home.items} things for this home`;
     const shop = $("#house-shop");
     shop.replaceChildren();
     catalog
@@ -313,6 +368,14 @@
         name.textContent = item.name;
         const owned = data.owned.includes(item.id),
           placed = data.placed.includes(item.id);
+        card.classList.toggle(
+          "can-afford",
+          !owned && window.badCatCampaign.snapshot().supplies >= item.price,
+        );
+        card.classList.toggle("furniture-owned", owned);
+        const price = document.createElement("small");
+        price.className = "furniture-price";
+        price.textContent = owned ? "Yours ✓" : `${item.price} treats`;
         button.dataset.buyItem = item.id;
         button.textContent = owned
           ? placed
@@ -333,13 +396,13 @@
           save();
           render();
         };
-        card.append(icon, name, button);
+        card.append(icon, name, price, button);
         shop.append(card);
       });
     const up = $("#house-upgrade");
     up.hidden = view !== data.tier || view === 4;
     up.disabled =
-      count(view) !== 20 ||
+      count(view) !== home.items ||
       window.badCatCampaign.snapshot().supplies < home.upgrade;
     up.textContent =
       view < 4
@@ -348,11 +411,11 @@
     $("#house-upgrade-help").textContent =
       view !== data.tier
         ? `This saved home stays furnished. Visit your ${homes[data.tier].name.toLowerCase()} to keep building.`
-        : count(view) === 20
+        : count(view) === home.items
           ? view === 4
             ? "Your mansion is fully furnished!"
             : `Fully furnished! Your next home costs ${home.upgrade} treats.`
-          : "Place all 20 furnishings to unlock the next home. There is no hurry.";
+          : `Place all ${home.items} furnishings to unlock the next home. There is no hurry.`;
     const selector = $("#house-visit");
     selector.replaceChildren();
     homes.forEach((h, i) => {
@@ -364,7 +427,7 @@
     });
     selector.value = view;
   }
-  function open() {
+  function open(section = "home") {
     if (
       window.badCatAdventure.isOpen() ||
       document.querySelector("#arsenal-dialog[open],#arsenal-editor[open]")
@@ -372,11 +435,13 @@
       return false;
     view = data.tier;
     selected = null;
+    dialog.classList.toggle("house-store-mode", section === "store");
     render();
     message(
       "Earn treats from spelling, notes, pipe repairs and Road Adventure cookies. Spend them to furnish Dylan’s home. Purchases stay on this device.",
     );
     dialog.showModal();
+    dialog.scrollTop = 0;
     return true;
   }
   function init(h) {
@@ -385,9 +450,24 @@
     dialog.id = "puppy-house-dialog";
     dialog.setAttribute("aria-labelledby", "house-title");
     dialog.innerHTML =
-      '<header><div><p>DYLAN’S PUPPY HOUSE</p><h2 id="house-title"></h2></div><b id="house-balance"></b><button id="house-close" aria-label="Close Puppy House">×</button></header><p id="house-status" role="status"></p><div class="house-toolbar"><label>Visit <select id="house-visit"></select></label><span id="house-progress"></span><button id="house-move">Move selected item</button></div><div id="house-garden"><div id="house-building"></div></div><div class="house-upgrade"><p id="house-upgrade-help"></p><button id="house-upgrade"></button></div><h3 id="house-shop-heading">Furnish this home · 20 things to collect</h3><div id="house-shop"></div>';
+      '<header><div><p>DYLAN’S PUPPY HOUSE</p><h2 id="house-title"></h2></div><b id="house-balance"></b><button id="house-close" aria-label="Close Puppy House">×</button></header><p id="house-status" role="status"></p><nav id="house-view-tabs" aria-label="Home and furniture store"><button id="house-home-tab">🏠 My home</button><button id="house-store-tab">🛍 Furniture store</button></nav><div class="house-toolbar"><label>Visit <select id="house-visit"></select></label><span id="house-progress"></span><button id="house-move">Move selected item</button></div><div id="house-garden"><div id="house-building"></div></div><div class="house-upgrade"><p id="house-upgrade-help"></p><button id="house-upgrade"></button></div><h3 id="house-shop-heading">Furniture store</h3><div id="house-shop"></div>';
     document.body.append(dialog);
     $("#house-close").onclick = () => dialog.close();
+    $("#house-home-tab").onclick = () => {
+      dialog.classList.remove("house-store-mode");
+      render();
+      dialog.scrollTop = 0;
+    };
+    $("#house-store-tab").onclick = () => {
+      dialog.classList.add("house-store-mode");
+      render();
+      dialog.scrollTop = 0;
+    };
+    const store = document.createElement("button");
+    store.id = "furniture-store-launch";
+    store.textContent = "🛍 Furniture store · spend treats";
+    store.onclick = () => open("store");
+    document.querySelector(".puppy-hq-options").prepend(store);
     dialog.addEventListener("close", hooks.closed);
     $("#house-upgrade").onclick = upgrade;
     $("#house-visit").onchange = () => {

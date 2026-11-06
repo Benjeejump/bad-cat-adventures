@@ -18,7 +18,7 @@
       max: 3,
       plans: [
         ["heist", "While you’re looking, I shall borrow your booster. Genius!"],
-        ["tunnel", "My secret tunnel leads right under your Odyssey!"],
+        ["heist", "My next invention will swipe those biscuits!"],
         [
           "spelling",
           "My spelling bees are sharpening their pencils… and their stingers!",
@@ -31,10 +31,7 @@
       max: 4,
       plans: [
         ["trap", "Pressure gauge green! My bubble cannon is nearly ready!"],
-        [
-          "tunnel",
-          "I welded a secret pipe over here. Let’s see where it pops out!",
-        ],
+        ["trap", "I built a giant bubble machine. Look at those gears!"],
         ["trap", "One more turn of this spanner… then BUBBLE TROUBLE!"],
       ],
     },
@@ -179,7 +176,7 @@
     }
     const damage =
       power === "sonar"
-        ? 0
+        ? 1
         : power === "laser"
           ? 2 + Math.min(1, window.badCatLoot.level("laser"))
           : 1;
@@ -244,23 +241,6 @@
           speak(key, "Field generator rebuilt! You’ll have to crack it again.");
         }
       }
-      if (cat.plan) {
-        cat.plan.remaining -= dt;
-        if (cat.plan.remaining <= 0) {
-          const kind = cat.plan.kind;
-          if (hooks.plan(kind, key)) {
-            cat.plan = null;
-            speak(
-              key,
-              kind === "trap"
-                ? "Bubble cannon: FIRE!"
-                : kind === "tunnel"
-                  ? "Into the pipes! Catch us if you can!"
-                  : "Spelling bees… ATTACK!",
-            );
-          }
-        }
-      }
     }
   }
   function init(h) {
@@ -280,6 +260,14 @@
     hit,
     tick,
     decorate,
+    resetField: (key) => {
+      if (!state[key]) return;
+      state[key].shield = defs[key].max;
+      state[key].exposedTime = 0;
+      state[key].plan = null;
+      save();
+      decorate();
+    },
     clearPlans: () => {
       for (const cat of Object.values(state)) cat.plan = null;
       spoken = null;

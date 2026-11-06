@@ -1265,3 +1265,426 @@ body.map-mode .action-rail {
   margin: 0;
   box-sizing: border-box;
 }
+
+/* Main adventure controls: five launch pads, separate HQ house, standard D-pad. */
+.action-rail .gadget-grid > .gadget:nth-child(5) {
+  grid-column: 1/-1;
+  justify-self: center;
+  width: 132px;
+  min-height: 82px;
+  border-radius: 46% 46% 38% 38%;
+  transform: none;
+}
+.action-rail .gadget-grid > .gadget:nth-child(5) b {
+  max-width: 105px;
+  font-size: 12px;
+}
+#puppy-hq-launch {
+  position: fixed;
+  inset: auto 16px 16px auto;
+  width: 76px;
+  min-height: 76px;
+  border-radius: 22px;
+  z-index: 860;
+}
+#puppy-hq-launch span {
+  font-size: 38px;
+}
+#puppy-hq-launch b {
+  font-size: 12px;
+}
+#movement-pad {
+  position: fixed;
+  left: 18px;
+  bottom: 100px;
+  z-index: 850;
+  width: 144px;
+  height: 144px;
+  display: grid;
+  grid-template: repeat(3, 48px) / repeat(3, 48px);
+  touch-action: none;
+  filter: drop-shadow(0 5px 0 #08213b);
+}
+#movement-pad[hidden] {
+  display: none;
+}
+#movement-pad button {
+  border: 2px solid #87d8ed;
+  background: linear-gradient(#2b6d99, #143655);
+  color: white;
+  padding: 0;
+  font-size: 24px;
+  touch-action: none;
+  min-width: 48px;
+  min-height: 48px;
+}
+#movement-pad [data-move="up"] {
+  grid-area: 1/2;
+  border-radius: 12px 12px 0 0;
+}
+#movement-pad [data-move="left"] {
+  grid-area: 2/1;
+  border-radius: 12px 0 0 12px;
+}
+#movement-pad [data-move="right"] {
+  grid-area: 2/3;
+  border-radius: 0 12px 12px 0;
+}
+#movement-pad [data-move="down"] {
+  grid-area: 3/2;
+  border-radius: 0 0 12px 12px;
+}
+#movement-pad span {
+  grid-area: 2/2;
+  display: grid;
+  place-items: center;
+  background: #183e5d;
+  color: #54859f;
+  border: 0;
+}
+#movement-pad button:active {
+  background: #e7b858;
+  color: #163b58;
+}
+#road-player {
+  top: calc(var(--road-y, 74%) - 40px);
+  bottom: auto;
+}
+.road-controls #road-left,
+.road-controls #road-right {
+  display: none;
+}
+.road-controls {
+  bottom: 20px;
+}
+[data-retired] {
+  display: none !important;
+}
+#field-encounters {
+  position: fixed;
+  inset: 0;
+  z-index: 705;
+  pointer-events: none;
+  overflow: hidden;
+}
+#field-encounters[hidden] {
+  display: none;
+}
+.field-bee,
+.message-bottle {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  border: 0;
+  background: none;
+  padding: 0;
+  box-shadow: none;
+  touch-action: manipulation;
+}
+.field-bee {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  min-height: 64px;
+}
+.field-bee img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 2px #091e3b66);
+}
+.message-bottle {
+  width: 74px;
+  height: 100px;
+}
+.message-bottle svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 4px #071e3c77);
+}
+.bottle-wiggle {
+  animation: bottle-wiggle 0.4s;
+}
+@keyframes bottle-wiggle {
+  50% {
+    rotate: 15deg;
+  }
+}
+
+/* Pipes is the workshop floor itself, with a wide working grid. */
+#pipeworks-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+  overflow: hidden;
+}
+#pipeworks-dialog .pipe-header {
+  min-height: 64px;
+  padding: 6px 70px 6px 12px;
+  flex: none;
+  gap: 10px;
+}
+#pipeworks-dialog .pipe-header > img {
+  width: 44px;
+  height: 44px;
+}
+#pipeworks-dialog .pipe-header h2 {
+  font-size: 21px;
+}
+#pipeworks-dialog .pipe-header p,
+#pipeworks-dialog .pipe-header small {
+  font-size: 9px;
+}
+#pipeworks-dialog .pipe-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  padding: 6px 12px;
+  gap: 5px;
+  overflow: auto;
+}
+#pipeworks-dialog #pipe-status {
+  font-size: 12px;
+  margin: 0;
+  min-height: 0;
+}
+#pipeworks-dialog .pipe-gauges {
+  margin: 0;
+  gap: 10px;
+}
+#pipeworks-dialog #pipe-route-label {
+  margin: 0;
+  font-size: 10px;
+}
+#pipeworks-dialog #pipe-board {
+  width: 100%;
+  max-width: none;
+  flex: 1;
+  min-height: 240px;
+  max-height: none;
+  aspect-ratio: auto;
+  margin: 0;
+  padding: 7px;
+  gap: 4px;
+  display: grid;
+  grid-template-columns: repeat(var(--pipe-cols), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--pipe-rows), minmax(0, 1fr));
+}
+#pipeworks-dialog .pipe-tile {
+  aspect-ratio: auto;
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+}
+#pipeworks-dialog .pipe-tile svg {
+  width: 100%;
+  height: 100%;
+}
+#pipeworks-dialog .pipe-controls {
+  margin: 0;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+#pipeworks-dialog .pipe-controls button {
+  padding: 8px;
+  min-height: 38px;
+}
+#pipeworks-dialog #pipe-piece-tray {
+  margin: 0;
+  gap: 6px;
+}
+#pipeworks-dialog #pipe-piece-preview {
+  height: 38px;
+  width: 38px;
+}
+#pipeworks-dialog .pipe-obstacle-art {
+  font-size: clamp(32px, 5vw, 60px);
+}
+
+/* Large formation mode uses the entire writing surface, with a full-note view. */
+#handwriting-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+  overflow: hidden;
+}
+#handwriting-dialog .pencil-header {
+  flex: none;
+  min-height: 64px;
+  padding: 6px 70px 6px 12px;
+  gap: 10px;
+}
+#handwriting-dialog .pencil-header img {
+  width: 44px;
+  height: 44px;
+}
+#handwriting-dialog .pencil-header h2 {
+  font-size: 20px;
+}
+#handwriting-dialog #pencil-status {
+  font-size: 11px;
+  margin: 3px 12px;
+}
+#handwriting-dialog #pencil-work:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  padding: 0 10px 8px;
+}
+#handwriting-dialog #pencil-note-text {
+  font-size: 15px;
+  margin: 3px 0;
+}
+#handwriting-dialog .pencil-letter-heading {
+  margin: 2px 0;
+}
+#handwriting-dialog .pencil-letter-heading b {
+  font-size: 24px;
+}
+#handwriting-dialog #pencil-step {
+  font-size: 11px;
+  margin: 2px 0;
+}
+#handwriting-dialog #pencil-page-scroll {
+  flex: 1;
+  min-height: 150px;
+  max-height: none;
+  width: 100%;
+  overflow: hidden;
+}
+#handwriting-dialog #writing-pad {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  max-height: none;
+  aspect-ratio: auto;
+}
+#handwriting-dialog .pencil-controls {
+  flex: none;
+  gap: 5px;
+  margin-top: 4px;
+}
+#handwriting-dialog .pencil-controls button {
+  padding: 8px;
+  min-height: 38px;
+  font-size: 11px;
+}
+#handwriting-dialog #pencil-setup {
+  overflow: auto;
+  padding: 12px;
+}
+@media (max-width: 600px) {
+  #movement-pad {
+    left: 10px;
+    bottom: 108px;
+  }
+  #pipeworks-dialog #pipe-board {
+    min-height: 340px;
+  }
+  #pipeworks-dialog .pipe-controls label {
+    font-size: 10px;
+  }
+  #handwriting-dialog #pencil-note-text {
+    font-size: 12px;
+  }
+}
+.field-bee,
+.message-bottle {
+  translate: -50% -50%;
+  transform: none !important;
+}
+#npc-speech {
+  pointer-events: none;
+}
+#house-view-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 12px;
+}
+#house-view-tabs button {
+  padding: 12px 18px;
+  border: 2px solid #70c7e3;
+  border-radius: 18px;
+  background: #164b76;
+  color: #fff;
+  font-weight: 800;
+  min-height: 48px;
+}
+#puppy-house-dialog:not(.house-store-mode) #house-shop,
+#puppy-house-dialog:not(.house-store-mode) #house-shop-heading {
+  display: none;
+}
+#puppy-house-dialog.house-store-mode #house-garden,
+#puppy-house-dialog.house-store-mode #house-move {
+  display: none;
+}
+#puppy-house-dialog.house-store-mode #house-shop-heading {
+  margin: 12px 20px;
+}
+#puppy-house-dialog.house-store-mode #house-shop {
+  padding: 12px 20px;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 16px;
+}
+#house-shop article {
+  border: 3px solid #93bfd5;
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: #f2f9ff;
+}
+#house-shop article.can-afford {
+  border-color: #3ca477;
+  box-shadow: 0 4px 0 #226c53;
+}
+#house-shop article.furniture-owned {
+  background: #e4f5e4;
+}
+#house-shop .house-shop-icon {
+  font-size: 52px;
+}
+#house-shop .furniture-price {
+  font-size: 16px;
+  color: #244c70;
+  font-weight: 850;
+}
+#house-shop button {
+  min-height: 44px;
+  width: 100%;
+}
+.house-store-mode #house-store-tab,
+#puppy-house-dialog:not(.house-store-mode) #house-home-tab {
+  background: #ffd378;
+  color: #163c5e;
+  border-color: #d79e42;
+}
+#writing-pad.large-tracing .note-print-label {
+  display: none;
+}
+#handwriting-dialog #pencil-note-text {
+  display: block;
+  background: #fff8e7;
+  color: #173b5e;
+  border-radius: 8px;
+  padding: 5px 9px;
+  white-space: pre-wrap;
+  line-height: 1.3;
+}
+#handwriting-dialog #pencil-note-text .note-future {
+  color: #486477;
+}
+#handwriting-dialog #pencil-letter {
+  display: inline;
+}

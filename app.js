@@ -474,14 +474,6 @@
         ];
       }
     }
-    const tunnel = window.badCatAdventure.tunnelState();
-    document
-      .querySelectorAll(".enemy-icon,.actor.enemy-actor")
-      .forEach((node) => node.classList.toggle("in-tunnel", !!tunnel?.hidden));
-    if (tunnel?.exiting) {
-      state.badcat = [state.car[0] + 0.00055, state.car[1] - 0.0006];
-      state.metro = [state.car[0] + 0.00075, state.car[1] + 0.0006];
-    }
     updateActors();
     window.badCatLoot.update(
       dt,
@@ -1177,7 +1169,7 @@
     )
       return;
     const index = Number(event.key) - 1;
-    if (index >= 0 && index < 4) {
+    if (index >= 0 && index < 5) {
       event.preventDefault();
       window.badCatArsenal.arm(index);
     }
@@ -1284,6 +1276,7 @@
           y: rect.y + rect.height / 2,
         });
       if (strike?.exposed) {
+        window.badCatEncounters?.defeated(target);
         window.badCatVehicle.reactToHit(target);
         state.targetEffects ||= {};
         state.targetEffects[target] = {
@@ -1304,7 +1297,7 @@
       if (!soundEnabled) $("#sound").click();
     },
     view: () => state.view,
-    startJourney: (mode) => (mode === "road" ? setRoadAdventure() : startGPS()),
+    startJourney: () => setRoadAdventure(),
     paused: () =>
       state.paused ||
       (!["gps", "test", "road"].includes(state.mode) &&
@@ -1358,7 +1351,7 @@
   locationGate(true);
   $("#pause").disabled = true;
   $("#speed").disabled = true;
-  loadMap();
+  setRoadAdventure();
   if (progress.gadgets)
     $("#gadget-count").textContent = `${progress.gadgets} big ideas unleashed`;
   let previous = performance.now();

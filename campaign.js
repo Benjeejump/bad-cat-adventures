@@ -239,8 +239,10 @@
     );
   }
   function resupply() {
-    change({ supplies: 3, heat: -1 });
-    notice("Puppy Base restocks three treats. Cats’ advantage −1.");
+    change({ supplies: Math.max(0, 3 - state.supplies), heat: -1 });
+    notice(
+      "Emergency snack box: at least three treats ready. Earn more by playing.",
+    );
   }
   function init(onNotice) {
     notice = onNotice;
@@ -252,7 +254,7 @@
     const card = document.createElement("section");
     card.className = "panel hq-card workshop-card";
     card.innerHTML =
-      '<span class="hq-icon">🛠️</span><h2>Odyssey workshop</h2><p id="workshop-status" role="status"></p><button id="repair-crew" class="primary-button">Repair car + clear jams</button> <button id="resupply-crew" class="primary-button">Restock Puppy Base</button><p>Choices and escaped kittens leave real setbacks. This is where the crew recovers.</p>';
+      '<span class="hq-icon">🛠️</span><h2>Odyssey workshop</h2><p id="workshop-status" role="status"></p><button id="repair-crew" class="primary-button">Repair car + clear jams</button> <button id="resupply-crew" class="primary-button">Emergency snack box</button><p>Choices and escaped kittens leave real setbacks. This is where the crew recovers.</p>';
     document.querySelector(".hq-grid").append(card);
     document.querySelector("#repair-crew").addEventListener("click", repair);
     document

@@ -9,7 +9,7 @@ with sync_playwright() as p:
   assert not hits, f'{label}: parent logo overlaps {hits}'
   print('PASS '+label+' parent logo clears controls',flush=True)
  overlap('Intro')
- page.locator('#launch-silent').click();page.locator('#test-drive').evaluate('(n)=>n.click()');page.wait_for_timeout(600)
+ page.locator('#launch-silent').click();page.wait_for_timeout(600)
  for w,h in [(1280,800),(1024,600),(800,1280),(390,844)]:
   page.set_viewport_size({'width':w,'height':h});overlap(f'{w} drive')
   page.evaluate('badCatAdventure.encounter("spelling")');overlap(f'{w} spelling');page.evaluate('badCatSpelling.parentExit()')

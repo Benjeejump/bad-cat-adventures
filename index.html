@@ -51,7 +51,7 @@
           ><img src="assets/bad-cat.png" alt="BC"
         /></span>
         <span
-          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.10</b></span></span
+          >BAD CAT<span class="brand-sub">ADVENTURES <b>v0.11</b></span></span
         ></a
       >
       <nav aria-label="Game sections">
@@ -137,17 +137,16 @@
           happen.
         </p>
         <div class="launch-buttons">
-          <select id="launch-journey" aria-label="Choose how to play">
-            <option value="gps">GPS map · use tablet location</option>
-            <option value="road">Road Adventure · no GPS needed</option></select
+          <select id="launch-journey" hidden aria-label="Adventure">
+            <option value="road">Adventure</option></select
           ><button id="launch-play">LET’S RIDE, DYLAN! <span>▶</span></button
           ><button id="launch-silent">Play quietly ♪ OFF</button>
         </div>
         <p class="launch-hint">
-          Choose GPS map or the new scrolling Road Adventure.
+          Drive, fly, dive or explore as Dylan the Dalmatian.
         </p>
       </div>
-      <span class="launch-version">v0.10 · THE LAKELINE ADVENTURES</span
+      <span class="launch-version">v0.11 · THE LAKELINE ADVENTURES</span
       ><button id="launch-skip" aria-label="Skip opening and play quietly">
         Skip intro →
       </button>
@@ -330,7 +329,7 @@
               </button>
             </div>
           </div>
-          <button id="edit-arsenal">⚙ My four launchers</button
+          <button id="edit-arsenal">⚙ My five launchers</button
           ><button data-puppy-house>🏠 Puppy House</button>
           <button id="pencil-launch" data-handwriting type="button">
             ✏️<span>Magic Pencil</span>
@@ -440,7 +439,7 @@
           <section class="panel hq-card">
             <h2>Dylan’s Puppy House</h2>
             <p>
-              Trade treats for 100 things across five homes. Furnish each one to
+              Trade treats for 150 things across five homes. Furnish each one to
               unlock the next!
             </p>
             <button data-puppy-house>Build and play at home</button>
@@ -665,6 +664,7 @@
     <script src="arsenal.js" defer></script>
     <script src="puppy-house.js" defer></script>
     <script src="app.js" defer></script>
+    <script src="field-adventure.js" defer></script>
     <script src="parents.js" defer></script>
   </body>
 </html>

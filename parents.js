@@ -13,6 +13,7 @@
     window.badCatAdventure.parentExit();
     document.querySelectorAll("dialog[open]").forEach((d) => d.close());
     window.badCatCharacters.clearPlans();
+    window.badCatEncounters?.clear();
     window.badCatAdventure.deferSpelling();
   }
   function badge(host) {

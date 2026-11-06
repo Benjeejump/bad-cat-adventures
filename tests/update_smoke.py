@@ -23,13 +23,13 @@ with tempfile.TemporaryDirectory() as temp:
   assert page.evaluate('caches.keys()')==['bad-cat-shell-v2']
   print('PASS Existing v0.1 service worker is installed',flush=True)
   page.evaluate('localStorage.setItem("bad-cat-progress-v1", JSON.stringify({inventions:[{name:"Original gadget",power:"bubble"}]}))')
-  for name in ['index.html','styles.css','team-style.css','pipeworks.js','cursive.js','handwriting.js','handwriting.css','pipeworks.css','app.js','parents.js','road.js','arsenal.js','puppy-house.js','road-home.css','inventions.js','inventions.css','vehicle-world.js','characters.js','theme.js','character-style.css','cinematics.js','word-bank.js','spelling.js','learning.css','loot.js','game-map.js','game-map-style.json','sw.js','manifest.webmanifest','adventure.js','puppy-options.js','campaign.js','targeting.js','site-config.js','map-mode.css']:
+  for name in ['index.html','styles.css','team-style.css','pipeworks.js','cursive.js','handwriting.js','handwriting.css','pipeworks.css','app.js','parents.js','field-adventure.js','road.js','arsenal.js','puppy-house.js','road-home.css','inventions.js','inventions.css','vehicle-world.js','characters.js','theme.js','character-style.css','cinematics.js','word-bank.js','spelling.js','learning.css','loot.js','game-map.js','game-map-style.json','sw.js','manifest.webmanifest','adventure.js','puppy-options.js','campaign.js','targeting.js','site-config.js','map-mode.css']:
    shutil.copy(root/name,Path(temp)/name)
   shutil.copytree(root/'assets',Path(temp)/'assets',dirs_exist_ok=True)
   page.reload(wait_until='domcontentloaded')
   page.wait_for_function('typeof badCatDiagnostics === "function" && !!badCatDiagnostics().adventure',timeout=30000)
-  page.wait_for_function('caches.keys().then(keys=>keys.includes("bad-cat-shell-v15"))')
-  page.locator('#launch-silent').click(); page.locator('#test-drive').evaluate('(el)=>el.click()');page.wait_for_timeout(600)
+  page.wait_for_function('caches.keys().then(keys=>keys.includes("bad-cat-shell-v16"))')
+  page.locator('#launch-silent').click();page.wait_for_timeout(600)
   assert page.evaluate('!badCatDiagnostics().adventure.launching')
   print('PASS Existing installation upgrades and its launch button works',flush=True)
   page.locator('[data-view="hq"]').click()
