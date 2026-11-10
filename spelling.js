@@ -3,8 +3,14 @@
 (() => {
   const $ = (s) => document.querySelector(s),
     KEY = "bad-cat-wordbook-v1";
-  const bank = window.BAD_CAT_WORDS,
-    byWord = new Map(bank.map((e) => [e.word, e]));
+  const holiday = window.badCatSeason.holidayWords;
+  const bank = [
+      ...window.BAD_CAT_WORDS,
+      ...holiday.filter(
+        (e) => !window.BAD_CAT_WORDS.some((w) => w.word === e.word),
+      ),
+    ],
+    byWord = new Map([...bank, ...holiday].map((e) => [e.word, e]));
   const shuffle = (list) => {
     const a = [...list];
     for (let i = a.length - 1; i > 0; i--) {
@@ -94,9 +100,9 @@
     $("#spell-message").textContent = message;
   }
   function chooseWord() {
-    const eligible = bank.filter(
-        (w) => book.grade === "mixed" || String(w.grade) === book.grade,
-      ),
+    const eligible = (
+        window.badCatSeason.active() ? holiday : window.BAD_CAT_WORDS
+      ).filter((w) => book.grade === "mixed" || String(w.grade) === book.grade),
       fresh = eligible.filter((w) => !book.recent.slice(-3).includes(w.word));
     const retry = fresh.filter((w) => book.missed.includes(w.word));
     const choices =

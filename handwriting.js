@@ -69,7 +69,7 @@
     "'": ["M53 24 L49 36"],
   };
   Object.assign(letters, window.badCatCursive.letters);
-  const notes = [
+  const normalNotes = [
     "You are kind. I like your hugs.",
     "We can help. You are my pal.",
     "The puppy can hop. We can play.",
@@ -86,6 +86,11 @@
     "We share some jam. It is very sweet.",
     "Please bring a drum. We can make music.",
   ];
+  const notes = [...normalNotes, ...window.badCatSeason.winterNotes];
+  const currentNotes = () =>
+    window.badCatSeason.active()
+      ? window.badCatSeason.winterNotes
+      : normalNotes;
   const recipients = [
     ["Luna", "assets/luna.png"],
     ["Captain Biscuit", "assets/captain-biscuit.png"],
@@ -492,7 +497,7 @@
       o.textContent = name;
       $("#pencil-recipient").append(o);
     }
-    for (const text of notes) {
+    for (const text of currentNotes()) {
       const o = document.createElement("option");
       o.value = text;
       o.textContent = text;
@@ -576,7 +581,7 @@
     label.textContent =
       book.alphabet.length === 26
         ? "You have practised all 26 letters!"
-        : `${book.alphabet.length} of 26 letters explored · ${book.completedNotes.length} of ${notes.length} notes completed`;
+        : `${book.alphabet.length} of 26 letters explored · ${book.completedNotes.length} of ${currentNotes().length} notes completed`;
     root.append(label);
     const grid = document.createElement("div");
     grid.className = "pencil-alphabet";
@@ -592,8 +597,10 @@
       grid.append(badge);
     }
     root.append(grid);
-    const candidates = notes.filter((t) => !book.completedNotes.includes(t));
-    const ranked = (candidates.length ? candidates : notes)
+    const candidates = currentNotes().filter(
+      (t) => !book.completedNotes.includes(t),
+    );
+    const ranked = (candidates.length ? candidates : currentNotes())
       .map((text) => ({
         text,
         newLetters: new Set(
@@ -623,7 +630,21 @@
       root.append(box);
     });
   }
+  function refreshSeason() {
+    const choice = $("#pencil-message"),
+      previous = choice.value;
+    choice.replaceChildren();
+    for (const text of currentNotes()) {
+      const o = document.createElement("option");
+      o.value = text;
+      o.textContent = text;
+      choice.append(o);
+    }
+    if (currentNotes().includes(previous)) choice.value = previous;
+    renderKeepsakes();
+  }
   window.badCatHandwriting = {
+    refreshSeason,
     init,
     open,
     isOpen: () => !!dialog?.open,
@@ -638,7 +659,7 @@
       pending: !!book.pending,
       alphabet: [...book.alphabet],
       completedNotes: book.completedNotes.length,
-      curriculum: [...notes],
+      curriculum: [...currentNotes()],
       guideStyle: "cursive",
     }),
   };

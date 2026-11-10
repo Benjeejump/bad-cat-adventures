@@ -131,7 +131,7 @@
     "marshmallows",
   ]);
   function picture(node, option) {
-    if (illustrated.has(option.id)) {
+    if (!window.badCatSeason.active() && illustrated.has(option.id)) {
       const img = document.createElement("img");
       img.src = `assets/inventions/${option.id}.svg`;
       img.alt = option.label;
@@ -303,7 +303,149 @@
     (dialog || document.body).append(stage);
     setTimeout(() => stage.remove(), 2400);
   }
+  const originalChoices = [launchers, items, features].map((list) =>
+    list.map((v) => ({ label: v.label, picture: v.picture })),
+  );
+  function refreshSeason() {
+    const active = window.badCatSeason.active();
+    const launcherNames = [
+      "North Pole waterslide",
+      "Candy-cane catapult",
+      "Snow cannon",
+      "Ribbon slingshot",
+      "Present rocket",
+      "Elf trampoline",
+      "Chimney chute",
+      "Hot cocoa hose",
+      "Blizzard fan",
+      "Ornament drop",
+      "Santa train",
+      "Reindeer springboard",
+      "Gingerbread volcano",
+      "Snow cloud chute",
+      "Narwhal snow spout",
+      "Santa squid launcher",
+      "Elf robot arm",
+      "Snowflake portal",
+      "North Pole trebuchet",
+      "Candy-cane ramp",
+    ];
+    const itemNames = [
+      "Gift ribbons",
+      "Candy canes",
+      "Santa letters",
+      "Wrapped presents",
+      "Gingerbread cookies",
+      "Stockings",
+      "Toy reindeer",
+      "Snowballs",
+      "Snow globes",
+      "Christmas trees",
+      "Christmas cushions",
+      "Candy bananas",
+      "Puppy Christmas cookies",
+      "Ornaments",
+      "Christmas cupcakes",
+      "Cranberry jelly",
+      "Tinsel",
+      "Snow feathers",
+      "Holly leaves",
+      "Christmas confetti",
+      "Snowflakes",
+      "Jingle balloons",
+      "Peppermint slime",
+      "Christmas popcorn",
+      "Wreath doughnuts",
+      "Elf boots",
+      "Toy sleighs",
+      "Christmas stars",
+      "Poinsettias",
+      "Reindeer carrots",
+      "Christmas cheese",
+      "Cocoa buckets",
+      "Snow umbrellas",
+      "North Pole magnets",
+      "Gift bows",
+      "Snow globes",
+      "Christmas pizza",
+      "Elf teddy bears",
+      "Snow ice cream",
+      "Snow sponges",
+    ];
+    const pictures = [
+      "🎀",
+      "🍭",
+      "✉️",
+      "🎁",
+      "🍪",
+      "🧦",
+      "🦌",
+      "☃️",
+      "🔮",
+      "🎄",
+      "🛏️",
+      "🍌",
+      "🍪",
+      "🔴",
+      "🧁",
+      "🍮",
+      "✨",
+      "❄️",
+      "🌿",
+      "🎊",
+      "❄️",
+      "🔔",
+      "🟢",
+      "🍿",
+      "🎄",
+      "🥾",
+      "🛷",
+      "⭐",
+      "🌺",
+      "🥕",
+      "🧀",
+      "☕",
+      "☂️",
+      "🧲",
+      "🎀",
+      "🔮",
+      "🍕",
+      "🧸",
+      "🍦",
+      "❄️",
+    ];
+    [launchers, items, features].forEach((list, k) =>
+      list.forEach((value, i) => {
+        const normal = originalChoices[k][i];
+        value.label = !active
+          ? normal.label
+          : k === 0
+            ? launcherNames[i]
+            : k === 1
+              ? itemNames[i]
+              : "Christmas " + normal.label.toLowerCase();
+        value.picture = active
+          ? k === 0
+            ? ["🛷", "🍭", "❄️", "🎀", "🎁"][i % 5]
+            : k === 1
+              ? pictures[i]
+              : ["❄️", "✨", "🔔", "🎄"][i % 4]
+          : normal.picture;
+        const b = document.querySelector(
+          `#invention-${["launcher", "item", "feature"][k]}-choices [data-recipe="${value.id}"]`,
+        );
+        if (b) {
+          b.querySelector("span:last-child").textContent = value.label;
+          const icon = b.querySelector("span:first-child");
+          icon.replaceChildren();
+          picture(icon, value);
+        }
+      }),
+    );
+    preview();
+  }
   window.badCatInventions = {
+    refreshSeason,
     init,
     recipe,
     normalize,

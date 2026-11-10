@@ -1,7 +1,23 @@
-const CACHE = "bad-cat-shell-v17";
+const CACHE = "bad-cat-shell-v19";
 const SHELL = [
   "./",
   "./index.html",
+  "./season-config.js",
+  "./christmas.js",
+  "./christmas.css",
+  "./assets/christmas/dylan.png",
+  "./assets/christmas/bad-cat.png",
+  "./assets/christmas/metro.png",
+  "./assets/christmas/captain-squirrel.png",
+  "./assets/christmas/metro-bus.png",
+  "./assets/christmas/bad-cat-balloon.png",
+  "./assets/christmas/doggy-plane.png",
+  "./assets/christmas/family-sub.png",
+  "./assets/christmas/carwash-squid.png",
+  "./assets/christmas/road-odyssey.png",
+  "./assets/christmas/north-pole.png",
+
+  "./legibility.css",
   "./styles.css",
   "./team-style.css",
   "./pipeworks.js",
@@ -70,6 +86,8 @@ const SHELL = [
   "./assets/doggy-plane.svg",
   "./assets/family-sub.svg",
   "./assets/bad-cat.png",
+  "./assets/bad-cat-balloon.png",
+  "./assets/metro-bus.png",
   "./assets/metro.png",
   "./assets/giant-puppy.png",
   "./assets/kitten.png",

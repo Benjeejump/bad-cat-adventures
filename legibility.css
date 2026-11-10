@@ -1,0 +1,188 @@
+/* Controls have explicit foregrounds and solid backplates in day, night and Christmas modes. */
+html
+  body
+  button:not(.gadget):not(.road-enemy):not(.world-enemy):not(
+    .kitten-target
+  ):not(.field-bee):not(.villain-projectile):not(.message-bottle):not(
+    .house-item
+  ):not(.parent-logo) {
+  background-color: #f4dfa9;
+  background-image: none;
+  color: #15364a;
+  text-shadow: none;
+  border-color: #6fa9bf;
+}
+html
+  body
+  button:not(.gadget):not(.road-enemy):not(.world-enemy):not(
+    .kitten-target
+  ):not(.field-bee):not(.villain-projectile):not(.message-bottle):not(
+    .house-item
+  ):not(.parent-logo)
+  :is(b, small, span) {
+  color: inherit;
+  text-shadow: none;
+}
+html
+  body
+  button:not(.gadget):not(.road-enemy):not(.world-enemy):not(
+    .kitten-target
+  ):not(.field-bee):not(.villain-projectile):not(.message-bottle):not(
+    .house-item
+  ):not(.parent-logo):disabled {
+  opacity: 1;
+  filter: none;
+  background-color: #e1e8e8;
+  color: #485a64;
+  border-color: #8b9ca3;
+}
+html
+  body
+  button:not(.gadget):not(.road-enemy):not(.world-enemy):not(
+    .kitten-target
+  ):not(.field-bee):not(.villain-projectile):not(.message-bottle):not(
+    .house-item
+  ):not(.parent-logo)[aria-pressed="true"] {
+  background-color: #c4e7e8;
+  color: #15364a;
+  border-color: #235d70;
+}
+html body :is(input, select, textarea) {
+  background-color: #fffdf4;
+  color: #173c50;
+  text-shadow: none;
+}
+html body :is(input, textarea)::placeholder {
+  color: #526a76;
+  opacity: 1;
+}
+html body option {
+  background-color: #fffdf4;
+  color: #173c50;
+}
+html body .action-rail .gadget-grid > .gadget {
+  color: #fff9ea;
+}
+html body .action-rail .gadget-grid > .gadget b {
+  color: #fff9ea;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1.15;
+  text-shadow: 0 1px #112f4d;
+  max-height: none;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+html body .action-rail .gadget-grid > .gadget:nth-child(5) b {
+  font-size: 12px;
+}
+html body .action-rail .gadget-grid > .gadget.aiming {
+  background: #ffe39c;
+  color: #17364a;
+}
+html body .action-rail .gadget-grid > .gadget.aiming b {
+  color: #17364a;
+  text-shadow: none;
+}
+html body .letter-bee {
+  background-color: #ffedb2;
+  color: #173b50;
+}
+html body .letter-bee b {
+  color: #173b50;
+  text-shadow: none;
+  background: #fff6d6;
+  border-radius: 8px;
+  padding: 1px 4px;
+}
+html body .panel :is(h2, h3, p, label),
+html body .hq-card :is(h2, h3, p, label) {
+  color: #173c50;
+}
+html body .panel .quiet,
+html body .hq-card .quiet {
+  color: #3e5d6c;
+}
+html body #house-shop :is(b, small),
+html body #house-friends :is(b, span) {
+  color: #173e54;
+}
+html body #parent-controls .christmas-toggle {
+  color: #fff7e3;
+}
+html body .recipe-caption {
+  background-color: #143c56;
+  color: #fff6dc;
+}
+html.christmas-mode body #parent-controls .christmas-toggle {
+  color: #fff7e3;
+}
+html body #forest-question,
+html body #forest-feedback,
+html body #forest-context {
+  text-shadow: none;
+}
+html:not(.christmas-mode) body #forest-question,
+html:not(.christmas-mode) body #forest-context,
+html:not(.christmas-mode) body #forest-feedback {
+  color: #fff6dc;
+}
+html[data-theme] body :is(.panel, .hq-card) {
+  background-color: #fff8e9;
+  background-image: none;
+  color: #173c50;
+}
+html[data-theme] body :is(.panel, .hq-card) :is(h2, h3, p, label, .quiet) {
+  color: #173c50;
+}
+html body #house-shop button:disabled,
+html body #house-friends button:disabled,
+html body #arsenal-choices button:disabled {
+  opacity: 1;
+  filter: none;
+  background: #e1e8e8;
+  color: #485a64;
+  border-color: #8b9ca3;
+}
+
+html
+  body
+  button:not(.gadget):not(.road-enemy):not(.world-enemy):not(
+    .kitten-target
+  ):not(.field-bee):not(.villain-projectile):not(.message-bottle):not(
+    .house-item
+  ):not(.parent-logo):disabled {
+  opacity: 1 !important;
+  filter: none !important;
+  background: #e1e8e8 !important;
+  color: #485a64 !important;
+}
+html body .nav-tab i {
+  color: inherit;
+  text-shadow: none;
+}
+html body #puppy-hq-launch {
+  background: linear-gradient(#16597e, #123c62);
+  color: #fff;
+}
+html body #paw-treat-balance {
+  color: #fff0c7;
+}
+html body #forest-answers button {
+  background: #e5f7e8;
+  color: #122e40;
+}
+html.christmas-mode body .gadget.gadget-heel {
+  background: linear-gradient(#78451e, #542c16);
+}
+html[data-theme].christmas-mode body #puppy-hq-launch {
+  color: #fff;
+  background: #123c62;
+}
+html body .action-rail .gadget-grid > .gadget b {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: auto;
+}

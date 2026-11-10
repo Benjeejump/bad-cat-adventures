@@ -11,7 +11,7 @@ root = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory() as temp:
     project = Path(temp) / 'bad-cat-adventures'
     project.mkdir()
-    for name in ['index.html','app.js','parents.js','field-adventure.js','adventure-combat.js','forest.js','road.js','arsenal.js','puppy-house.js','road-home.css','inventions.js','inventions.css','vehicle-world.js','characters.js','theme.js','character-style.css','cinematics.js','word-bank.js','spelling.js','learning.css','loot.js','game-map.js','game-map-style.json','styles.css','team-style.css','pipeworks.js','cursive.js','handwriting.js','handwriting.css','pipeworks.css','sw.js','manifest.webmanifest','adventure.js','puppy-options.js','campaign.js','targeting.js','site-config.js','map-mode.css']:
+    for name in ['index.html','season-config.js','christmas.js','christmas.css','legibility.css','app.js','parents.js','field-adventure.js','adventure-combat.js','forest.js','road.js','arsenal.js','puppy-house.js','road-home.css','inventions.js','inventions.css','vehicle-world.js','characters.js','theme.js','character-style.css','cinematics.js','word-bank.js','spelling.js','learning.css','loot.js','game-map.js','game-map-style.json','styles.css','team-style.css','pipeworks.js','cursive.js','handwriting.js','handwriting.css','pipeworks.css','sw.js','manifest.webmanifest','adventure.js','puppy-options.js','campaign.js','targeting.js','site-config.js','map-mode.css']:
         shutil.copy(root / name, project / name)
     shutil.copytree(root / 'assets', project / 'assets')
     handler = partial(SimpleHTTPRequestHandler, directory=temp)

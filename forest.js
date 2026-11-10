@@ -37,7 +37,7 @@
     $("#forest-lanterns").innerHTML = Array.from(
       { length: 6 },
       (_, i) =>
-        `<span class="${i < round.solved ? "lit" : ""}" aria-label="${i < round.solved ? "Lit" : "Unlit"} lantern">✦</span>`,
+        `<span class="${i < round.solved ? "lit" : ""}" aria-label="${i < round.solved ? "Lit" : "Unlit"} ${window.badCatSeason.active() ? "Christmas present" : "lantern"}">${window.badCatSeason.active() ? "🎁" : "✦"}</span>`,
     ).join("");
     $("#forest-puppy").style.left =
       `min(${3 + round.solved * 13}%, calc(100% - 100px))`;
@@ -62,9 +62,13 @@
       b = 1 + Math.floor(Math.random() * 12);
     round.b = b;
     round.used.add(round.a + "x" + b);
+    $("#forest-title").textContent = window.badCatSeason.active()
+      ? "Light the North Pole trail"
+      : "Light the puppy path";
     $("#forest-question").textContent = `${round.a} × ${round.b} = ?`;
-    $("#forest-context").textContent =
-      `${round.a} lantern trees, with ${round.b} fireflies on each. How many fireflies?`;
+    $("#forest-context").textContent = window.badCatSeason.active()
+      ? `${round.a} Christmas trees, with ${round.b} ornaments on each. How many ornaments?`
+      : `${round.a} lantern trees, with ${round.b} fireflies on each. How many fireflies?`;
     const correct = round.a * round.b,
       answers = new Set([correct]);
     for (const value of [
@@ -168,6 +172,14 @@
   document.querySelector("#hq-view .hq-banner").append(hqEntry);
   window.badCatForest = {
     open,
+    refreshSeason: () => {
+      if (round) {
+        draw();
+        $("#forest-title").textContent = window.badCatSeason.active()
+          ? "Light the North Pole trail"
+          : "Light the puppy path";
+      }
+    },
     isOpen: () => dialog.open,
     diagnostics: () => ({
       a: round?.a,

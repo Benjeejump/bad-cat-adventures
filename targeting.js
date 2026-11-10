@@ -71,7 +71,7 @@
       img.src = "assets/captain-biscuit.png";
       img.alt = "";
       fx.append(img);
-    } else fx.textContent = emoji[power];
+    } else fx.textContent = window.badCatSeason.powerIcon(power, emoji[power]);
     fx.style.left = `${rect.x + rect.width / 2}px`;
     fx.style.top = `${rect.y}px`;
     document.body.append(fx);

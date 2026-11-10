@@ -55,7 +55,12 @@
     document.body.classList.toggle("mode-plane", mode === "plane");
     document.body.classList.toggle("mode-submarine", mode === "submarine");
     if (["car", "walking"].includes(mode)) return;
-    document.querySelector("#world-title").textContent = titles[mode];
+    document.querySelector("#world-title").textContent =
+      window.badCatSeason.active()
+        ? mode === "plane"
+          ? "SANTA’S DOGGY PLANE"
+          : "NORTH POLE UNDER-ICE SUB"
+        : titles[mode];
     document.querySelector("#world-stability").textContent =
       `${mode === "plane" ? "Flight" : "Dive"} stability ${stability}%`;
     document.querySelector("#world-status").textContent = hazard
@@ -76,6 +81,14 @@
       mode === "plane"
         ? ["◈ Cloud shield", "Puppy autopilot", "ϟ Waffle boost"]
         : ["↔ Wipers", "◎ Sonar", "🫧 Bubble jets"];
+    if (window.badCatSeason.active())
+      labels.splice(
+        0,
+        3,
+        ...(mode === "plane"
+          ? ["❄ Snow shield", "🦌 Reindeer autopilot", "🎁 Sleigh boost"]
+          : ["↔ Ice wipers", "🔔 Iceberg sonar", "🍭 Peppermint jets"]),
+      );
     tools.forEach((b, i) => {
       b.textContent = labels[i];
       if (mode === "plane" && i === 1) {
@@ -86,8 +99,9 @@
         b.prepend(img);
       }
     });
-    document.querySelector("#world-vehicle").src =
-      mode === "plane" ? "assets/doggy-plane.png" : "assets/family-sub.png";
+    document.querySelector("#world-vehicle").src = window.badCatSeason.asset(
+      mode === "plane" ? "assets/doggy-plane.png" : "assets/family-sub.png",
+    );
     document.querySelector("#world-vehicle").alt =
       mode === "plane"
         ? "Doggy Plane flying through the clouds"
@@ -239,7 +253,7 @@
     const root = document.createElement("div");
     root.id = "vehicle-world";
     root.hidden = true;
-    root.innerHTML = `<div class="world-scenery"><div class="world-cloud-stream">${Array.from({ length: 8 }, (_, i) => `<i style="--cloud-x:${i * 17 - 10}%;--cloud-delay:-${i * 2.1}s"></i>`).join("")}</div><div class="sea-rays"></div><div class="sea-floor"></div><div class="sea-fish fish-one">🐟</div><div class="sea-fish fish-two">🐠</div><div class="sea-ink"></div><div class="world-storm"></div></div><div class="world-heading"><b id="world-title"></b><span id="world-stability"></span></div><img id="world-vehicle" class="world-family-vehicle" alt=""><div class="world-enemy world-badcat"><img src="assets/bad-cat.png" alt="BC in his villain airship"><span>BC</span></div><div class="world-enemy world-metro"><img src="assets/metro.png" alt="M and his invention"><span>M</span></div><button class="world-enemy world-captain" aria-label="Target Captain Squirrel"><img src="assets/captain-squirrel.png" alt="Captain Squirrel"><span>C</span></button><div class="sub-wiper"></div><div class="sub-wiper sub-wiper-right"></div><div class="world-sonar"></div><div class="world-controls"><p id="world-status" role="status"></p><div><button data-world-tool="0"></button><button data-world-tool="1"></button><button data-world-tool="2"></button></div><details><summary>Captain’s announcement <button id="repeat-flight" aria-label="Repeat the captain’s announcement">♪</button></summary><p id="world-announcement"></p></details></div>`;
+    root.innerHTML = `<div class="world-scenery"><div class="world-cloud-stream">${Array.from({ length: 8 }, (_, i) => `<i style="--cloud-x:${i * 17 - 10}%;--cloud-delay:-${i * 2.1}s"></i>`).join("")}</div><div class="sea-rays"></div><div class="sea-floor"></div><div class="sea-fish fish-one">🐟</div><div class="sea-fish fish-two">🐠</div><div class="sea-ink"></div><div class="world-storm"></div></div><div class="world-heading"><b id="world-title"></b><span id="world-stability"></span></div><img id="world-vehicle" class="world-family-vehicle" alt=""><div class="world-enemy world-badcat"><img src="assets/bad-cat-balloon.png" alt="Bad Cat riding his hot-air balloon"><span>BC</span></div><div class="world-enemy world-metro"><img src="assets/metro-bus.png" alt="Metro driving his Austin city bus"><span>M</span></div><button class="world-enemy world-captain" aria-label="Target Captain Squirrel"><img src="assets/captain-squirrel.png" alt="Captain Squirrel"><span>C</span></button><div class="sub-wiper"></div><div class="sub-wiper sub-wiper-right"></div><div class="world-sonar"></div><div class="world-controls"><p id="world-status" role="status"></p><div><button data-world-tool="0"></button><button data-world-tool="1"></button><button data-world-tool="2"></button></div><details><summary>Captain’s announcement <button id="repeat-flight" aria-label="Repeat the captain’s announcement">♪</button></summary><p id="world-announcement"></p></details></div>`;
     document.querySelector("#map-stage").append(root);
     root
       .querySelectorAll("[data-world-tool]")

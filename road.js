@@ -68,7 +68,9 @@
   function render() {
     const walking = window.badCatVehicle.mode() === "walking";
     const playerImage = root.querySelector("#road-player img");
-    const image = walking ? "assets/dylan.png" : "assets/road-odyssey.png";
+    const image = window.badCatSeason.asset(
+      walking ? "assets/dylan.png" : "assets/road-odyssey.png",
+    );
     if (!playerImage.src.endsWith(image)) playerImage.src = image;
     playerImage.alt = walking
       ? "Dylan the Dalmatian puppy"
@@ -115,7 +117,12 @@
     lastFire = elapsed;
     const node = document.createElement("span");
     node.className = "road-shot";
-    node.textContent = "✦";
+    node.textContent = window.badCatSeason.active()
+      ? window.badCatSeason.powerIcon(
+          window.badCatTargeting.diagnostics().armed,
+          "❄️",
+        )
+      : "✦";
     root.querySelector(".road-playfield").append(node);
     bullets.push({ x, y: y - 6, node });
     hooks.sound("laser");
@@ -192,9 +199,13 @@
       for (const key of cast) {
         const b = root.querySelector(".road-" + key);
         if (b.hidden) continue;
-        const bx = parseFloat(b.style.left),
-          by = parseFloat(b.style.top);
-        if (Math.abs(shot.x - bx) < 8 && Math.abs(shot.y - by) < 8) {
+        const bounds = b.getBoundingClientRect();
+        if (
+          point.x >= bounds.left &&
+          point.x <= bounds.right &&
+          point.y >= bounds.top &&
+          point.y <= bounds.bottom
+        ) {
           hooks.hit(key, b);
           shot.y = -10;
           break;
@@ -233,7 +244,7 @@
     root = document.createElement("section");
     root.id = "road-world";
     root.hidden = true;
-    root.innerHTML = `<div class="road-playfield"><div class="road-verge"></div><div class="road-asphalt"><i></i><i></i></div><div class="road-trees">${Array.from({ length: 12 }, (_, i) => `<span style="--tree:${i}">🌳</span>`).join("")}</div>${cast.map((k) => `<button class="road-enemy road-${k}" aria-label="Target ${names[k]}" hidden><img src="assets/${k === "badcat" ? "bad-cat" : k === "captain" ? "captain-squirrel" : k}.png" alt="${names[k]}"></button>`).join("")}<div id="road-player"><img src="assets/road-odyssey.png" alt="Dylan’s white Honda Odyssey driving up the road"></div></div><div class="road-hud"><b>ROAD ADVENTURE</b><span id="road-distance"></span><p id="road-radio" role="status">Steer, catch treats, and stop the villains’ surprise plans!</p></div><div class="road-controls"><button id="road-left" aria-label="Steer left">◀</button><button id="road-fire">✦ Fire launcher</button><button id="road-right" aria-label="Steer right">▶</button></div>`;
+    root.innerHTML = `<div class="road-playfield"><div class="road-verge"></div><div class="road-asphalt"><i></i><i></i></div><div class="road-trees">${Array.from({ length: 12 }, (_, i) => `<span style="--tree:${i}">🌳</span>`).join("")}</div>${cast.map((k) => `<button class="road-enemy road-${k}" aria-label="Target ${names[k]}" hidden><img src="assets/${k === "badcat" ? "bad-cat-balloon" : k === "metro" ? "metro-bus" : "captain-squirrel"}.png" alt="${k === "badcat" ? "Bad Cat riding his hot-air balloon" : k === "metro" ? "Metro driving his Austin city bus" : names[k]}"></button>`).join("")}<div id="road-player"><img src="assets/road-odyssey.png" alt="Dylan’s white Honda Odyssey driving up the road"></div></div><div class="road-hud"><b>ROAD ADVENTURE</b><span id="road-distance"></span><p id="road-radio" role="status">Steer, catch treats, and stop the villains’ surprise plans!</p></div><div class="road-controls"><button id="road-left" aria-label="Steer left">◀</button><button id="road-fire">✦ Fire launcher</button><button id="road-right" aria-label="Steer right">▶</button></div>`;
     document.querySelector("#map-stage").append(root);
     cast.forEach(
       (k) =>

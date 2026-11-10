@@ -2253,3 +2253,49 @@ body:not(.map-mode) #npc-speech {
   font-size: 12px;
   padding: 5px 7px;
 }
+
+/* Their vehicles are part of the villain, including the hitbox and forcefield. */
+.road-enemy.road-metro,
+#vehicle-world .world-enemy.world-metro {
+  width: 164px;
+  height: 108px;
+}
+.road-enemy.road-badcat,
+#vehicle-world .world-enemy.world-badcat {
+  width: 116px;
+  height: 166px;
+}
+.road-metro .enemy-forcefield,
+#vehicle-world .world-metro .enemy-forcefield {
+  border-radius: 32%;
+}
+.road-badcat .enemy-forcefield,
+#vehicle-world .world-badcat .enemy-forcefield {
+  border-radius: 48%;
+}
+.road-enemy .stolen-booster-token,
+#vehicle-world .world-enemy .stolen-booster-token {
+  top: auto;
+  bottom: 5px;
+  right: -12px;
+}
+@media (max-width: 600px) {
+  .road-enemy.road-metro,
+  #vehicle-world .world-enemy.world-metro {
+    width: 134px;
+    height: 90px;
+  }
+  .road-enemy.road-badcat,
+  #vehicle-world .world-enemy.world-badcat {
+    width: 100px;
+    height: 145px;
+  }
+  #vehicle-world .world-metro {
+    right: 12px;
+    top: 48%;
+  }
+  #vehicle-world .world-captain {
+    left: 42%;
+    top: 63%;
+  }
+}

@@ -79,10 +79,21 @@
     const a = bag.splice(Math.floor(Math.random() * bag.length), 1)[0],
       b = bag[Math.floor(Math.random() * bag.length)],
       firstGood = Math.random() < 0.5;
-    return [
+    const choices = [
       { ...a, success: firstGood },
       { ...b, success: !firstGood },
     ];
+    if (window.badCatSeason.active())
+      choices.forEach((option) => {
+        option.name =
+          "🎄 " +
+          option.name
+            .replace(/bubble/gi, "snow-globe")
+            .replace(/treat/gi, "Christmas cookie")
+            .replace(/blanket/gi, "Christmas quilt")
+            .replace(/rainbow/gi, "candy-cane");
+      });
+    return choices;
   }
   window.badCatPuppyOptions = { sample, count: options.length };
 })();

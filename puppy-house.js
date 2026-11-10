@@ -188,6 +188,10 @@
     { id: "boston", name: "Ziggy", breed: "Boston Terrier", price: 18 },
   ];
   const knownItems = [...catalog, ...legacyDogHouse];
+  const originalItems = new Map(
+    knownItems.map((item) => [item.id, { name: item.name, icon: item.icon }]),
+  );
+  const originalHomes = homes.map((h) => h.name);
   let data = {
       tier: 0,
       owned: [],
@@ -430,6 +434,7 @@
     pup.style.left = actor.x + "%";
     pup.style.top = actor.y + "%";
     pup.dataset.activity = actor.phase;
+    window.badCatSeason?.positionOutfit?.(pup);
     bubble.hidden = ["walking", "idle"].includes(actor.phase);
     bubble.textContent =
       actor === pet
@@ -774,7 +779,31 @@
       .querySelectorAll("[data-puppy-house]")
       .forEach((b) => (b.onclick = open));
   }
+  function refreshSeason() {
+    const active = window.badCatSeason.active();
+    const winterHomes = [
+      "Gingerbread dog house",
+      "Elf apartment",
+      "Gingerbread house",
+      "North Pole lodge",
+      "Santa’s mansion",
+    ];
+    homes.forEach(
+      (h, i) => (h.name = active ? winterHomes[i] : originalHomes[i]),
+    );
+    knownItems.forEach((item) => {
+      const winter =
+          window.badCatSeason.holidayFurniture[
+            (item.index + item.tier * 5) % 50
+          ],
+        normal = originalItems.get(item.id);
+      item.name = active ? winter[0] : normal.name;
+      item.icon = active ? winter[1] : normal.icon;
+    });
+    if (dialog.open) render();
+  }
   window.badCatHouse = {
+    refreshSeason,
     init,
     open,
     isOpen: () => !!dialog?.open,

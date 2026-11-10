@@ -42,7 +42,12 @@
     for (let i = 0; i < 5; i++) {
       const node = document.createElement("button");
       node.className = "field-bee";
-      node.setAttribute("aria-label", "Launcher target: spelling bee");
+      node.setAttribute(
+        "aria-label",
+        window.badCatSeason.active()
+          ? "Launcher target: Christmas jingle bee"
+          : "Launcher target: spelling bee",
+      );
       node.innerHTML = '<img src="assets/spelling-bee.png" alt="Bee">';
       const bee = {
         node,
@@ -69,7 +74,9 @@
     node.className = "message-bottle";
     node.setAttribute(
       "aria-label",
-      "Catch the message in a bottle with your net",
+      window.badCatSeason.active()
+        ? "Catch Santa’s letter in a bottle with your net"
+        : "Catch the message in a bottle with your net",
     );
     node.innerHTML =
       '<svg viewBox="0 0 80 110" aria-hidden="true"><path d="M30 6h20v24l14 16v51q0 8-8 8H24q-8 0-8-8V46l14-16Z" fill="#79dedbcc" stroke="#fff1c5" stroke-width="4"/><path d="M28 7h24v11H28Z" fill="#c09256"/><path d="M25 49h30v39H25Z" fill="#fff1c5"/><path d="m29 57 22 0m-22 9h22m-22 9h16" stroke="#527998" stroke-width="3"/></svg>';

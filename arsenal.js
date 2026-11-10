@@ -53,12 +53,22 @@
       b.dataset.arsenalPower = typeof inv === "string" ? inv : inv.power;
       const label = b.querySelector("b");
       label.textContent =
-        typeof inv === "string" ? base.find((x) => x[0] === inv)[1] : inv.name;
+        typeof inv === "string"
+          ? window.badCatSeason.powerName(
+              inv,
+              base.find((x) => x[0] === inv)[1],
+            )
+          : inv.name;
       const icon = b.querySelector(".gadget-icon");
       icon.replaceChildren();
       if (typeof inv !== "string" && window.badCatInventions.recipe(inv)) {
         const r = window.badCatInventions.recipe(inv);
         icon.textContent = r.item.picture;
+      } else if (window.badCatSeason.active()) {
+        icon.textContent = window.badCatSeason.powerIcon(
+          typeof inv === "string" ? inv : inv.power,
+          "🎁",
+        );
       } else if ((typeof inv === "string" ? inv : inv.power) === "puppy") {
         const img = document.createElement("img");
         img.src = "assets/captain-biscuit.png";
@@ -93,7 +103,10 @@
       const b = document.createElement("button");
       b.textContent =
         typeof item === "string"
-          ? base.find((x) => x[0] === item)[1]
+          ? window.badCatSeason.powerName(
+              item,
+              base.find((x) => x[0] === item)[1],
+            )
           : `${window.badCatInventions.recipe(item)?.item.picture || "✦"} ${item.name}`;
       b.onclick = () => {
         slots[editing] = item;

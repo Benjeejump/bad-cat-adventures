@@ -1,4 +1,4 @@
-# Bad Cat Adventures v0.12
+# Bad Cat Adventures v0.13
 
 A personal, child-friendly adventure for Dylan the Dalmatian puppy. Bad Cat, Metro and Captain Squirrel are the villains. All characters and assets are original; there are no accounts, advertising or real-money purchases.
 
@@ -58,3 +58,11 @@ Load once online, wait for offline readiness, then use Chrome’s Install app op
 ## Validation and playability
 
 See [PLAYABILITY.md](PLAYABILITY.md) for the assessment and remaining gaps. Current release checks are documented in [TESTING.md](TESTING.md). Browser checks demonstrate software behavior; a real tablet play session is still needed to judge finger comfort, spoken-word clarity and Dylan’s engagement.
+
+## Christmas mode
+
+Tap the top-right puppy logo five times to open parental settings, then switch **Christmas mode** on or off. The choice saves on this device without changing treats, purchases, collected words or inventions. Day/night remains a separate choice.
+
+The winter version includes snowy North Pole scenery, festive character outfits and vehicles, Christmas launchers and invention ingredients, gingerbread homes and furniture, dressed-up friends, seasonal spelling and tracing sentences, present-themed multiplication, an elf pipe workshop and Santa squid wash. Switching off restores the regular artwork and labels.
+
+Metro drives his Austin Metro bus, and Bad Cat rides a hot-air balloon. Their forcefields and projectile hit areas follow their vehicles. Controls use solid contrasting label backgrounds in both themes.

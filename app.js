@@ -696,8 +696,9 @@
         }
         return;
       }
-      const notes =
-        kind === "puppy"
+      const notes = window.badCatSeason.active()
+        ? [659, 659, 783, 659, 1046, 988]
+        : kind === "puppy"
           ? [440, 554, 659, 880]
           : kind === "sonar"
             ? [740, 370]
@@ -764,13 +765,14 @@
     else {
       const shot = document.createElement("span");
       shot.className = "free-shot";
-      shot.textContent = {
+      const symbol = {
         shield: "◈",
         laser: "✦",
         sonar: "◎",
         bubble: "🫧",
         puppy: "🐾",
       }[kind];
+      shot.textContent = window.badCatSeason.powerIcon(kind, symbol);
       document.body.append(shot);
       const player = window.badCatTargeting.targetNode("car");
       const r = player?.getBoundingClientRect();

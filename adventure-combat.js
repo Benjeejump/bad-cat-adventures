@@ -93,6 +93,7 @@
       boost();
   });
   function art(key) {
+    if(window.badCatSeason.active())return `<span class="christmas-missile">${key==="badcat"?"🎁":key==="metro"?"🍭":"🔔"}</span>`;
     if (key === "badcat") return '<img src="assets/kitten.png" alt="Kitten">';
     if (key === "captain")
       return '<img src="assets/inventions/acorns.svg" alt="Acorn">';
@@ -104,8 +105,14 @@
       player = hero();
     if (!source || !player) return false;
     const from = center(source),
-      to = center(player),
-      distance = Math.max(1, Math.hypot(to.x - from.x, to.y - from.y));
+      to = center(player);
+    const sourceBounds = source.getBoundingClientRect();
+    if (key === "badcat") from.y = sourceBounds.top + sourceBounds.height * 0.8;
+    if (key === "metro") {
+      from.x = sourceBounds.left + sourceBounds.width * 0.72;
+      from.y = sourceBounds.top + sourceBounds.height * 0.45;
+    }
+    const distance = Math.max(1, Math.hypot(to.x - from.x, to.y - from.y));
     const node = document.createElement("button");
     node.className = "villain-projectile projectile-" + key;
     node.setAttribute(
