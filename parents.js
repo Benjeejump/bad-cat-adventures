@@ -14,6 +14,9 @@
     document.querySelectorAll("dialog[open]").forEach((d) => d.close());
     window.badCatCharacters.clearPlans();
     window.badCatEncounters?.clear();
+    window.badCatCombat?.clear();
+    if (window.badCatCombat?.recoverBoosters())
+      window.badCatAdventure.onGadget("sonar");
     window.badCatAdventure.deferSpelling();
   }
   function badge(host) {
@@ -122,6 +125,8 @@
       "bad-cat-pencil-v1",
       "bad-cat-enemy-fields-v1",
       "metro-pipeworks-v1",
+      "bad-cat-boosters-v1",
+      "bad-cat-forest-v1",
     ];
     try {
       keys.forEach((key) => localStorage.removeItem(key));

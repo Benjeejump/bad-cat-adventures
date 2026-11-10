@@ -21,13 +21,7 @@
     '<button data-move="up" aria-label="Move up">▲</button><button data-move="left" aria-label="Move left">◀</button><span aria-hidden="true">●</span><button data-move="right" aria-label="Move right">▶</button><button data-move="down" aria-label="Move down">▼</button>';
   document.body.append(pad);
   function playing() {
-    return (
-      !document.hidden &&
-      !$("#drive-view").hidden &&
-      !document.querySelector("dialog[open]") &&
-      !window.badCatAdventure.isOpen() &&
-      !$("#pause").matches('[aria-pressed="true"]')
-    );
+    return window.badCatPlay.active();
   }
   function hero() {
     return window.badCatRoad.visible()
@@ -52,10 +46,13 @@
       node.innerHTML = '<img src="assets/spelling-bee.png" alt="Bee">';
       const bee = {
         node,
-        x: innerWidth * (0.2 + i * 0.13),
-        y: 95 + i * 25,
+        x: 55 + Math.random() * Math.max(1, innerWidth - 110),
+        y: 105 + Math.random() * Math.min(140, innerHeight * 0.2),
         age: 0,
-        phase: i,
+        vx: (Math.random() < 0.5 ? -1 : 1) * (35 + Math.random() * 35),
+        vy: 15 + Math.random() * 30,
+        turnIn: 0.4 + Math.random() * 1.3,
+        phase: Math.random() * Math.PI * 2,
       };
       bees.push(bee);
       layer.append(node);
@@ -129,7 +126,10 @@
   }
   function steer(dx, dy, dt) {
     if (window.badCatRoad.visible()) {
-      window.badCatRoad.steer(dx * dt * 35, dy * dt * 35);
+      window.badCatRoad.steer(
+        dx * dt * 35 * (window.badCatCombat?.speed() || 1),
+        dy * dt * 35 * (window.badCatCombat?.speed() || 1),
+      );
       return;
     }
     const node = hero();
@@ -137,7 +137,10 @@
     const mode = window.badCatVehicle.mode(),
       o = (offsets[mode] ??= { x: 0, y: 0 });
     const r = node.getBoundingClientRect(),
-      speed = Math.min(innerWidth, innerHeight) * 0.32;
+      speed =
+        Math.min(innerWidth, innerHeight) *
+        0.32 *
+        (window.badCatCombat?.speed() || 1);
     const nx = Math.max(
       12 - r.left,
       Math.min(innerWidth - 12 - r.right, dx * dt * speed),
@@ -189,6 +192,7 @@
     const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
     last = now;
     const active = playing();
+    document.body.classList.toggle("game-paused", !active);
     pad.hidden = !active;
     layer.hidden = !active;
     if (active) {
@@ -206,8 +210,21 @@
         p = player ? center(player) : null;
       for (const b of [...bees]) {
         b.age += dt;
-        b.y += dt * 22;
-        b.x += Math.sin(b.age * 1.7 + b.phase) * dt * 24;
+        b.turnIn -= dt;
+        if (b.turnIn <= 0) {
+          b.vx =
+            Math.cos(Math.random() * Math.PI * 2) * (30 + Math.random() * 45);
+          b.vy = -12 + Math.random() * 65;
+          b.turnIn = 0.6 + Math.random() * 1.7;
+        }
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        if (b.x < 38 || b.x > innerWidth - 38) b.vx *= -1;
+        b.x = Math.max(38, Math.min(innerWidth - 38, b.x));
+        if (b.y < 90) {
+          b.y = 90;
+          b.vy = Math.abs(b.vy);
+        }
         b.node.style.left = b.x + "px";
         b.node.style.top = b.y + "px";
         if (p && Math.hypot(p.x - b.x, p.y - b.y) < 46) {
@@ -270,6 +287,8 @@
     },
     diagnostics: () => ({
       bees: bees.length,
+      beePositions: bees.map((b) => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy })),
+      active: playing(),
       bottle: !!bottle,
       elapsed,
       defeated: { ...defeatedAt },

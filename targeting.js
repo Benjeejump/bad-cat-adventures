@@ -112,6 +112,11 @@
       window.badCatAdventure.isOpen()
     )
       return;
+    if (window.badCatCombat?.findHit(x, y)) {
+      if (hooks.miss(armed, armedInvention, { x, y }) !== false)
+        window.badCatCombat.hitAt(x, y);
+      return;
+    }
     if (window.badCatEncounters?.findHit(x, y)) {
       if (hooks.miss(armed, armedInvention, { x, y }) !== false)
         window.badCatEncounters.hitAt(x, y);

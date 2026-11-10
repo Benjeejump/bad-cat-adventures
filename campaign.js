@@ -270,6 +270,7 @@
     raidUse,
     puppyOutcome,
     snapshot,
+    projectileHit: () => change({ condition: -3 }),
     repair,
     resupply,
     motionScale: () =>

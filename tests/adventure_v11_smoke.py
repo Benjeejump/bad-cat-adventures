@@ -30,9 +30,12 @@ with sync_playwright() as p:
  page.evaluate('badCatEncounters.spawnBees()');page.wait_for_timeout(100)
  check(page.locator('.field-bee').count()==5,'A swarm has exactly five recognizable bees')
  page.locator('[data-slot="1"]').click();r=page.locator('.field-bee').first.bounding_box();page.mouse.click(r['x']+r['width']/2,r['y']+r['height']/2);check(page.locator('.field-bee').count()==4,'A launcher can shoot a bee before it touches Dylan')
- page.wait_for_timeout(5200)
- page.evaluate('''()=>{const r=document.querySelector('.field-bee').getBoundingClientRect(),p=document.querySelector('#road-player').getBoundingClientRect(),s=document.querySelector('#road-world').getBoundingClientRect();badCatRoad.steer(((r.x+r.width/2)-(p.x+p.width/2))/s.width*100,((r.y+r.height/2)-(p.y+p.height/2))/s.height*100);}''')
- page.wait_for_function('badCatSpelling.isOpen()',timeout=6000);check(page.locator('.field-bee').count()==0,'Actual bee-to-player contact launches one spelling game and clears the swarm')
+ # Move the real player toward reachable independently moving bees.
+ for attempt in range(80):
+  if page.evaluate('badCatSpelling.isOpen()'):break
+  page.evaluate("""()=>{const p=document.querySelector('#road-player').getBoundingClientRect(),s=document.querySelector('#road-world').getBoundingClientRect();const r=[...document.querySelectorAll('.field-bee')].map(n=>n.getBoundingClientRect()).find(r=>r.x+r.width/2>s.x+s.width*.26&&r.x+r.width/2<s.x+s.width*.74&&r.y+r.height/2>s.y+s.height*.23);if(r)badCatRoad.steer(((r.x+r.width/2)-(p.x+p.width/2))/s.width*100,((r.y+r.height/2)-(p.y+p.height/2))/s.height*100);} """)
+  page.wait_for_timeout(250)
+ page.wait_for_function('badCatSpelling.isOpen()',timeout=1000);check(page.locator('.field-bee').count()==0,'Actual bee-to-player contact launches one spelling game and clears the swarm')
  leave(page)
  page.evaluate('badCatEncounters.spawnBottle()');page.wait_for_timeout(100);r=page.locator('.message-bottle').bounding_box();page.mouse.click(r['x']+r['width']/2,r['y']+r['height']/2);check(not page.evaluate('badCatHandwriting.isOpen()'),'A bottle needs the net, rather than a plain tap')
  tap_tool(page,'#net-launch');page.locator('.message-bottle').wait_for(state='visible');r=page.locator('.message-bottle').bounding_box();page.mouse.click(r['x']+r['width']/2,r['y']+r['height']/2);check(page.evaluate('badCatHandwriting.isOpen()'),'Netting the message bottle opens handwriting')

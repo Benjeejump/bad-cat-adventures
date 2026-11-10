@@ -563,6 +563,7 @@
       return;
     }
     hazard = kind;
+    if (kind === "heist") window.badCatCombat?.stealBoosters();
     hazardSeconds = 35;
     let layer = $("#map-hazard");
     if (!layer) {
@@ -584,6 +585,7 @@
   }
   function clearHazard(message) {
     if (!hazard) return;
+    if (hazard === "heist") window.badCatCombat?.recoverBoosters();
     hazard = null;
     hazardSeconds = 0;
     $("#map-hazard")?.replaceChildren();

@@ -17,7 +17,7 @@ with sync_playwright() as p:
    page.evaluate('badCatCampaign.awardTreats(99)');page.locator('#house-store-tab').click()
    if item['id'] not in page.evaluate('badCatHouse.diagnostics().owned'):page.locator('[data-buy-item="'+item['id']+'"]').click()
   assert page.evaluate('badCatHouse.diagnostics().furnished')==total
-  if tier<4:page.locator('#house-upgrade').click();assert page.evaluate('badCatHouse.diagnostics().tier')==tier+1 and page.evaluate('badCatHouse.diagnostics().furnished')==0
+  if tier<4:page.evaluate('badCatCampaign.awardTreats(99)');page.locator('#house-store-tab').click();page.locator('#house-upgrade').click();assert page.evaluate('badCatHouse.diagnostics().tier')==tier+1 and page.evaluate('badCatHouse.diagnostics().furnished')==0
  print('PASS All five furnishing targets and upgrades work; all 150 purchases persist',flush=True)
  assert len(page.evaluate('badCatHouse.diagnostics().owned'))==150
  page.locator('#house-visit').select_option('0');page.locator('#house-home-tab').click();assert page.locator('.house-item').count()==10

@@ -410,10 +410,22 @@
     $("#distance").textContent =
       `${(state.distance / 1000).toFixed(2)} km explored`;
   }
+  // One clock gate for every background system, including non-modal Mission HQ.
+  window.badCatPlay = {
+    active: () =>
+      state.view === "drive" &&
+      !state.paused &&
+      !document.hidden &&
+      !document.querySelector("dialog[open]") &&
+      !window.badCatAdventure.isOpen(),
+    view: () => state.view,
+  };
   function tick(dt) {
+    if (state.view === "drive" && !state.paused && !document.hidden)
+      window.badCatTargeting.tick(dt);
+    if (!window.badCatPlay.active()) return;
     window.badCatVehicle.tick(dt);
     window.badCatCharacters.tick(dt);
-    window.badCatTargeting.tick(dt);
     window.badCatAdventure.tick(dt);
     if (state.mode === "road") return;
     if (
@@ -986,8 +998,13 @@
   }
   function setView(view) {
     state.view = view;
+    $("#drive-view").hidden = view !== "drive";
+    $("#hq-view").hidden = view !== "hq";
     document.body.classList.toggle("map-mode", view === "drive");
-    if (view !== "drive") window.badCatTargeting.cancel();
+    if (view !== "drive") {
+      window.badCatTargeting.cancel();
+      window.speechSynthesis?.cancel();
+    }
     $("#drive-view").classList.toggle("hidden", view !== "drive");
     $("#hq-view").classList.toggle("hidden", view !== "hq");
     $$("[data-view]").forEach((b) => {
@@ -1207,17 +1224,15 @@
     finished: () => window.badCatAdventure.deferSpelling(),
   });
   window.badCatVehicle.init({
-    canSpeak: () => soundEnabled,
-    active: () =>
-      state.view === "drive" &&
-      !state.paused &&
-      !window.badCatAdventure.isOpen(),
+    canSpeak: () => soundEnabled && window.badCatPlay.active(),
+    active: () => window.badCatPlay.active(),
     sound,
     say: (message) => {
       story(message);
       toast(message);
     },
     changed: (type) => {
+      window.badCatCombat?.clear();
       if (["car", "walking"].includes(type) && map && state.mode !== "road") {
         map.invalidateSize();
         if (["gps", "test", "road"].includes(state.mode)) {
@@ -1228,12 +1243,7 @@
     },
   });
   window.badCatCharacters.init({
-    active: () =>
-      state.view === "drive" &&
-      !state.paused &&
-      (["gps", "test", "road"].includes(state.mode) ||
-        window.badCatVehicle.worldActive()) &&
-      !window.badCatAdventure.isOpen(),
+    active: () => window.badCatPlay.active(),
     plan: (kind, key) =>
       state.mode === "road" && window.badCatRoad.visible()
         ? window.badCatRoad.deploy(kind, key)
@@ -1268,6 +1278,8 @@
       state.retreatUntil = retreat;
       state.allyUntil = ally;
       const strike = window.badCatCharacters.hit(target, kind);
+      if (window.badCatCombat?.recoverFromHit(target, kind, strike?.exposed))
+        window.badCatAdventure.onGadget("sonar");
       const node = window.badCatTargeting.targetNode(target);
       const rect = node?.getBoundingClientRect();
       if (rect)
@@ -1319,12 +1331,7 @@
     closed: () => window.badCatAdventure.deferSpelling(),
   });
   window.badCatRoad.init({
-    active: () =>
-      state.mode === "road" &&
-      state.view === "drive" &&
-      !state.paused &&
-      !document.hidden &&
-      !window.badCatAdventure.isOpen(),
+    active: () => state.mode === "road" && window.badCatPlay.active(),
     sound,
     surprise: (kind) => window.badCatAdventure.encounter(kind),
     hit: (key, node) => {

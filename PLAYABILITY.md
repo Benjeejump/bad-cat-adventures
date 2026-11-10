@@ -1,4 +1,4 @@
-# Playability assessment — v0.11
+# Playability assessment — v0.12
 
 ## Verdict
 
@@ -8,7 +8,7 @@ A strong concept for a personal game: Dylan is the hero, the villains are famili
 
 Explore and steer → use a launcher or net → encounter a short challenge → earn treats or words → furnish the puppy home → return to the adventure.
 
-The current update connects encounters to visible causes. Defeating a villain produces a decision game. Bees can be shot or avoided before contact triggers spelling. Bottles require the net and deliver handwriting notes. Timed surprise cutaways and tunnels are removed. The home provides the longer-term goal.
+The current update connects encounters to visible causes. Defeating a villain produces a decision game. Bees can be shot or avoided before contact triggers spelling. Bottles require the net and deliver handwriting notes. Timed surprise cutaways and tunnels are removed. The home provides the longer-term goal. The forest adds multiplication practice; breed invitations make the furnished homes feel inhabited.
 
 ## Gaps addressed in this release
 
@@ -21,6 +21,15 @@ The current update connects encounters to visible causes. Defeating a villain pr
 - **Reward balance:** defeating a villain earns a treat. Pipes pays five and a completed handwritten note pays eight; longer activities should feel useful. The emergency snack box no longer stacks unlimited free currency.
 - **Battle repetition:** defeated enemies get a fresh field for a later appearance instead of repeatedly launching decisions from one already-broken shield.
 - **Map complexity:** GPS is retired; the game needs no location permission or mapping connection.
+
+## v0.12 follow-up
+
+- One shared play gate now stops base-world clocks in both the Mission HQ page and modal menus. Bees, projectiles and other world layers are hidden there; home pets and learning activities run on their own clocks.
+- Bees have independent starting points, speeds and steering changes. Enemy projectiles are telegraphed and slow enough to dodge or intercept.
+- Boosters are visible equipment with activation, recharge, theft and recovery. Missing equipment remains recoverable after reload.
+- Furniture and upgrades cost more; the first item is still affordable with the initial balance. Existing purchases remain owned.
+- Home occupants walk to furnishings and perform context-specific activities. Breed invitations unlock once and have clear per-home capacity limits.
+- The forest offers a small, untimed multiplication loop with concrete grouping hints rather than another speed test.
 
 ## Remaining gaps, in priority order
 

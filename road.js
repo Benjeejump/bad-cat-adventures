@@ -125,7 +125,6 @@
   }
   function tick(dt) {
     if (!enabled) return;
-    render();
     const busy = window.badCatAdventure.isOpen();
     if (wasBusy && !busy) {
       cooldown = 20;
@@ -139,8 +138,16 @@
       bullets.forEach((b) => b.node.remove());
       bullets = [];
     }
-    if (!visible() || !hooks.active()) return;
-    elapsed += dt * window.badCatCampaign.motionScale();
+    if (!visible() || !hooks.active()) {
+      root.hidden = !visible();
+      root.classList.add("road-paused");
+      return;
+    }
+    elapsed +=
+      dt *
+      window.badCatCampaign.motionScale() *
+      window.badCatAdventure.motionScale() *
+      (window.badCatCombat?.speed() || 1);
     if (keys.fire) fire();
     cooldown = Math.max(0, cooldown - dt);
     nextSpawn -= dt;
@@ -172,7 +179,10 @@
         x: bounds.x + (shot.x / 100) * bounds.width,
         y: bounds.y + (shot.y / 100) * bounds.height,
       };
-      if (window.badCatEncounters?.findHit(point.x, point.y)) {
+      if (
+        window.badCatCombat?.findHit(point.x, point.y) ||
+        window.badCatEncounters?.findHit(point.x, point.y)
+      ) {
         if (!window.badCatTargeting.diagnostics().armed)
           window.badCatArsenal.arm(1);
         window.badCatTargeting.shootAt(point.x, point.y);

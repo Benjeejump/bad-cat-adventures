@@ -239,7 +239,7 @@
     const root = document.createElement("div");
     root.id = "vehicle-world";
     root.hidden = true;
-    root.innerHTML = `<div class="world-scenery"><div class="world-cloud-stream">${Array.from({ length: 8 }, (_, i) => `<i style="--cloud-x:${i * 17 - 10}%;--cloud-delay:-${i * 2.1}s"></i>`).join("")}</div><div class="sea-rays"></div><div class="sea-floor"></div><div class="sea-fish fish-one">🐟</div><div class="sea-fish fish-two">🐠</div><div class="sea-ink"></div><div class="world-storm"></div></div><div class="world-heading"><b id="world-title"></b><span id="world-stability"></span></div><img id="world-vehicle" class="world-family-vehicle" alt=""><div class="world-enemy world-badcat"><img src="assets/bad-cat.png" alt="BC in his villain airship"><span>BC</span></div><div class="world-enemy world-metro"><img src="assets/metro.png" alt="M and his invention"><span>M</span></div><div class="sub-wiper"></div><div class="sub-wiper sub-wiper-right"></div><div class="world-sonar"></div><div class="world-controls"><p id="world-status" role="status"></p><div><button data-world-tool="0"></button><button data-world-tool="1"></button><button data-world-tool="2"></button></div><details><summary>Captain’s announcement <button id="repeat-flight" aria-label="Repeat the captain’s announcement">♪</button></summary><p id="world-announcement"></p></details></div>`;
+    root.innerHTML = `<div class="world-scenery"><div class="world-cloud-stream">${Array.from({ length: 8 }, (_, i) => `<i style="--cloud-x:${i * 17 - 10}%;--cloud-delay:-${i * 2.1}s"></i>`).join("")}</div><div class="sea-rays"></div><div class="sea-floor"></div><div class="sea-fish fish-one">🐟</div><div class="sea-fish fish-two">🐠</div><div class="sea-ink"></div><div class="world-storm"></div></div><div class="world-heading"><b id="world-title"></b><span id="world-stability"></span></div><img id="world-vehicle" class="world-family-vehicle" alt=""><div class="world-enemy world-badcat"><img src="assets/bad-cat.png" alt="BC in his villain airship"><span>BC</span></div><div class="world-enemy world-metro"><img src="assets/metro.png" alt="M and his invention"><span>M</span></div><button class="world-enemy world-captain" aria-label="Target Captain Squirrel"><img src="assets/captain-squirrel.png" alt="Captain Squirrel"><span>C</span></button><div class="sub-wiper"></div><div class="sub-wiper sub-wiper-right"></div><div class="world-sonar"></div><div class="world-controls"><p id="world-status" role="status"></p><div><button data-world-tool="0"></button><button data-world-tool="1"></button><button data-world-tool="2"></button></div><details><summary>Captain’s announcement <button id="repeat-flight" aria-label="Repeat the captain’s announcement">♪</button></summary><p id="world-announcement"></p></details></div>`;
     document.querySelector("#map-stage").append(root);
     root
       .querySelectorAll("[data-world-tool]")
@@ -250,7 +250,7 @@
       e.preventDefault();
       speak(true);
     });
-    for (const key of ["badcat", "metro"])
+    for (const key of ["badcat", "metro", "captain"])
       root
         .querySelector(`.world-${key}`)
         .addEventListener("click", () =>

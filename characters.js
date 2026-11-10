@@ -71,7 +71,7 @@
         key === "badcat"
           ? "#actor-badcat,.badcat-marker,.world-badcat,.road-badcat"
           : key === "captain"
-            ? ".road-captain"
+            ? ".road-captain,.world-captain"
             : "#actor-metro,.metro-marker,.world-metro,.road-metro",
       ),
     ];
