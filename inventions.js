@@ -194,7 +194,7 @@
     inventory = document.createElement("dialog");
     inventory.id = "arsenal-dialog";
     inventory.innerHTML =
-      '<header><h2>Dylan’s inventions</h2><button type="button" aria-label="Close inventions">×</button></header><p>Choose your invention, then tap BC, Metro or a kitten.</p><div id="field-inventions"></div><button type="button" id="build-more">Build at HQ</button>';
+      '<header><h2>Dylan’s inventions</h2><button type="button" aria-label="Close inventions">×</button></header><p>Choose an invention to fire ahead. Equip it on a paw pad to keep using it.</p><div id="field-inventions"></div><button type="button" id="build-more">Build at HQ</button>';
     inventory.querySelector("header button").onclick = () => inventory.close();
     inventory.querySelector("#build-more").onclick = () => {
       inventory.close();

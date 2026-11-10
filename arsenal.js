@@ -44,6 +44,15 @@
     if (typeof inv === "string") window.badCatTargeting.arm(inv);
     else window.badCatTargeting.arm(inv.power, inv);
   }
+  function fire(i) {
+    if (window.badCatTargeting.raidActive()) {
+      arm(i);
+      return true;
+    }
+    if (!window.badCatPlay?.active()) return false;
+    arm(i);
+    return window.badCatTargeting.fireForward();
+  }
   function render() {
     if (!hooks) return;
     buttons.forEach((b, i) => {
@@ -128,16 +137,46 @@
     buttons = base
       .slice(0, 5)
       .map(([power]) => document.querySelector(`[data-gadget="${power}"]`));
-    buttons.forEach((b, i) =>
+    buttons.forEach((b, i) => {
+      let repeating;
+      const stop = () => {
+        clearInterval(repeating);
+        repeating = null;
+      };
+      b.addEventListener("pointerdown", (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        stop();
+        fire(i);
+        b.setPointerCapture(e.pointerId);
+        if (!window.badCatTargeting.raidActive())
+          repeating = setInterval(() => {
+            if (!window.badCatPlay?.active()) {
+              stop();
+              return;
+            }
+            fire(i);
+          }, 280);
+      });
+      for (const event of [
+        "pointerup",
+        "pointercancel",
+        "lostpointercapture",
+        "blur",
+      ])
+        b.addEventListener(event, stop);
+      window.addEventListener("blur", stop);
+      document.addEventListener("visibilitychange", stop);
       b.addEventListener(
         "click",
         (e) => {
           e.stopImmediatePropagation();
-          arm(i);
+          if (e.detail === 0) fire(i);
         },
         true,
-      ),
-    );
+      );
+    });
     dialog = document.createElement("dialog");
     dialog.id = "arsenal-editor";
     dialog.innerHTML =
@@ -204,6 +243,7 @@
     init,
     render,
     arm,
+    fire,
     isOpen: () => !!dialog?.open || !!hqMenu?.open,
     diagnostics: () =>
       slots.map((_, i) => {

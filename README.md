@@ -1,4 +1,4 @@
-# Bad Cat Adventures v0.13
+# Bad Cat Adventures v0.14
 
 A personal, child-friendly adventure for Dylan the Dalmatian puppy. Bad Cat, Metro and Captain Squirrel are the villains. All characters and assets are original; there are no accounts, advertising or real-money purchases.
 
@@ -7,14 +7,14 @@ A personal, child-friendly adventure for Dylan the Dalmatian puppy. Bad Cat, Met
 Open the game and choose **Let’s ride** or **Play quietly**. Road Adventure is now the only main world: GPS and maps have been retired. No location permission or map-service requests are needed.
 
 - Use the left D-pad or arrow keys to move. Switch between the white Odyssey, Doggy Plane, submarine and walking puppy in HQ.
-- The four toes and heel of the paw are five configurable launchers. Choose one, then tap the playfield or a nearby villain. Keys 1–5 select launchers. The road’s Fire button sends a projectile upward and can hit villains or bees.
+- The four toes and heel of the paw are five configurable launchers. Press a pad to fire straight ahead; hold it to repeat. Move with the D-pad to line up a shot. Keys 1–5 also fire the corresponding launcher. Shots travel up the screen in every vehicle mode and can hit villains, bees or incoming attacks. Tapping scenery or a villain does not aim or attack. Kitten raids keep their separate tap-the-kitten controls.
 - Bees wander independently rather than descending in formation. All adventure movement, attacks, boost timers and bee encounters pause in Mission HQ, Puppy HQ, the home, the store and other activities.
 - Visible booster pods can be activated with the Boost button or B: a three-second burst, temporary projectile protection and a twelve-second recharge. Theft removes them; recovery restores them with a glow. Sonar/puppy/shield hits on the cats, or defeating them, recover stolen equipment even after a reload.
-- Bad Cat fires kittens, Metro throws spanners and Captain Squirrel fires acorns. Attacks wind up first, travel slowly, can be dodged or shot, and cause small recoverable dents.
+- At most two villains appear on screen at once, with all three rotating into play. Bad Cat fires kittens, Metro throws spanners and Captain Squirrel fires acorns. Attacks wind up first, travel slowly, can be dodged or shot, and cause small recoverable dents.
 - The separate house button at bottom right opens Puppy HQ: inventory, launcher editing, vehicle choices, the puppy house, net, learning games and workshop.
 - Crack a villain’s forcefield and hit the exposed villain to earn a treat and launch a decision encounter. Villain chatter no longer schedules automatic attacks.
 - Occasionally, five illustrated bees enter the world. Shoot or dodge them. Contact with Dylan starts the spelling game. Games pause while menus or another activity are open.
-- A floating message bottle can be collected with the net selected in HQ. It opens a handwritten note directly on the large tracing surface.
+- Drive over a floating message bottle to collect it, just like a cookie treat. It opens a handwritten note directly on the large tracing surface; no net selection is needed. The net remains available for upgrades.
 - Treats buy 150 furnishings across five homes: dog house, apartment, house, big house and mansion. The homes offer 10, 20, 30, 40 and 50 items respectively. Fully furnish each home before upgrading. Earlier homes remain visitable. New furniture costs 6–82 treats; home upgrades cost 20/40/65/90 treats. Existing purchases remain owned.
 
 There are no timed random cutaways and no tunnel activity. Instruction notifications and the aiming popup are removed. Story feedback is kept inside HQ.
@@ -31,7 +31,7 @@ Dylan walks around his home independently, naps on beds, snacks at bowls, reads 
 
 **Spelling:** 288 words for grades 2–3, spoken words with context, exact letter blanks, distractor bees, hints and three attempts. Correct words are collected and unlock sentence codes. The final correct letter stops speech and celebrates. A puppy rescues Dylan after three unsuccessful attempts.
 
-**Pipes:** a full-screen workshop with 24 large tiles at the start and up to 48 later. Connect the route, then watch water or slime flow. Later puzzles add obstacles and selectable pieces. No deadline or failure timer. Hints remain available. Completion earns five treats.
+**Pipes:** a full-screen timber-framed workshop with chunky curved silver pipes, riveted joints, a parts rack and a puppy water tank. There are 24 large tiles at the start and up to 48 later. Connect the route, then watch water or slime flow. Later puzzles add obstacles and selectable pieces. No deadline or failure timer. Hints remain available. Completion earns five treats.
 
 **Magic Pencil:** two-sentence notes covering A–Z through the course. The current formation is magnified across the available writing surface; **Whole note** shows the complete two-line page. Finger movement follows ordered cursive strokes. Notes and progress save locally. Completion earns eight treats.
 

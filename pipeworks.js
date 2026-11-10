@@ -141,12 +141,27 @@
       required: path.length,
     };
   }
+  let artSerial = 0;
   function svg(mask) {
+    const ends = [
+      [1, 50, 0],
+      [2, 100, 50],
+      [4, 50, 100],
+      [8, 0, 50],
+    ].filter(([bit]) => mask & bit);
+    const id = `pipe-metal-${++artSerial}`;
     let d = "";
-    for (const [, , bit] of directions)
-      if (mask & bit)
-        d += `M50 50L${bit === 2 ? 100 : bit === 8 ? 0 : 50} ${bit === 1 ? 0 : bit === 4 ? 100 : 50}`;
-    return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path class="pipe-shadow" d="${d}"/><path class="pipe-metal" d="${d}"/><path class="pipe-bore" d="${d}"/><path class="pipe-water" d="${d}"/><circle class="pipe-joint" cx="50" cy="50" r="12"/><circle class="pipe-bolt" cx="14" cy="14" r="3"/><circle class="pipe-bolt" cx="86" cy="86" r="3"/></svg>`;
+    if (ends.length === 2) {
+      const [[, ax, ay], [, bx, by]] = ends;
+      d = `M${ax} ${ay}Q50 50 ${bx} ${by}`;
+    } else for (const [, x, y] of ends) d += `M50 50L${x} ${y}`;
+    const collars = ends
+      .map(
+        ([bit]) =>
+          `<g class="pipe-collar" transform="rotate(${{ 1: 0, 2: 90, 4: 180, 8: 270 }[bit]} 50 50)"><rect x="29" y="1" width="42" height="13" rx="3" fill="url(#${id})" stroke="#25323d" stroke-width="2"/><circle cx="35" cy="7" r="2.5" fill="#cce4ed" stroke="#435763"/><circle cx="65" cy="7" r="2.5" fill="#cce4ed" stroke="#435763"/></g>`,
+      )
+      .join("");
+    return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#263c50"/><stop offset=".27" stop-color="#90a7b9"/><stop offset=".44" stop-color="#eefaff"/><stop offset=".62" stop-color="#879aa8"/><stop offset="1" stop-color="#263646"/></linearGradient></defs><path class="pipe-shadow" d="${d}"/><path class="pipe-metal" d="${d}" style="stroke:url(#${id})"/><path class="pipe-bore" d="${d}"/><path class="pipe-water" d="${d}"/><path class="pipe-flow-shine" d="${d}"/>${collars}</svg>`;
   }
   function connections() {
     const { tiles, start, end, cols, rows } = round,
@@ -280,6 +295,10 @@
       flowCount: 0,
     };
     $("#pipe-piece-tray").hidden = !round.placement;
+    $("#pipe-supply-examples").hidden = round.placement;
+    $("#pipe-supply-title").textContent = round.placement
+      ? "PIPE PARTS"
+      : "TURN & CONNECT";
     board.style.setProperty("--pipe-cols", cols);
     board.style.setProperty("--pipe-rows", rows);
     board.replaceChildren();
@@ -308,6 +327,9 @@
   }
   function updateClock() {
     $("#pipe-timer").textContent = round.done ? "Connected!" : "No rush";
+    $("#pipe-receiver-fill").value = round.done
+      ? 100
+      : (round.flowCount / round.required) * 100;
     $("#pipe-tank").value = round.done
       ? 100
       : (round.flowCount / round.required) * 100;
@@ -401,6 +423,19 @@
       '<header class="pipe-header"><img src="assets/metro.png" alt="Metro"><div><p>DYLAN’S MISSION · NO TIME LIMIT</p><h2 id="pipe-title">Pipeworks!</h2><small id="pipe-level"></small></div><button id="pipe-close" aria-label="Close Pipeworks">×</button></header><section class="pipe-content"><p id="pipe-status" role="status"></p><div class="pipe-gauges"><b id="pipe-timer"></b><progress id="pipe-tank" max="100"></progress><span id="pipe-connected"></span><span id="pipe-turns"></span></div><p id="pipe-route-label"></p><div id="pipe-piece-tray" hidden><b>Pick a piece</b><button data-pipe-piece="10">━ Straight</button><button data-pipe-piece="3">┗ Bend</button><button id="pipe-piece-turn">↻ Turn chosen piece</button><button data-pipe-piece="0">× Remove</button><span id="pipe-piece-preview"></span></div><div id="pipe-board" aria-label="Rotate or place pipes to carry water around obstacles"></div><div class="pipe-controls"><label><input type="checkbox" id="pipe-practice" checked> Slow flow · watch it travel</label><label>Send <select id="pipe-fluid"><option value="water">Water</option><option value="slime">Green slime</option><option value="honey">Golden goo</option><option value="sparkles">Purple sparkle juice</option></select></label><button id="pipe-start-water">Start the flow</button><button id="pipe-pause" hidden>Pause water</button><button id="pipe-hint">Luna’s hint</button><button id="pipe-small">Smaller puzzle</button></div><div id="pipe-result" hidden><button id="pipe-next"></button><button id="pipe-replay">Replay this workshop</button></div></section>';
     document.body.append(dialog);
     board = $("#pipe-board");
+    const workbench = document.createElement("div");
+    workbench.className = "pipe-workbench";
+    board.before(workbench);
+    workbench.append(board);
+    const supply = document.createElement("aside");
+    supply.className = "pipe-supply";
+    supply.setAttribute("aria-label", "Pipe parts and water tank");
+    supply.innerHTML = `<h3 id="pipe-supply-title">TURN & CONNECT</h3><div id="pipe-supply-examples"><div>${svg(10)}</div><div>${svg(3)}</div><p>Tap a pipe to turn it.</p></div><div class="pipe-receiver"><span aria-hidden="true">💧</span><b>PUPPY WATER TANK</b><progress id="pipe-receiver-fill" max="100" value="0" aria-label="Water arriving in the puppy tank"></progress></div>`;
+    supply.insertBefore(
+      $("#pipe-piece-tray"),
+      supply.querySelector(".pipe-receiver"),
+    );
+    workbench.append(supply);
     const preview = () => {
       $("#pipe-piece-preview").innerHTML = selectedPiece
         ? svg(selectedPiece)

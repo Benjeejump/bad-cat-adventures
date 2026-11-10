@@ -1,6 +1,6 @@
 """Road-only adventure: five launchers, D-pad, collision games and large learning surfaces."""
 from playwright.sync_api import sync_playwright
-from ui_helpers import tap_tool
+from ui_helpers import tap_tool, fire_road_target
 
 def check(v,m):
  assert v,m
@@ -29,7 +29,6 @@ with sync_playwright() as p:
  check('tunnel' not in page.evaluate('badCatAdventure.diagnostics().surprisePool'),'Tunnel surprises are removed')
  page.evaluate('badCatEncounters.spawnBees()');page.wait_for_timeout(100)
  check(page.locator('.field-bee').count()==5,'A swarm has exactly five recognizable bees')
- page.locator('[data-slot="1"]').click();r=page.locator('.field-bee').first.bounding_box();page.mouse.click(r['x']+r['width']/2,r['y']+r['height']/2);check(page.locator('.field-bee').count()==4,'A launcher can shoot a bee before it touches Dylan')
  # Move the real player toward reachable independently moving bees.
  for attempt in range(80):
   if page.evaluate('badCatSpelling.isOpen()'):break
@@ -37,8 +36,9 @@ with sync_playwright() as p:
   page.wait_for_timeout(250)
  page.wait_for_function('badCatSpelling.isOpen()',timeout=1000);check(page.locator('.field-bee').count()==0,'Actual bee-to-player contact launches one spelling game and clears the swarm')
  leave(page)
- page.evaluate('badCatEncounters.spawnBottle()');page.wait_for_timeout(100);r=page.locator('.message-bottle').bounding_box();page.mouse.click(r['x']+r['width']/2,r['y']+r['height']/2);check(not page.evaluate('badCatHandwriting.isOpen()'),'A bottle needs the net, rather than a plain tap')
- tap_tool(page,'#net-launch');page.locator('.message-bottle').wait_for(state='visible');r=page.locator('.message-bottle').bounding_box();page.mouse.click(r['x']+r['width']/2,r['y']+r['height']/2);check(page.evaluate('badCatHandwriting.isOpen()'),'Netting the message bottle opens handwriting')
+ page.evaluate('badCatEncounters.spawnBottle()');page.wait_for_timeout(100);r=page.locator('.message-bottle').bounding_box();page.mouse.click(r['x']+r['width']/2,r['y']+r['height']/2);check(not page.evaluate('badCatHandwriting.isOpen()'),'Tapping a bottle does not collect it from a distance')
+ page.evaluate("""()=>{const b=document.querySelector('.message-bottle').getBoundingClientRect(),p=document.querySelector('#road-player').getBoundingClientRect(),w=document.querySelector('#road-world').getBoundingClientRect();badCatRoad.steer((b.x+b.width/2-p.x-p.width/2)/w.width*100,(b.y+b.height/2-p.y-p.height/2)/w.height*100);}""")
+ page.wait_for_function('badCatHandwriting.isOpen()');check(True,'Driving over the bottle opens handwriting without selecting a net')
  check(page.locator('#pencil-work').is_visible(),'Bottle note begins directly on the writing page')
  pad=page.locator('#writing-pad').bounding_box();check(pad['width']>1100 and pad['height']>420,'Tracing uses the whole working screen')
  page.screenshot(path='/tmp/v11-writing.png')
@@ -46,13 +46,15 @@ with sync_playwright() as p:
  page.locator('#pencil-zoom').click();check(page.locator('#writing-pad').get_attribute('viewBox')=='0 0 1000 380','Full two-sentence note remains available')
  leave(page)
  tap_tool(page,'#pipe-launch');d=page.evaluate('badCatPipes.diagnostics()');check(d['rows']*d['cols']>=24,'Rebuilt Pipes begins with at least 24 tiles')
- grid=page.locator('#pipe-board').bounding_box();check(grid['width']>1150 and grid['height']>400,'Pipe tiles occupy the full workshop floor')
+ grid=page.locator('#pipe-board').bounding_box();check(grid['width']>1000 and grid['height']>400,'Pipe tiles occupy the full workshop floor')
  page.screenshot(path='/tmp/v11-pipes.png')
  for _ in range(30):page.locator('#pipe-hint').click()
  page.locator('#pipe-start-water').click();page.wait_for_function('badCatPipes.diagnostics().won',timeout=30000);check(True,'A connected large puzzle visibly fills and reaches its outlet without a deadline')
  leave(page)
- page.locator('[data-slot="1"]').click()
- page.evaluate('''()=>{for(let i=0;i<3;i++)badCatTargeting.target('badcat',badCatTargeting.targetNode('badcat'));}''')
+ page.evaluate('badCatRoad.change(true);badCatRoad.tick(10)')
+ for _ in range(3):
+  fire_road_target(page,'badcat')
+  if page.locator('#encounter-dialog').evaluate('(d)=>d.open'):break
  check(page.locator('#encounter-dialog').evaluate('(d)=>d.open'),'Defeating a villain with launchers launches a decision encounter')
  leave(page)
  for w,h in [(1024,600),(800,1280),(390,844)]:

@@ -1,7 +1,7 @@
 /* Controls have explicit foregrounds and solid backplates in day, night and Christmas modes. */
 html
   body
-  button:not(.gadget):not(.road-enemy):not(.world-enemy):not(
+  button:not(.pipe-tile):not(.gadget):not(.road-enemy):not(.world-enemy):not(
     .kitten-target
   ):not(.field-bee):not(.villain-projectile):not(.message-bottle):not(
     .house-item
@@ -14,7 +14,7 @@ html
 }
 html
   body
-  button:not(.gadget):not(.road-enemy):not(.world-enemy):not(
+  button:not(.pipe-tile):not(.gadget):not(.road-enemy):not(.world-enemy):not(
     .kitten-target
   ):not(.field-bee):not(.villain-projectile):not(.message-bottle):not(
     .house-item
@@ -25,7 +25,7 @@ html
 }
 html
   body
-  button:not(.gadget):not(.road-enemy):not(.world-enemy):not(
+  button:not(.pipe-tile):not(.gadget):not(.road-enemy):not(.world-enemy):not(
     .kitten-target
   ):not(.field-bee):not(.villain-projectile):not(.message-bottle):not(
     .house-item
@@ -38,7 +38,7 @@ html
 }
 html
   body
-  button:not(.gadget):not(.road-enemy):not(.world-enemy):not(
+  button:not(.pipe-tile):not(.gadget):not(.road-enemy):not(.world-enemy):not(
     .kitten-target
   ):not(.field-bee):not(.villain-projectile):not(.message-bottle):not(
     .house-item
@@ -149,7 +149,7 @@ html body #arsenal-choices button:disabled {
 
 html
   body
-  button:not(.gadget):not(.road-enemy):not(.world-enemy):not(
+  button:not(.pipe-tile):not(.gadget):not(.road-enemy):not(.world-enemy):not(
     .kitten-target
   ):not(.field-bee):not(.villain-projectile):not(.message-bottle):not(
     .house-item

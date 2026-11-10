@@ -44,4 +44,4 @@ The current update connects encounters to visible causes. Defeating a villain pr
 
 ## Suggested child play session
 
-Play for 10–15 minutes with minimal coaching. Observe whether Dylan can move, hit a villain, avoid or shoot a bee, collect a bottle with the net, finish one puzzle and buy a furnishing. Record where he hesitates, mis-taps or asks what something does. Improve those points before expanding the feature list.
+Play for 10–15 minutes with minimal coaching. Observe whether Dylan can move, hit a villain, avoid or shoot a bee, drive over a message bottle, finish one puzzle and buy a furnishing. Record where he hesitates, mis-taps or asks what something does. Improve those points before expanding the feature list.

@@ -75,27 +75,26 @@
     node.setAttribute(
       "aria-label",
       window.badCatSeason.active()
-        ? "Catch Santa’s letter in a bottle with your net"
-        : "Catch the message in a bottle with your net",
+        ? "Drive over Santa’s message bottle to collect it"
+        : "Drive over the message bottle to collect it",
     );
     node.innerHTML =
       '<svg viewBox="0 0 80 110" aria-hidden="true"><path d="M30 6h20v24l14 16v51q0 8-8 8H24q-8 0-8-8V46l14-16Z" fill="#79dedbcc" stroke="#fff1c5" stroke-width="4"/><path d="M28 7h24v11H28Z" fill="#c09256"/><path d="M25 49h30v39H25Z" fill="#fff1c5"/><path d="m29 57 22 0m-22 9h22m-22 9h16" stroke="#527998" stroke-width="3"/></svg>';
     bottle = { node, x: innerWidth * 0.68, y: innerHeight * 0.43, age: 0 };
     layer.append(node);
     node.onclick = () => {
-      if (!playing()) return;
-      if (!window.badCatLoot.diagnostics().armed) {
-        node.classList.remove("bottle-wiggle");
-        void node.offsetWidth;
-        node.classList.add("bottle-wiggle");
-        return;
-      }
-      node.remove();
-      bottle = null;
-      window.badCatLoot.cancel();
-      nextBottle = 60 + Math.random() * 25;
-      if (window.badCatHandwriting.open()) $("#pencil-begin").click();
+      // The net remains an optional shortcut; driving over the bottle needs no tool.
+      if (window.badCatLoot.diagnostics().armed) collectBottle();
     };
+    return true;
+  }
+  function collectBottle() {
+    if (!bottle || !playing()) return false;
+    bottle.node.remove();
+    bottle = null;
+    window.badCatLoot.cancel();
+    nextBottle = 60 + Math.random() * 25;
+    if (window.badCatHandwriting.open()) $("#pencil-begin").click();
     return true;
   }
   function findHit(x, y) {
@@ -119,6 +118,7 @@
     window.badCatCampaign.awardTreats(1);
     window.badCatCharacters.resetField?.(key);
     window.badCatRoad.dismiss?.(key);
+    window.badCatVehicle.dismiss?.(key);
     clearBees();
     const options =
       key === "metro"
@@ -249,7 +249,17 @@
         bottle.age += dt;
         bottle.node.style.left = bottle.x + "px";
         bottle.node.style.top = bottle.y + Math.sin(bottle.age) * 14 + "px";
-        if (bottle.age > 90) {
+        const r = player?.getBoundingClientRect(),
+          q = bottle.node.getBoundingClientRect();
+        if (
+          r &&
+          q.right >= r.left &&
+          q.left <= r.right &&
+          q.bottom >= r.top &&
+          q.top <= r.bottom
+        ) {
+          collectBottle();
+        } else if (bottle.age > 90) {
           bottle.node.remove();
           bottle = null;
           nextBottle = 40;
@@ -276,7 +286,7 @@
       n.hidden = true;
     }),
   );
-  $("#net-launch b").textContent = "Net · catch messages";
+  $("#net-launch b").textContent = "Net · catch upgrades";
   const choice = $("#launch-journey");
   choice.innerHTML = '<option value="road">Adventure</option>';
   choice.hidden = true;
@@ -297,6 +307,7 @@
       beePositions: bees.map((b) => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy })),
       active: playing(),
       bottle: !!bottle,
+      bottlePosition: bottle ? { x: bottle.x, y: bottle.y } : null,
       elapsed,
       defeated: { ...defeatedAt },
     }),

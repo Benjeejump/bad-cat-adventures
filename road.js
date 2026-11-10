@@ -11,8 +11,6 @@
     nextTreat = 5,
     cooldown = 0,
     wasBusy = false,
-    lastFire = -1,
-    bullets = [],
     treats = [],
     keys = { left: false, right: false },
     activeEnemy = null,
@@ -44,18 +42,16 @@
     cancelAnimationFrame(animationFrame);
     lastFrame = 0;
     enabled = on;
+    window.badCatProjectiles?.clear();
     root.hidden = !visible();
     document.body.classList.toggle("road-mode", on);
     keys = { left: false, right: false };
     if (on) {
       elapsed = 0;
-      lastFire = -1;
       ((spawnIndex = 0), (animationFrame = 0), (lastFrame = 0));
       nextSpawn = 3;
       cooldown = 3;
-      bullets.forEach((b) => b.node.remove());
       treats.forEach((b) => b.node.remove());
-      bullets = [];
       treats = [];
       cast.forEach((k) => (root.querySelector(".road-" + k).hidden = true));
       activeEnemy = null;
@@ -92,6 +88,11 @@
     const key = cast[spawnIndex++ % cast.length];
     activeEnemy = key;
     const b = root.querySelector(".road-" + key);
+    const visible = cast.filter(
+      (k) => k !== key && !root.querySelector(".road-" + k).hidden,
+    );
+    if (visible.length >= 2)
+      root.querySelector(".road-" + visible[0]).hidden = true;
     b.hidden = false;
     b.classList.add("road-arrival");
     setTimeout(() => b.classList.remove("road-arrival"), 900);
@@ -113,19 +114,10 @@
     return true;
   }
   function fire() {
-    if (!visible() || !hooks.active() || elapsed - lastFire < 0.22) return;
-    lastFire = elapsed;
-    const node = document.createElement("span");
-    node.className = "road-shot";
-    node.textContent = window.badCatSeason.active()
-      ? window.badCatSeason.powerIcon(
-          window.badCatTargeting.diagnostics().armed,
-          "❄️",
-        )
-      : "✦";
-    root.querySelector(".road-playfield").append(node);
-    bullets.push({ x, y: y - 6, node });
-    hooks.sound("laser");
+    if (!visible() || !hooks.active()) return false;
+    if (!window.badCatTargeting.diagnostics().armed)
+      window.badCatArsenal.arm(1);
+    return window.badCatTargeting.fireForward();
   }
   function move(value) {
     x = Math.max(24, Math.min(76, value));
@@ -142,8 +134,6 @@
     wasBusy = busy;
     if (busy) {
       keys = { left: false, right: false, fire: false };
-      bullets.forEach((b) => b.node.remove());
-      bullets = [];
     }
     if (!visible() || !hooks.active()) {
       root.hidden = !visible();
@@ -177,48 +167,6 @@
       treats.push({ x: 26 + Math.random() * 48, y: 3, node });
       nextTreat = 8;
     }
-    for (const shot of bullets) {
-      shot.y -= dt * 62;
-      shot.node.style.left = shot.x + "%";
-      shot.node.style.top = shot.y + "%";
-      const bounds = root.getBoundingClientRect();
-      const point = {
-        x: bounds.x + (shot.x / 100) * bounds.width,
-        y: bounds.y + (shot.y / 100) * bounds.height,
-      };
-      if (
-        window.badCatCombat?.findHit(point.x, point.y) ||
-        window.badCatEncounters?.findHit(point.x, point.y)
-      ) {
-        if (!window.badCatTargeting.diagnostics().armed)
-          window.badCatArsenal.arm(1);
-        window.badCatTargeting.shootAt(point.x, point.y);
-        shot.y = -10;
-        continue;
-      }
-      for (const key of cast) {
-        const b = root.querySelector(".road-" + key);
-        if (b.hidden) continue;
-        const bounds = b.getBoundingClientRect();
-        if (
-          point.x >= bounds.left &&
-          point.x <= bounds.right &&
-          point.y >= bounds.top &&
-          point.y <= bounds.bottom
-        ) {
-          hooks.hit(key, b);
-          shot.y = -10;
-          break;
-        }
-      }
-    }
-    bullets = bullets.filter((b) => {
-      if (b.y < 0) {
-        b.node.remove();
-        return false;
-      }
-      return true;
-    });
     for (const t of treats) {
       t.y += dt * 21;
       t.node.style.left = t.x + "%";
@@ -337,7 +285,7 @@
       y,
       elapsed,
       activeEnemy,
-      shots: bullets.length,
+      shots: window.badCatProjectiles?.diagnostics().length || 0,
       treats: treats.length,
       cooldown,
     }),

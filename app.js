@@ -1143,7 +1143,7 @@
     $("#invention-name").value = "";
     sound("shield");
     toast(
-      `${name} saved! Equip it in your arsenal, then tap anywhere to shoot.`,
+      `${name} saved! Equip it in your arsenal, then press its paw pad to fire ahead.`,
     );
   });
   window.badCatInventions.init({
@@ -1152,7 +1152,8 @@
     deploy: (inv) => {
       setView("drive");
       window.badCatTargeting.arm(inv.power, inv);
-      story(`${inv.name} ready — tap anywhere to shoot.`);
+      window.badCatTargeting.fireForward();
+      story(`${inv.name} ready — line up and press its paw pad to fire ahead.`);
     },
   });
   let tickles = 0;
@@ -1190,7 +1191,7 @@
     const index = Number(event.key) - 1;
     if (index >= 0 && index < 5) {
       event.preventDefault();
-      window.badCatArsenal.arm(index);
+      window.badCatArsenal.fire(index);
     }
   });
   window.addEventListener("online", updateConnection);
@@ -1264,13 +1265,22 @@
       sound(kind);
       shotVisual(kind, invention, point);
     },
-    apply: (kind, target, invention) => {
-      const retreat = state.retreatUntil,
-        ally = state.allyUntil;
+    launch: (kind) => {
       if (!window.badCatCampaign.use(kind)) return false;
       progress.gadgets++;
       save();
       sound(kind);
+      return true;
+    },
+    apply: (kind, target, invention, { paid = false } = {}) => {
+      const retreat = state.retreatUntil,
+        ally = state.allyUntil;
+      if (!paid) {
+        if (!window.badCatCampaign.use(kind)) return false;
+        progress.gadgets++;
+        save();
+        sound(kind);
+      }
       window.badCatAdventure.onGadget(kind);
       if (kind === "shield") {
         state.shieldUntil =
@@ -1284,7 +1294,7 @@
         window.badCatAdventure.onGadget("sonar");
       const node = window.badCatTargeting.targetNode(target);
       const rect = node?.getBoundingClientRect();
-      if (rect)
+      if (rect && !paid)
         shotVisual(kind, invention, {
           x: rect.x + rect.width / 2,
           y: rect.y + rect.height / 2,

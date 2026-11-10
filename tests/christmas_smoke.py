@@ -18,7 +18,7 @@ with sync_playwright() as p:
  after=q.evaluate('Object.fromEntries(["bad-cat-progress-v1","bad-cat-puppy-house-v1","bad-cat-campaign-v1","bad-cat-arsenal-v1"].map(k=>[k,localStorage.getItem(k)]))');assert before==after
  q.locator('#parent-close').click();q.locator('[data-view=drive]').click();q.wait_for_timeout(150)
  assert 'christmas/road-odyssey' in q.locator('#road-player img').get_attribute('src');assert 'Candy' in q.locator('[data-slot="1"]').inner_text()
- q.evaluate('badCatRoad.tick(10);badCatRoad.tick(10);badCatRoad.tick(10)');q.wait_for_timeout(150)
+ q.evaluate('badCatRoad.tick(10);badCatRoad.tick(10)');q.wait_for_timeout(150)
  assert 'christmas/metro-bus' in q.locator('.road-metro img').get_attribute('src') and 'christmas/bad-cat-balloon' in q.locator('.road-badcat img').get_attribute('src')
  print('PASS Real parent switch enables winter characters, vehicles, scenery and launchers without changing saved progress',flush=True)
  tap_tool(q,'[data-puppy-house]');assert 'Gingerbread' in q.locator('#house-title').inner_text();assert q.evaluate('badCatHouse.diagnostics().owned')==['home-0-0'];assert q.evaluate('badCatHouse.diagnostics().visitors')==['golden']
@@ -32,7 +32,7 @@ with sync_playwright() as p:
  tap_tool(q,'#forest-launch');assert 'North Pole' in q.locator('#forest-title').inner_text();assert 'Christmas trees' in q.locator('#forest-context').inner_text();assert '🎁' in q.locator('#forest-lanterns').inner_text();q.screenshot(path='/tmp/christmas-forest.png');close(q)
  tap_tool(q,'#carwash-launch');q.wait_for_timeout(100);assert 'christmas/carwash-squid' in q.locator('.windscreen-squid').get_attribute('src');q.screenshot(path='/tmp/christmas-carwash.png');close(q)
  q.locator('[data-view=hq]').click();assert 'Candy' in q.locator('#invention-launcher-choices').inner_text() and 'Stockings' in q.locator('#invention-item-choices').inner_text()
- q.locator('#inventions .use-invention').first.click();q.mouse.click(180,380);assert q.locator('.recipe-launch[data-item=acorns] .recipe-projectile').first.inner_text()=='🎁';q.locator('[data-view=hq]').click()
+ q.locator('#inventions .use-invention').first.click();assert q.locator('.hero-shot[data-item=acorns]').first.inner_text()=='🎁';q.locator('[data-view=hq]').click()
  print('PASS Homes, furniture, friends, Pipes, handwriting, spelling, forest, squid wash and actual launched inventory items have festive content',flush=True)
  parents(q);q.locator('#christmas-mode').uncheck();q.locator('#parent-close').click();q.locator('[data-view=drive]').click();q.wait_for_timeout(100);assert q.locator('#road-player img').get_attribute('src')=='assets/road-odyssey.png';assert 'Confetti' in q.locator('[data-slot="1"]').inner_text();assert q.evaluate('badCatHouse.diagnostics().homes[0]')=='Dog house';assert 'Yarn' in q.locator('#invention-item-choices').inner_text()
  q.locator('[data-view=hq]').click();parents(q);q.locator('#christmas-mode').check();q.locator('#parent-close').click();q.evaluate('navigator.serviceWorker.ready');q.wait_for_function('navigator.serviceWorker.controller');c.set_offline(True);q.reload(wait_until='domcontentloaded');q.locator('#launch-silent').click();q.wait_for_function('document.querySelector("#road-player img").naturalWidth>0');assert q.evaluate('badCatSeason.active()');assert 'christmas/' in q.locator('#road-player img').get_attribute('src')

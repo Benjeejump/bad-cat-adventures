@@ -29,7 +29,7 @@
     const bar = $("#target-bar");
     bar.hidden = !armed && !selected;
     $("#target-instruction").textContent = armed
-      ? `${armedInvention?.name || names[armed]} ready — tap ${raid ? "a kitten" : "anywhere to fire"}!`
+      ? `${armedInvention?.name || names[armed]} ready — ${raid ? "tap a kitten" : "press a paw pad to fire ahead"}!`
       : `${targetNames[selected] || "A character"} selected — choose a gadget.`;
     document.querySelectorAll("[data-gadget]").forEach((b) => {
       b.classList.toggle(
@@ -47,7 +47,7 @@
     if (!names[power]) return;
     window.badCatLoot?.cancel();
     armed = power;
-    if (selected) {
+    if (raid && selected) {
       target(
         selected,
         window.badCatTargeting.targetNode(selected) ||
@@ -80,15 +80,20 @@
       visual.classList.remove("target-impact");
     }, 1000);
   }
-  function target(character, node) {
-    window.badCatCharacters.talk(character);
+  function target(character, node, projectile = false) {
+    if (!projectile) {
+      window.badCatCharacters.talk(character);
+      return;
+    }
     if (!armed) {
       selected = character;
       update();
       return;
     }
     const power = armed;
-    const strike = hooks.apply(power, character, armedInvention);
+    const strike = hooks.apply(power, character, armedInvention, {
+      paid: projectile,
+    });
     if (strike === false) return;
     impact(node, power);
     const line = {
@@ -104,46 +109,30 @@
     selected = null;
     update();
   }
-  function shootAt(x, y) {
+  // Touching the scenery never chooses a target: movement lines up the shot.
+  function shootAt() {
+    return false;
+  }
+  function forwardHit(character, node, power, invention) {
+    const previousPower = armed,
+      previousInvention = armedInvention;
+    armed = power;
+    armedInvention = invention;
+    target(character, node, true);
+    armed = previousPower;
+    armedInvention = previousInvention;
+    update();
+  }
+  function fireForward() {
     if (
       !armed ||
       raid ||
-      hooks.view() !== "drive" ||
-      window.badCatAdventure.isOpen()
+      !window.badCatPlay?.active() ||
+      !window.badCatProjectiles?.ready()
     )
-      return;
-    if (window.badCatCombat?.findHit(x, y)) {
-      if (hooks.miss(armed, armedInvention, { x, y }) !== false)
-        window.badCatCombat.hitAt(x, y);
-      return;
-    }
-    if (window.badCatEncounters?.findHit(x, y)) {
-      if (hooks.miss(armed, armedInvention, { x, y }) !== false)
-        window.badCatEncounters.hitAt(x, y);
-      return;
-    }
-    const nearby = Object.keys(targetNames)
-      .map((key) => {
-        const node = window.badCatTargeting.targetNode(key);
-        const r = node?.getBoundingClientRect();
-        return {
-          key,
-          node,
-          distance: r
-            ? Math.hypot(x - r.x - r.width / 2, y - r.y - r.height / 2)
-            : Infinity,
-          radius: r ? Math.max(r.width, r.height) / 2 + 14 : 0,
-        };
-      })
-      .filter((t) => t.distance <= t.radius)
-      .sort((a, b) => a.distance - b.distance)[0];
-    if (nearby) {
-      target(nearby.key, nearby.node);
-      return;
-    }
-    if (hooks.miss(armed, armedInvention, { x, y }) === false) return;
-    selected = null;
-    update();
+      return false;
+    if (hooks.launch(armed, armedInvention) === false) return false;
+    return window.badCatProjectiles.launch(armed, armedInvention);
   }
   function startRaid() {
     if (raid) return;
@@ -296,30 +285,6 @@
     bar.innerHTML =
       '<span id="target-instruction" role="status"></span><button id="cancel-target" aria-label="Cancel aiming">×</button>';
     document.body.append(bar);
-    let down;
-    const stage = $("#map-stage");
-    stage.addEventListener("pointerdown", (e) => {
-      down = { x: e.clientX, y: e.clientY, id: e.pointerId, moved: false };
-    });
-    stage.addEventListener("pointermove", (e) => {
-      if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 10)
-        down.moved = true;
-    });
-    stage.addEventListener("pointercancel", () => {
-      down = null;
-    });
-    stage.addEventListener("pointerup", (e) => {
-      const start = down;
-      down = null;
-      if (
-        !start ||
-        start.moved ||
-        start.id !== e.pointerId ||
-        e.target.closest("button,a,input,select,.leaflet-control,[role=button]")
-      )
-        return;
-      shootAt(e.clientX, e.clientY);
-    });
     $("#cancel-target").addEventListener("click", () => {
       armed = null;
       armedInvention = null;
@@ -368,6 +333,8 @@
       update();
     },
     shootAt,
+    fireForward,
+    forwardHit,
     startRaid,
     tick,
     raidActive: () => !!raid,

@@ -1,20 +1,18 @@
 """Exercise hidden parent gestures and free aiming in a real browser."""
 from playwright.sync_api import sync_playwright
+from ui_helpers import fire_road_target
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
  c=b.new_context(viewport={'width':1280,'height':800},reduced_motion='reduce')
  page=c.new_page(); errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
  page.goto('http://127.0.0.1:8000/',wait_until='domcontentloaded')
  page.locator('#launch-silent').click();page.wait_for_timeout(600)
- page.locator('[data-gadget="laser"]').click()
- before=page.evaluate('badCatCharacters.diagnostics()')
- page.mouse.click(200,500)
- assert page.locator('.free-shot').count()==1
+ page.evaluate('badCatRoad.tick(10);badCatRoad.tick(10)')
+ before=page.evaluate('badCatCharacters.diagnostics()');page.mouse.click(200,500)
  assert page.evaluate('badCatCharacters.diagnostics()')==before
- assert page.evaluate('badCatTargeting.diagnostics().armed')=='laser'
- page.evaluate('badCatTargeting.target("metro",badCatTargeting.targetNode("metro"))')
+ fire_road_target(page,'metro')
  assert page.evaluate('badCatCharacters.diagnostics().metro.shield')==2
- print('PASS Free shot can miss; a cat hit damages its forcefield; launcher stays armed')
+ print('PASS Scenery taps do not shoot; a physically lined-up paw shot damages a cat forcefield')
  page.evaluate('badCatAdventure.encounter("spelling")')
  treats=page.evaluate('badCatCampaign.snapshot().supplies')
  badge=page.locator('#spelling-dialog > .parent-logo');badge.wait_for()

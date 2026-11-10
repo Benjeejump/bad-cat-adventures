@@ -9,7 +9,9 @@
     protectedFor = 0,
     nextHazard = 14,
     announcement = "",
-    speechSerial = 0;
+    speechSerial = 0,
+    enemyTime = 0,
+    enemyIndex = 0;
   const planeFollowups = [
     "We hope you are safely buckled in your seats. This could be a bumpy ride.",
     "Captain Biscuit has checked the wings. Please keep all paws inside the aircraft.",
@@ -107,6 +109,13 @@
         ? "Doggy Plane flying through the clouds"
         : "Odyssey submarine beneath the sea";
   }
+  function showPair() {
+    const cast = ["badcat", "metro", "captain"];
+    cast.forEach((key, i) => {
+      document.querySelector(".world-" + key).hidden =
+        i === (enemyIndex + 2) % 3;
+    });
+  }
   function change(type, announce = true) {
     if (type === mode) {
       render();
@@ -115,6 +124,10 @@
     speechSerial++;
     window.speechSynthesis?.cancel();
     mode = type;
+    enemyTime = 0;
+    enemyIndex = 0;
+    showPair();
+    window.badCatProjectiles?.clear();
     hazard = null;
     stability = 100;
     hazardTime = 0;
@@ -209,6 +222,12 @@
   }
   function tick(dt) {
     if (["car", "walking"].includes(mode) || !hooks.active()) return;
+    enemyTime += dt;
+    if (enemyTime >= 14) {
+      enemyTime = 0;
+      enemyIndex++;
+      showPair();
+    }
     protectedFor = Math.max(0, protectedFor - dt);
     nextHazard -= dt;
     if (!hazard && nextHazard <= 0) {
@@ -273,6 +292,7 @@
             root.querySelector(`.world-${key}`),
           ),
         );
+    showPair();
     render();
   }
   window.badCatVehicle = {
@@ -280,6 +300,11 @@
     change,
     tick,
     reactToHit,
+    dismiss: (key) => {
+      const node = document.querySelector(".world-" + key);
+      if (node) node.hidden = true;
+      enemyTime = 8;
+    },
     worldActive: () => !["car", "walking"].includes(mode),
     mode: () => mode,
     diagnostics: () => ({

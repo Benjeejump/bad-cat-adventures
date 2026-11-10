@@ -1,0 +1,306 @@
+/* Original water workshop: a timber cabinet, riveted silver pipes and a visible tank. */
+html body #pipeworks-dialog {
+  background:
+    linear-gradient(#102d3acc, #172f35dd),
+    url("assets/underfloor-world.png") center / cover;
+  color: #fff1c7;
+}
+html body #pipeworks-dialog .pipe-header {
+  background: repeating-linear-gradient(
+    3deg,
+    #6d391c 0 12px,
+    #794522 13px 16px,
+    #633519 17px 31px
+  );
+  border-bottom: 5px solid #d6a54e;
+  box-shadow:
+    0 3px 0 #302315,
+    inset 0 2px #ffdf8b;
+}
+html body #pipeworks-dialog .pipe-header h2 {
+  color: #ffe6a2;
+  font-weight: 950;
+  text-shadow: 0 3px #352713;
+  letter-spacing: 0.5px;
+}
+html body #pipeworks-dialog .pipe-header :is(p, small) {
+  color: #fff3cb;
+}
+html body #pipeworks-dialog .pipe-content {
+  padding: 8px 16px 12px;
+  gap: 7px;
+}
+html body #pipeworks-dialog #pipe-status {
+  color: #fff3ce;
+  background: #122b35;
+  padding: 5px 9px;
+  border-radius: 8px;
+}
+html body #pipeworks-dialog #pipe-route-label {
+  color: #ffe6a0;
+}
+.pipe-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  gap: 12px;
+  flex: 1;
+  min-height: 300px;
+}
+html body #pipeworks-dialog #pipe-board {
+  padding: 8px;
+  gap: 1px;
+  min-height: 0;
+  height: 100%;
+  border: 10px solid #a96829;
+  border-radius: 7px;
+  box-shadow:
+    inset 0 0 0 3px #241b13,
+    0 0 0 3px #402914,
+    0 5px 0 #161d21;
+  background: #493321;
+}
+html body #pipeworks-dialog .pipe-tile {
+  background: radial-gradient(ellipse at 50% 10%, #233d46, #0b171e 80%);
+  border: 1px solid #4d3620;
+  border-radius: 0;
+  box-shadow: inset 0 0 8px #0009;
+}
+html body #pipeworks-dialog .pipe-tile:disabled {
+  background: radial-gradient(ellipse at 50% 10%, #233d46, #0b171e 80%);
+}
+html body #pipeworks-dialog .pipe-tile:focus-visible {
+  outline: 4px solid #fff1a8;
+  outline-offset: -5px;
+}
+html body #pipeworks-dialog .pipe-tile.pipe-wet {
+  background: radial-gradient(#29515b, #0c242d);
+}
+html body #pipeworks-dialog .pipe-shadow {
+  stroke: #030c14;
+  stroke-width: 44;
+}
+html body #pipeworks-dialog .pipe-metal {
+  stroke-width: 38;
+}
+html body #pipeworks-dialog .pipe-bore {
+  stroke: #223c50;
+  stroke-width: 21;
+}
+html body #pipeworks-dialog .pipe-water {
+  stroke-width: 17;
+  stroke-dasharray: none;
+}
+html body #pipeworks-dialog .pipe-flow-shine {
+  opacity: 0;
+  stroke: #ffffffb3;
+  stroke-width: 4;
+  stroke-dasharray: 4 15;
+}
+html body #pipeworks-dialog .pipe-wet .pipe-flow-shine {
+  opacity: 1;
+  animation: pipe-flow 0.9s linear infinite;
+}
+html body #pipeworks-dialog .pipe-start:after,
+html body #pipeworks-dialog .pipe-end:after {
+  z-index: 2;
+  padding: 3px 5px;
+  font-size: 11px;
+}
+html body #pipeworks-dialog .pipe-obstacle {
+  background: repeating-linear-gradient(
+    35deg,
+    #2f251e 0 10px,
+    #52432d 11px 20px
+  );
+}
+html body #pipeworks-dialog .pipe-empty-socket {
+  color: #98b8ba;
+  opacity: 0.75;
+  font-size: 26px;
+}
+.pipe-supply {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 9px;
+  border: 6px solid #a96829;
+  border-radius: 7px;
+  background: linear-gradient(#0a1720, #243a42);
+  box-shadow:
+    inset 0 0 0 2px #362513,
+    0 0 0 2px #432d17;
+}
+.pipe-supply h3 {
+  margin: 0;
+  color: #fff0b0;
+  font-size: 15px;
+  text-align: center;
+  text-shadow: 0 2px #000;
+}
+#pipe-supply-examples {
+  display: grid;
+  justify-items: center;
+}
+#pipe-supply-examples > div {
+  width: 78px;
+  height: 78px;
+}
+#pipe-supply-examples p {
+  color: #e8f5f4;
+  font-size: 12px;
+  text-align: center;
+  margin: 4px 0;
+}
+#pipeworks-dialog .pipe-receiver {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+  padding: 8px;
+  background: #153c4b;
+  border: 2px solid #5b97aa;
+  border-radius: 10px;
+  text-align: center;
+}
+.pipe-receiver span {
+  font-size: 35px;
+}
+.pipe-receiver b {
+  color: #fff1c2;
+  font-size: 10px;
+}
+.pipe-receiver progress {
+  width: 100%;
+  height: 24px;
+  accent-color: #6ee1ee;
+}
+html body #pipeworks-dialog #pipe-piece-tray {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+html body #pipeworks-dialog #pipe-piece-tray[hidden] {
+  display: none;
+}
+html body #pipeworks-dialog #pipe-piece-tray > b {
+  display: none;
+}
+html body #pipeworks-dialog #pipe-piece-preview {
+  width: 70px;
+  height: 70px;
+  align-self: center;
+}
+html body #pipeworks-dialog #pipe-piece-tray button {
+  min-height: 44px;
+  width: 100%;
+  font-size: 12px;
+  padding: 7px 3px;
+}
+html.christmas-mode body #pipeworks-dialog {
+  background:
+    linear-gradient(#153b32ed, #163b33f0),
+    url("assets/christmas/north-pole.png") center / cover;
+}
+html.christmas-mode body #pipeworks-dialog .pipe-header {
+  background: #8e293d;
+  border-color: #fff0be;
+}
+html.christmas-mode body #pipeworks-dialog #pipe-board {
+  border-color: #eee2bd;
+  background: #b6364d;
+  box-shadow:
+    0 0 0 4px #b6364d,
+    inset 0 0 0 3px #16392f;
+}
+html.christmas-mode body #pipeworks-dialog .pipe-bore {
+  stroke: #7d273b;
+}
+html.christmas-mode body #pipeworks-dialog .pipe-supply {
+  border-color: #efe3c7;
+  background: #163d35;
+}
+@media (max-width: 650px) {
+  html body #pipeworks-dialog .pipe-content {
+    padding: 6px 8px 10px;
+  }
+  .pipe-workbench {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(340px, 1fr) auto;
+    min-height: 440px;
+    gap: 8px;
+  }
+  .pipe-supply {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 5px;
+    border-width: 4px;
+  }
+  .pipe-supply h3 {
+    font-size: 10px;
+    width: 70px;
+  }
+  #pipe-supply-examples {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex: 1;
+  }
+  #pipe-supply-examples > div {
+    width: 38px;
+    height: 38px;
+  }
+  #pipe-supply-examples p {
+    flex: 1;
+    font-size: 11px;
+  }
+  #pipeworks-dialog .pipe-receiver {
+    display: none;
+  }
+  html body #pipeworks-dialog #pipe-piece-tray {
+    flex: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  html body #pipeworks-dialog #pipe-piece-tray button {
+    width: auto;
+    flex: 1;
+    font-size: 10px;
+  }
+  html body #pipeworks-dialog #pipe-piece-preview {
+    width: 38px;
+    height: 38px;
+  }
+  html body #pipeworks-dialog #pipe-board {
+    border-width: 7px;
+    padding: 3px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body #pipeworks-dialog .pipe-wet .pipe-flow-shine {
+    animation: none;
+  }
+}
+#pipe-supply-examples[hidden] {
+  display: none;
+}
+.pipe-workbench {
+  grid-template-rows: minmax(0, 1fr);
+}
+.pipe-supply {
+  min-height: 0;
+  overflow: auto;
+}
+html body #pipeworks-dialog #pipe-board {
+  grid-row: auto;
+  grid-column: auto;
+  overflow: hidden;
+}
+@media (max-width: 650px) {
+  .pipe-workbench {
+    grid-template-rows: minmax(340px, 1fr) auto;
+  }
+}

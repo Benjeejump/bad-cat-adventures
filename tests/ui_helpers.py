@@ -24,3 +24,13 @@ def equip_puppies(page):
     page.locator('#arsenal-choices button').filter(has_text='Puppy squad').click()
     page.locator('#close-loadout').click()
     page.locator('[data-slot="3"]').click()
+
+def line_up_road(page, selector, edge=0):
+    page.evaluate('''({selector,edge})=>{const t=document.querySelector(selector).getBoundingClientRect(),p=document.querySelector('#road-player').getBoundingClientRect(),w=document.querySelector('#road-world').getBoundingClientRect();badCatRoad.steer((t.x+t.width/2+edge-p.x-p.width/2)/w.width*100,0);}''',{'selector':selector,'edge':edge})
+
+def fire_road_target(page, key, slot=1):
+    page.wait_for_timeout(260)
+    line_up_road(page,'.road-'+key)
+    before=page.evaluate('(key)=>badCatCharacters.diagnostics()[key].shield',key)
+    page.locator(f'[data-slot="{slot}"]').click()
+    page.wait_for_function('(v)=>badCatCharacters.diagnostics()[v.key].shield!==v.before || !!document.querySelector("dialog[open]")',arg={'key':key,'before':before},timeout=3000)

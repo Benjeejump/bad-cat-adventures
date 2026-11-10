@@ -2299,3 +2299,114 @@ body:not(.map-mode) #npc-speech {
     top: 63%;
   }
 }
+
+/* Every launcher travels ahead from the vehicle, with no scenery-tap aiming. */
+#hero-projectiles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 695;
+  overflow: hidden;
+}
+#hero-projectiles[hidden],
+.road-enemy[hidden],
+.world-enemy[hidden] {
+  display: none !important;
+}
+.hero-shot {
+  position: absolute;
+  translate: -50% -50%;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+  color: #fff7b0;
+  text-shadow:
+    0 0 5px #184c70,
+    0 2px 2px #112d45;
+  filter: drop-shadow(0 0 5px #7deafa);
+}
+.hero-shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.shot-intercept {
+  position: absolute;
+  translate: -50% -50%;
+  color: #fff4a3;
+  font: bold 48px sans-serif;
+  text-shadow: 0 0 12px #2e8bb8;
+  animation: intercept-pop 0.45s ease-out forwards;
+}
+@keyframes intercept-pop {
+  to {
+    scale: 1.8;
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shot-intercept {
+    animation: none;
+  }
+}
+.vacuum-prop {
+  position: absolute;
+  left: 32%;
+  top: 6%;
+  width: 42%;
+  height: 80%;
+  z-index: 3;
+}
+.vacuum-prop .vacuum-machine {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 10px #10233a66);
+}
+.vacuum-suction {
+  position: absolute;
+  left: -20%;
+  top: 15%;
+  width: 40%;
+  color: #d0fbff;
+  font-size: 30px;
+  letter-spacing: 5px;
+  animation: vacuum-particles 1.2s linear infinite;
+}
+.story-world.vacuum .scene-character {
+  z-index: 4;
+}
+.landing-vacuum {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.christmas-mode .vacuum-prop:after {
+  content: "🎄 🎁";
+  position: absolute;
+  right: 10%;
+  bottom: 20%;
+  font-size: 35px;
+}
+@keyframes vacuum-particles {
+  from {
+    translate: -60px -15px;
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  to {
+    translate: 65px 15px;
+    scale: 0.3;
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vacuum-suction,
+  .vacuum-prop .vacuum-machine {
+    animation: none;
+  }
+}

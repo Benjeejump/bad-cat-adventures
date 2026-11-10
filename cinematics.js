@@ -47,9 +47,8 @@
       trampoline: svg(
         '<path d="M90 120 70 175m340-55 20 55" stroke="#7d8c9a" stroke-width="14"/><ellipse cx="250" cy="100" rx="200" ry="45" fill="#599aaa" stroke="#c8e3c7" stroke-width="14"/>',
       ),
-      vacuum: svg(
-        '<rect x="160" y="90" width="180" height="80" rx="20" fill="#c98d78" stroke="#604e55" stroke-width="6"/><ellipse cx="250" cy="80" rx="110" ry="38" fill="#5d7b88" stroke="#d2e4d4" stroke-width="10"/><path d="m200 80 100 0m-50-25v50" stroke="#d4dddd" stroke-width="12"/>',
-      ),
+      vacuum:
+        '<img class="landing-vacuum" src="assets/mega-vacuum.png" alt="Metro’s cartoon mega vacuum">',
       blanket: svg(
         '<path d="M20 50 120 100 250 125 380 100 480 50 450 145H50Z" fill="#c595b6" stroke="#745f7e" stroke-width="5"/><path d="M120 100v45m130-20v20m130-45v45m-330-15h400" stroke="#f0d2ba" stroke-width="7"/>',
       ),

@@ -57,7 +57,7 @@
     ["#spelling-launch span", "Jingle bees"],
     ["#kitten-launch span", "Elf kitten attack"],
     ["#edit-arsenal", "🎁 My five Christmas launchers"],
-    ["#net-launch b", "Net · catch Santa’s letters"],
+    ["#net-launch b", "Net · catch presents"],
     ["#furniture-store-launch", "🎁 Christmas furniture store"],
   ];
   const textOriginal = new Map();
